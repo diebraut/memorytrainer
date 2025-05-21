@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>delete-image.png</file>
+        <file>photo-640.png</file>
+        <file>photo-save_640.png</file>
+    </qresource>
+</RCC>

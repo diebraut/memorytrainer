@@ -1,0 +1,1957 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Daten>
+    <Übungen name="Hauptstädte aller Länder" sequentiell="true">
+        <MainÜbungsliste>
+            <FrageText>in welchem Zeitraum war der Papst [FrageSubjekt] im Amt</FrageText>
+            <Übung nummer="1">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Peter</FrageSubjekt>
+                <Antwort>30-64/68</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="2">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Linus</FrageSubjekt>
+                <Antwort>64/68-76/79</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="3">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Anacletus (Cletus)</FrageSubjekt>
+                <Antwort>76/79-88</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="4">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Clement I</FrageSubjekt>
+                <Antwort>88-97</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="5">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Evaristus</FrageSubjekt>
+                <Antwort>97-105</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="6">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Alexander I</FrageSubjekt>
+                <Antwort>105-115</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="7">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Sixtus I</FrageSubjekt>
+                <Antwort>115-125</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="8">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Telesphorus</FrageSubjekt>
+                <Antwort>125-136</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="9">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Hyginus</FrageSubjekt>
+                <Antwort>136-140</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="10">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Pius I</FrageSubjekt>
+                <Antwort>140-155</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="11">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Anicetus</FrageSubjekt>
+                <Antwort>155-166</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="12">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Soter</FrageSubjekt>
+                <Antwort>166-175</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="13">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Eleutherius</FrageSubjekt>
+                <Antwort>175-189</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="14">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Victor I</FrageSubjekt>
+                <Antwort>189-199</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="15">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Zephyrinus</FrageSubjekt>
+                <Antwort>199-217</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="16">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Callixtus I</FrageSubjekt>
+                <Antwort>217-222</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="17">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Urban I</FrageSubjekt>
+                <Antwort>222-230</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="18">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Pontian</FrageSubjekt>
+                <Antwort>230-235</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="19">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Anterus</FrageSubjekt>
+                <Antwort>235-236</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="20">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Fabian</FrageSubjekt>
+                <Antwort>236-250</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="21">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Cornelius</FrageSubjekt>
+                <Antwort>251-253</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="22">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Lucius I</FrageSubjekt>
+                <Antwort>253-254</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="23">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Stephen I</FrageSubjekt>
+                <Antwort>254-257</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="24">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Sixtus II</FrageSubjekt>
+                <Antwort>257-258</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="25">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Dionysius</FrageSubjekt>
+                <Antwort>259-268</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="26">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Felix I</FrageSubjekt>
+                <Antwort>269-274</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="27">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Eutychian</FrageSubjekt>
+                <Antwort>275-283</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="28">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Caius (Gaius)</FrageSubjekt>
+                <Antwort>283-296</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="29">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Marcellinus</FrageSubjekt>
+                <Antwort>296-304</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="30">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Marcellus I</FrageSubjekt>
+                <Antwort>308-309</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="31">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Eusebius</FrageSubjekt>
+                <Antwort>309 or 310</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="32">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Miltiades (Melchiades)</FrageSubjekt>
+                <Antwort>311-314</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="33">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Sylvester I</FrageSubjekt>
+                <Antwort>314-335</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="34">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Marcus</FrageSubjekt>
+                <Antwort>336</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="35">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Julius I</FrageSubjekt>
+                <Antwort>337-352</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="36">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Liberius</FrageSubjekt>
+                <Antwort>352-366</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="37">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Damasus I</FrageSubjekt>
+                <Antwort>366-384</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="38">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Siricius</FrageSubjekt>
+                <Antwort>384-399</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="39">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Anastasius I</FrageSubjekt>
+                <Antwort>399-401</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="40">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Innocent I</FrageSubjekt>
+                <Antwort>401-417</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="41">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Zosimus</FrageSubjekt>
+                <Antwort>417-418</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="42">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Boniface I</FrageSubjekt>
+                <Antwort>418-422</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="43">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Celestine I</FrageSubjekt>
+                <Antwort>422-432</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="44">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Sixtus III</FrageSubjekt>
+                <Antwort>432-440</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="45">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Leo I (the Great)</FrageSubjekt>
+                <Antwort>440-461</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="46">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Hilarius</FrageSubjekt>
+                <Antwort>461-468</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="47">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Simplicius</FrageSubjekt>
+                <Antwort>468-483</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="48">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Felix III (II)</FrageSubjekt>
+                <Antwort>483-492</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="49">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Gelasius I</FrageSubjekt>
+                <Antwort>492-496</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="50">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Anastasius II</FrageSubjekt>
+                <Antwort>496-498</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="51">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Symmachus</FrageSubjekt>
+                <Antwort>498-514</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="52">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Hormisdas</FrageSubjekt>
+                <Antwort>514-523</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="53">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. John I</FrageSubjekt>
+                <Antwort>523-526</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="54">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Felix IV (III)</FrageSubjekt>
+                <Antwort>526-530</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="55">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Boniface II</FrageSubjekt>
+                <Antwort>530-532</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="56">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John II</FrageSubjekt>
+                <Antwort>533-535</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="57">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Agapetus I</FrageSubjekt>
+                <Antwort>535-536</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="58">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Silverius</FrageSubjekt>
+                <Antwort>536-537</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="59">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Vigilius</FrageSubjekt>
+                <Antwort>537-555</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="60">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Pelagius I</FrageSubjekt>
+                <Antwort>556-561</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="61">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John III</FrageSubjekt>
+                <Antwort>561-574</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="62">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict I</FrageSubjekt>
+                <Antwort>575-579</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="63">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Pelagius II</FrageSubjekt>
+                <Antwort>579-590</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="64">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Gregory I (the Great)</FrageSubjekt>
+                <Antwort>590-604</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="65">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Sabinian</FrageSubjekt>
+                <Antwort>604-606</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="66">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Boniface III</FrageSubjekt>
+                <Antwort>607</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="67">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Boniface IV</FrageSubjekt>
+                <Antwort>608-615</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="68">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Deusdedit (Adeodatus I)</FrageSubjekt>
+                <Antwort>615-618</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="69">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Boniface V</FrageSubjekt>
+                <Antwort>619-625</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="70">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Honorius I</FrageSubjekt>
+                <Antwort>625-638</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="71">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Severinus</FrageSubjekt>
+                <Antwort>640</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="72">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John IV</FrageSubjekt>
+                <Antwort>640-642</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="73">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Theodore I</FrageSubjekt>
+                <Antwort>642-649</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="74">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Martin I</FrageSubjekt>
+                <Antwort>649-655</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="75">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Eugene I</FrageSubjekt>
+                <Antwort>654-657</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="76">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Vitalian</FrageSubjekt>
+                <Antwort>657-672</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="77">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Adeodatus II</FrageSubjekt>
+                <Antwort>672-676</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="78">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Donus</FrageSubjekt>
+                <Antwort>676-678</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="79">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Agatho</FrageSubjekt>
+                <Antwort>678-681</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="80">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Leo II</FrageSubjekt>
+                <Antwort>682-683</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="81">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Benedict II</FrageSubjekt>
+                <Antwort>684-685</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="82">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John V</FrageSubjekt>
+                <Antwort>685-686</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="83">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Conon</FrageSubjekt>
+                <Antwort>686-687</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="84">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Sergius I</FrageSubjekt>
+                <Antwort>687-701</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="85">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John VI</FrageSubjekt>
+                <Antwort>701-705</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="86">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John VII</FrageSubjekt>
+                <Antwort>705-707</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="87">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Sisinnius</FrageSubjekt>
+                <Antwort>708</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="88">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Constantine</FrageSubjekt>
+                <Antwort>708-715</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="89">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Gregory II</FrageSubjekt>
+                <Antwort>715-731</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="90">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Gregory III</FrageSubjekt>
+                <Antwort>731-741</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="91">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Zachary</FrageSubjekt>
+                <Antwort>741-752</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="92">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen II (Stephen III)</FrageSubjekt>
+                <Antwort>752-757</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="93">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Paul I</FrageSubjekt>
+                <Antwort>757-767</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="94">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen III (IV)</FrageSubjekt>
+                <Antwort>768-772</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="95">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Adrian I</FrageSubjekt>
+                <Antwort>772-795</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="96">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Leo III</FrageSubjekt>
+                <Antwort>795-816</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="97">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen IV (V)</FrageSubjekt>
+                <Antwort>816-817</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="98">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Paschal I</FrageSubjekt>
+                <Antwort>817-824</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="99">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Eugene II</FrageSubjekt>
+                <Antwort>824-827</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="100">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Valentine</FrageSubjekt>
+                <Antwort>827</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="101">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Gregory IV</FrageSubjekt>
+                <Antwort>827-844</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="102">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Sergius II</FrageSubjekt>
+                <Antwort>844-847</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="103">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Leo IV</FrageSubjekt>
+                <Antwort>847-855</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="104">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict III</FrageSubjekt>
+                <Antwort>855-858</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="105">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Nicholas I (the Great)</FrageSubjekt>
+                <Antwort>858-867</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="106">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Adrian II</FrageSubjekt>
+                <Antwort>867-872</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="107">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John VIII</FrageSubjekt>
+                <Antwort>872-882</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="108">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Marinus I</FrageSubjekt>
+                <Antwort>882-884</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="109">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>St. Adrian III</FrageSubjekt>
+                <Antwort>884-885</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="110">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen V (VI)</FrageSubjekt>
+                <Antwort>885-891</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="111">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Formosus</FrageSubjekt>
+                <Antwort>891-896</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="112">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Boniface VI</FrageSubjekt>
+                <Antwort>896</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="113">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen VI (VII)</FrageSubjekt>
+                <Antwort>896-897</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="114">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Romanus</FrageSubjekt>
+                <Antwort>897</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="115">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Theodore II</FrageSubjekt>
+                <Antwort>897</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="116">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John IX</FrageSubjekt>
+                <Antwort>898-900</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="117">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict IV</FrageSubjekt>
+                <Antwort>900-903</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="118">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Leo V</FrageSubjekt>
+                <Antwort>903</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="119">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Sergius III</FrageSubjekt>
+                <Antwort>904-911</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="120">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Anastasius III</FrageSubjekt>
+                <Antwort>911-913</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="121">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Lando</FrageSubjekt>
+                <Antwort>913-914</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="122">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John X</FrageSubjekt>
+                <Antwort>914-928</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="123">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Leo VI</FrageSubjekt>
+                <Antwort>928</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="124">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen VII (VIII)</FrageSubjekt>
+                <Antwort>928-931</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="125">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John XI</FrageSubjekt>
+                <Antwort>931-935</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="126">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Leo VII</FrageSubjekt>
+                <Antwort>936-939</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="127">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Stephen VIII (IX)</FrageSubjekt>
+                <Antwort>939-942</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="128">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Marinus II</FrageSubjekt>
+                <Antwort>942-946</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="129">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Agapetus II</FrageSubjekt>
+                <Antwort>946-955</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="130">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John XII</FrageSubjekt>
+                <Antwort>955-964</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="131">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Leo VIII</FrageSubjekt>
+                <Antwort>963-965</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="132">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict V</FrageSubjekt>
+                <Antwort>964-966</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="133">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John XIII</FrageSubjekt>
+                <Antwort>965-972</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="134">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict VI</FrageSubjekt>
+                <Antwort>973-974</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="135">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Benedict VII</FrageSubjekt>
+                <Antwort>974-983</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="136">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John XIV</FrageSubjekt>
+                <Antwort>983-984</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="137">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>John XV</FrageSubjekt>
+                <Antwort>985-996</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="138">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Gregory V</FrageSubjekt>
+                <Antwort>996-999</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="139">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>Sylvester II</FrageSubjekt>
+                <Antwort>999-1003</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+        </MainÜbungsliste>
+        <MainÜbungslisteUmgekehrt>
+            <FrageText>Im Zeitraum [FrageSubjekt] regierte welcher Papst</FrageText>
+            <Übung nummer="1">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>30-64/68</FrageSubjekt>
+                <Antwort>St. Peter</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="2">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>64/68-76/79</FrageSubjekt>
+                <Antwort>St. Linus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="3">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>76/79-88</FrageSubjekt>
+                <Antwort>St. Anacletus (Cletus)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="4">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>88-97</FrageSubjekt>
+                <Antwort>St. Clement I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="5">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>97-105</FrageSubjekt>
+                <Antwort>St. Evaristus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="6">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>105-115</FrageSubjekt>
+                <Antwort>St. Alexander I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="7">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>115-125</FrageSubjekt>
+                <Antwort>St. Sixtus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="8">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>125-136</FrageSubjekt>
+                <Antwort>St. Telesphorus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="9">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>136-140</FrageSubjekt>
+                <Antwort>St. Hyginus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="10">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>140-155</FrageSubjekt>
+                <Antwort>St. Pius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="11">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>155-166</FrageSubjekt>
+                <Antwort>St. Anicetus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="12">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>166-175</FrageSubjekt>
+                <Antwort>St. Soter</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="13">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>175-189</FrageSubjekt>
+                <Antwort>St. Eleutherius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="14">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>189-199</FrageSubjekt>
+                <Antwort>St. Victor I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="15">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>199-217</FrageSubjekt>
+                <Antwort>St. Zephyrinus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="16">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>217-222</FrageSubjekt>
+                <Antwort>St. Callixtus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="17">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>222-230</FrageSubjekt>
+                <Antwort>St. Urban I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="18">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>230-235</FrageSubjekt>
+                <Antwort>St. Pontian</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="19">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>235-236</FrageSubjekt>
+                <Antwort>St. Anterus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="20">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>236-250</FrageSubjekt>
+                <Antwort>St. Fabian</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="21">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>251-253</FrageSubjekt>
+                <Antwort>St. Cornelius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="22">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>253-254</FrageSubjekt>
+                <Antwort>St. Lucius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="23">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>254-257</FrageSubjekt>
+                <Antwort>St. Stephen I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="24">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>257-258</FrageSubjekt>
+                <Antwort>St. Sixtus II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="25">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>259-268</FrageSubjekt>
+                <Antwort>St. Dionysius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="26">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>269-274</FrageSubjekt>
+                <Antwort>St. Felix I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="27">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>275-283</FrageSubjekt>
+                <Antwort>St. Eutychian</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="28">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>283-296</FrageSubjekt>
+                <Antwort>St. Caius (Gaius)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="29">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>296-304</FrageSubjekt>
+                <Antwort>St. Marcellinus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="30">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>308-309</FrageSubjekt>
+                <Antwort>St. Marcellus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="31">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>309 or 310</FrageSubjekt>
+                <Antwort>St. Eusebius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="32">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>311-314</FrageSubjekt>
+                <Antwort>St. Miltiades (Melchiades)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="33">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>314-335</FrageSubjekt>
+                <Antwort>St. Sylvester I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="34">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>336</FrageSubjekt>
+                <Antwort>St. Marcus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="35">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>337-352</FrageSubjekt>
+                <Antwort>St. Julius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="36">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>352-366</FrageSubjekt>
+                <Antwort>Liberius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="37">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>366-384</FrageSubjekt>
+                <Antwort>St. Damasus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="38">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>384-399</FrageSubjekt>
+                <Antwort>St. Siricius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="39">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>399-401</FrageSubjekt>
+                <Antwort>St. Anastasius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="40">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>401-417</FrageSubjekt>
+                <Antwort>St. Innocent I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="41">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>417-418</FrageSubjekt>
+                <Antwort>St. Zosimus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="42">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>418-422</FrageSubjekt>
+                <Antwort>St. Boniface I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="43">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>422-432</FrageSubjekt>
+                <Antwort>St. Celestine I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="44">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>432-440</FrageSubjekt>
+                <Antwort>St. Sixtus III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="45">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>440-461</FrageSubjekt>
+                <Antwort>St. Leo I (the Great)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="46">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>461-468</FrageSubjekt>
+                <Antwort>St. Hilarius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="47">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>468-483</FrageSubjekt>
+                <Antwort>St. Simplicius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="48">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>483-492</FrageSubjekt>
+                <Antwort>St. Felix III (II)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="49">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>492-496</FrageSubjekt>
+                <Antwort>St. Gelasius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="50">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>496-498</FrageSubjekt>
+                <Antwort>Anastasius II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="51">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>498-514</FrageSubjekt>
+                <Antwort>St. Symmachus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="52">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>514-523</FrageSubjekt>
+                <Antwort>St. Hormisdas</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="53">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>523-526</FrageSubjekt>
+                <Antwort>St. John I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="54">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>526-530</FrageSubjekt>
+                <Antwort>St. Felix IV (III)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="55">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>530-532</FrageSubjekt>
+                <Antwort>Boniface II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="56">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>533-535</FrageSubjekt>
+                <Antwort>John II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="57">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>535-536</FrageSubjekt>
+                <Antwort>St. Agapetus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="58">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>536-537</FrageSubjekt>
+                <Antwort>St. Silverius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="59">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>537-555</FrageSubjekt>
+                <Antwort>Vigilius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="60">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>556-561</FrageSubjekt>
+                <Antwort>Pelagius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="61">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>561-574</FrageSubjekt>
+                <Antwort>John III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="62">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>575-579</FrageSubjekt>
+                <Antwort>Benedict I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="63">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>579-590</FrageSubjekt>
+                <Antwort>Pelagius II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="64">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>590-604</FrageSubjekt>
+                <Antwort>St. Gregory I (the Great)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="65">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>604-606</FrageSubjekt>
+                <Antwort>Sabinian</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="66">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>607</FrageSubjekt>
+                <Antwort>Boniface III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="67">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>608-615</FrageSubjekt>
+                <Antwort>St. Boniface IV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="68">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>615-618</FrageSubjekt>
+                <Antwort>Deusdedit (Adeodatus I)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="69">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>619-625</FrageSubjekt>
+                <Antwort>Boniface V</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="70">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>625-638</FrageSubjekt>
+                <Antwort>Honorius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="71">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>640</FrageSubjekt>
+                <Antwort>Severinus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="72">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>640-642</FrageSubjekt>
+                <Antwort>John IV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="73">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>642-649</FrageSubjekt>
+                <Antwort>Theodore I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="74">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>649-655</FrageSubjekt>
+                <Antwort>St. Martin I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="75">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>654-657</FrageSubjekt>
+                <Antwort>St. Eugene I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="76">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>657-672</FrageSubjekt>
+                <Antwort>St. Vitalian</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="77">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>672-676</FrageSubjekt>
+                <Antwort>Adeodatus II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="78">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>676-678</FrageSubjekt>
+                <Antwort>Donus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="79">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>678-681</FrageSubjekt>
+                <Antwort>St. Agatho</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="80">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>682-683</FrageSubjekt>
+                <Antwort>St. Leo II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="81">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>684-685</FrageSubjekt>
+                <Antwort>St. Benedict II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="82">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>685-686</FrageSubjekt>
+                <Antwort>John V</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="83">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>686-687</FrageSubjekt>
+                <Antwort>Conon</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="84">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>687-701</FrageSubjekt>
+                <Antwort>St. Sergius I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="85">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>701-705</FrageSubjekt>
+                <Antwort>John VI</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="86">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>705-707</FrageSubjekt>
+                <Antwort>John VII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="87">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>708</FrageSubjekt>
+                <Antwort>Sisinnius</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="88">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>708-715</FrageSubjekt>
+                <Antwort>Constantine</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="89">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>715-731</FrageSubjekt>
+                <Antwort>St. Gregory II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="90">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>731-741</FrageSubjekt>
+                <Antwort>St. Gregory III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="91">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>741-752</FrageSubjekt>
+                <Antwort>St. Zachary</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="92">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>752-757</FrageSubjekt>
+                <Antwort>Stephen II (Stephen III)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="93">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>757-767</FrageSubjekt>
+                <Antwort>St. Paul I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="94">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>768-772</FrageSubjekt>
+                <Antwort>Stephen III (IV)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="95">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>772-795</FrageSubjekt>
+                <Antwort>Adrian I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="96">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>795-816</FrageSubjekt>
+                <Antwort>St. Leo III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="97">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>816-817</FrageSubjekt>
+                <Antwort>Stephen IV (V)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="98">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>817-824</FrageSubjekt>
+                <Antwort>St. Paschal I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="99">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>824-827</FrageSubjekt>
+                <Antwort>Eugene II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="100">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>827</FrageSubjekt>
+                <Antwort>Valentine</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="101">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>827-844</FrageSubjekt>
+                <Antwort>Gregory IV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="102">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>844-847</FrageSubjekt>
+                <Antwort>Sergius II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="103">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>847-855</FrageSubjekt>
+                <Antwort>St. Leo IV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="104">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>855-858</FrageSubjekt>
+                <Antwort>Benedict III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="105">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>858-867</FrageSubjekt>
+                <Antwort>St. Nicholas I (the Great)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="106">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>867-872</FrageSubjekt>
+                <Antwort>Adrian II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="107">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>872-882</FrageSubjekt>
+                <Antwort>John VIII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="108">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>882-884</FrageSubjekt>
+                <Antwort>Marinus I</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="109">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>884-885</FrageSubjekt>
+                <Antwort>St. Adrian III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="110">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>885-891</FrageSubjekt>
+                <Antwort>Stephen V (VI)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="111">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>891-896</FrageSubjekt>
+                <Antwort>Formosus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="112">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>896</FrageSubjekt>
+                <Antwort>Boniface VI</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="113">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>896-897</FrageSubjekt>
+                <Antwort>Stephen VI (VII)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="114">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>897</FrageSubjekt>
+                <Antwort>Romanus</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="115">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>897</FrageSubjekt>
+                <Antwort>Theodore II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="116">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>898-900</FrageSubjekt>
+                <Antwort>John IX</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="117">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>900-903</FrageSubjekt>
+                <Antwort>Benedict IV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="118">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>903</FrageSubjekt>
+                <Antwort>Leo V</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="119">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>904-911</FrageSubjekt>
+                <Antwort>Sergius III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="120">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>911-913</FrageSubjekt>
+                <Antwort>Anastasius III</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="121">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>913-914</FrageSubjekt>
+                <Antwort>Lando</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="122">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>914-928</FrageSubjekt>
+                <Antwort>John X</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="123">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>928</FrageSubjekt>
+                <Antwort>Leo VI</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="124">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>928-931</FrageSubjekt>
+                <Antwort>Stephen VII (VIII)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="125">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>931-935</FrageSubjekt>
+                <Antwort>John XI</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="126">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>936-939</FrageSubjekt>
+                <Antwort>Leo VII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="127">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>939-942</FrageSubjekt>
+                <Antwort>Stephen VIII (IX)</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="128">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>942-946</FrageSubjekt>
+                <Antwort>Marinus II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="129">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>946-955</FrageSubjekt>
+                <Antwort>Agapetus II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="130">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>955-964</FrageSubjekt>
+                <Antwort>John XII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="131">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>963-965</FrageSubjekt>
+                <Antwort>Leo VIII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="132">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>964-966</FrageSubjekt>
+                <Antwort>Benedict V</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="133">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>965-972</FrageSubjekt>
+                <Antwort>John XIII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="134">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>973-974</FrageSubjekt>
+                <Antwort>Benedict VI</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="135">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>974-983</FrageSubjekt>
+                <Antwort>Benedict VII</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="136">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>983-984</FrageSubjekt>
+                <Antwort>John XIV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="137">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>985-996</FrageSubjekt>
+                <Antwort>John XV</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="138">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>996-999</FrageSubjekt>
+                <Antwort>Gregory V</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+            <Übung nummer="139">
+                <SubjektPrefix></SubjektPrefix>
+                <FrageSubjekt>999-1003</FrageSubjekt>
+                <Antwort>Sylvester II</Antwort>
+                <Imagefile></Imagefile>
+                <InfoURL></InfoURL>
+            </Übung>
+        </MainÜbungslisteUmgekehrt>
+    </Übungen>
+</Daten>

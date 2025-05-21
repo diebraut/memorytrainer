@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>app.png</file>
+        <file>arrow.png</file>
+        <file>arrow@2x.png</file>
+        <file>arrow@3x.png</file>
+        <file>arrow@4x.png</file>
+        <file>arrows.png</file>
+        <file>arrows@2x.png</file>
+        <file>arrows@3x.png</file>
+        <file>arrows@4x.png</file>
+        <file>images.qrc</file>
+        <file>lineedit.png</file>
+        <file>lineedit.sci</file>
+        <file>qt-logo.png</file>
+        <file>qt-logo@2x.png</file>
+        <file>qt-logo@3x.png</file>
+        <file>qt-logo@4x.png</file>
+        <file>Question mark.jpg</file>
+        <file>progressbar.jpg</file>
+        <file>exercize_finish.png</file>
+        <file>exercize_running.png</file>
+        <file>exercize_start.png</file>
+    </qresource>
+</RCC>

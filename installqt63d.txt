@@ -1,0 +1,6 @@
+g: & cd \qt\add*\qt*\qt*\src\build 
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
+
+cmake -G Ninja ..
+ninja
+ninja install
