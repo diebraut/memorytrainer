@@ -55,7 +55,6 @@
         <file>icons/minus.ico</file>
         <file>global/Util.qml</file>
         <file>pages/CustomBox.qml</file>
-        <file>exercisepackages/Fussball Werder Bremen.zip</file>
         <file>pages/PackageManager.qml</file>
         <file>pages/PackageProvider.qml</file>
         <file>icons/installer_icon.png</file>
