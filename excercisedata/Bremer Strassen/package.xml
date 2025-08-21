@@ -919,7 +919,7 @@
                 <ImageAntwortLizenz></ImageAntwortLizenz>
                 <WikiPageFraVers></WikiPageFraVers>
                 <WikiPageAntVers></WikiPageAntVers>
-                <ExcludeAereaFra>737,819,108,15,36|971,878,92,16,0</ExcludeAereaFra>
+                <ExcludeAereaFra>736,765,108,15,36|971,828,91,16,0</ExcludeAereaFra>
                 <ExcludeAereaAnt></ExcludeAereaAnt>
             </Übung>
             <Übung nummer="52">
@@ -1585,7 +1585,7 @@
                 <ImageAntwortLizenz></ImageAntwortLizenz>
                 <WikiPageFraVers></WikiPageFraVers>
                 <WikiPageAntVers></WikiPageAntVers>
-                <ExcludeAereaFra>1053,980,64,15,110</ExcludeAereaFra>
+                <ExcludeAereaFra>1053,980,64,15,110|1015,715,104,20,76</ExcludeAereaFra>
                 <ExcludeAereaAnt></ExcludeAereaAnt>
             </Übung>
             <Übung nummer="89">

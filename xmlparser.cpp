@@ -93,32 +93,53 @@ bool XMLParser::entryExistsWithPosition(QList<Entry> *entries, int position, boo
 }
 
 
-ExcludeAereaList XMLParser::parseExcludeAereaStr(const QString& excludeAereaStr) {
-    ExcludeAereaList excludeAereaList;  // Verwende den definierten Typ
+ExcludeAereaList XMLParser::parseExcludeAereaStr(const QString& excludeAereaStr)
+{
+    ExcludeAereaList list;
 
-    if (!excludeAereaStr.isEmpty()) {
-        // Teile den String anhand des Trennzeichens "|" in mehrere Bereiche
-        QStringList areas = excludeAereaStr.split("|");
-        for (const QString& areaStr : areas) {
-            // Teile jeden Bereich in x, y, width, height und rotationAngle auf
-            QStringList coords = areaStr.split(",");
-            if (coords.size() == 5) {  // x, y, width, height, rotationAngle
-                int x = coords[0].toInt();
-                int y = coords[1].toInt();
-                int width = coords[2].toInt();
-                int height = coords[3].toInt();
-                int rotationAngle = coords[4].toInt();
+    if (excludeAereaStr.trimmed().isEmpty())
+        return list;
 
-                // Erstelle ein neues ExcludeAerea-Objekt mit den angegebenen Werten
-                ExcludeAereaPtr excludeAerea(new ExcludeAerea(QRect(x, y, width, height), rotationAngle));
+    const QStringList areas = excludeAereaStr.split('|', Qt::SkipEmptyParts);
 
-                // Füge das Objekt der Liste hinzu
-                excludeAereaList.append(excludeAerea);
-            }
+    for (const QString& areaStr : areas) {
+        const QStringList coords = areaStr.split(',', Qt::KeepEmptyParts);
+        if (coords.size() < 5)
+            continue; // zu kurz
+
+        const int x      = coords[0].toInt();
+        const int y      = coords[1].toInt();
+        const int width  = coords[2].toInt();
+        const int height = coords[3].toInt();
+        const int angle  = coords[4].toInt();
+
+        // 6. Feld: Farbe als QString (CSS-Name oder Hex, z.B. "#ff0000")
+        QString color = QStringLiteral("black");
+        if (coords.size() > 5) {
+            color = coords[5].trimmed();
+            if (color.isEmpty())
+                color = QStringLiteral("black");
         }
+
+        // 7. Feld: Flag für „rectTranspWithLine“/Hintergrundrechteck als bool
+        bool isBackgroundRectancle = false;
+        if (coords.size() > 6) {
+            const QString f = coords[6].trimmed().toLower();
+            isBackgroundRectancle = (f == QLatin1String("1") ||
+                                     f == QLatin1String("true") ||
+                                     f == QLatin1String("yes"));
+        }
+
+        // Falls du den erweiterten ctor aus meinem Fix benutzt:
+        ExcludeAereaPtr e(new ExcludeAerea(QRect(x, y, width, height),
+                                           angle,
+                                           color,
+                                           isBackgroundRectancle));
+        list.append(e);
+
     }
 
-    return excludeAereaList;
+    return list;
 }
 
 QString XMLParser::getÜbungsTitel() const {

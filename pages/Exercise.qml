@@ -82,6 +82,7 @@ Page {
         id:pageRectId
         anchors.fill: parent
         color: "lightgray"
+        property string backColorPage: color
     }
 
     Rectangle {
@@ -100,7 +101,7 @@ Page {
         property int cntAll:0
         property int allQuestions :0
 
-        color: "#4DA527"
+        color: "#4DA527"        
 
         radius: 5 // optional, für abgerundete Ecken
 
@@ -1751,14 +1752,29 @@ Page {
                         var rectY = area.rect.y * scaleY + (imageId.height - imgRealHeight) / 2;
                         var rectWidth = area.rect.width * scaleX;
                         var rectHeight = area.rect.height * scaleY;
-
+                        var rectColor = area.color;
+                        var rectTextColor = area.color;
+                        var rectBorderWith = 2
+                        var rectBorderColor = "black"
+                        var showQuestionText = false
+                        if (area.isBackgroundRectancle) {
+                            rectBorderWith = 0
+                            rectBorderColor = pageRectId.backColorPage
+                            rectColor = pageRectId.backColorPage
+                            showQuestionText = true
+                        }
                         var rectObject = rectangleComponent.createObject(excludeRectContainer, {
                             x: rectX,
                             y: rectY,
                             width: rectWidth,
                             height: rectHeight,
-                            rotation: area.rotationAngle
-                        });
+                            rotation: area.rotationAngle,
+                            backColor: rectColor,
+                            textColor: rectTextColor,
+                            borderWidth: rectBorderWith,
+                            borderColor: rectBorderColor,
+                            showQuestionText
+                        })
                     }
                 }
             }
@@ -1779,9 +1795,96 @@ Page {
             Component {
                 id: rectangleComponent
                 Rectangle {
-                    color: "red"
-                    border.color: "black"
-                    border.width: 2
+                    property int borderWidth: 2
+                    property string borderColor: "black"
+                    // Text-Props
+                    property bool   showQuestionText: true
+                    property color  backColor: "black"
+                    property color  textColor: "black"
+
+                    antialiasing: false
+                    color: backColor
+                    border.color: borderColor
+                    border.width: borderWidth
+                    // zentrierter „?“-Teppich, einzeilig, ~90% der Rechteckgröße
+                    Text {
+                        id: q
+                        anchors.centerIn: parent
+                        width:  parent.width  * 0.8
+                        height: parent.height * 0.8
+                        visible: parent.showQuestionText
+                        font.family: "monospace"
+
+                        color: parent.textColor
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideNone
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment:   Text.AlignVCenter
+                        renderType: Text.NativeRendering
+
+                        // WICHTIG: niemals 0/NaN
+                        font.pixelSize: Math.max(1, Math.floor(parent.height * 0.8))
+
+                        // Ergebnis
+                        property string computedText: ""
+                        text: computedText
+
+                        // --- Messung per TextMetrics (kein Scenegraph-Layout nötig) ---
+                        TextMetrics {
+                            id: measure
+                            font: q.font
+                            text: ""
+                            elide: Text.ElideNone
+                        }
+
+                        // Cache für Strings
+                        property var _cache: ({})
+                        function _qs(n) { if (!_cache[n]) _cache[n] = Array(n + 1).join("?"); return _cache[n]; }
+
+                        function widthOf(n) {
+                            measure.text = _qs(n);
+                            var w = measure.advanceWidth;                 // stabiler als paintedWidth
+                            return (isFinite(w) && w >= 0) ? w : 1e12;    // Guard gegen NaN
+                        }
+
+                        // Reentrancy-Guard gegen Kettenevents
+                        property bool _busy: false
+
+                        function recompute() {
+                            if (_busy) return;
+                            _busy = true;
+                            try {
+                                const W = q.width;
+                                if (!(W > 0)) { computedText = ""; return; }
+
+                                const EPS = 1;       // kleine Toleranz in px
+                                const MAX = 20000;   // harte Obergrenze
+
+                                // 1) Exponentiell hoch
+                                let low = 0, high = 1;
+                                while (high < MAX && widthOf(high) <= W + EPS) { low = high; high <<= 1; }
+
+                                // 2) Binärsuche
+                                while (low + 1 < high) {
+                                    const mid = (low + high) >> 1;
+                                    if (widthOf(mid) <= W + EPS) low = mid; else high = mid;
+                                }
+
+                                // 3) Letztes bisschen „auffüllen“
+                                while (low + 1 <= MAX && widthOf(low + 1) <= W + EPS) low++;
+
+                                computedText = _qs(Math.max(1, low));
+                            } finally {
+                                _busy = false;
+                            }
+                        }
+
+                        Component.onCompleted: recompute()
+                        onWidthChanged:        recompute()
+                        onHeightChanged:       recompute()
+                        onFontChanged:         recompute()
+                        onVisibleChanged:      if (visible) recompute()
+                    }
                 }
             }
         }
