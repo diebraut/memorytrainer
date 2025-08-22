@@ -101,7 +101,7 @@ Page {
         property int cntAll:0
         property int allQuestions :0
 
-        color: "#4DA527"        
+        color: "#4DA527"
 
         radius: 5 // optional, für abgerundete Ecken
 
@@ -1718,64 +1718,61 @@ Page {
             fillMode: Image.PreserveAspectFit
             source: ""
 
-            property var  excludeAereaList: [] // Liste von ExcludeAerea-Objekten
-            property real imgRealWidth: 0
-            property real imgRealHeight: 0
+            onStatusChanged: if (status === Image.Ready) updateExcludeRects()
 
-            function setRealImageDimensions() {
-                var imgAspectRatio = imageId.sourceSize.width / imageId.sourceSize.height;
-                var displayAspectRatio = imageId.width / imageId.height;
-                if (imgAspectRatio > displayAspectRatio) {
-                    imgRealWidth = imageId.width;
-                    imgRealHeight = imgRealWidth / imgAspectRatio;
-                } else {
-                    imgRealHeight = imageId.height;
-                    imgRealWidth = imgRealHeight * imgAspectRatio;
-                }
-            }
+            property var  excludeAereaList: [] // Liste von ExcludeAerea-Objekten
 
             function updateExcludeRects() {
-                setRealImageDimensions()
-                // Entferne alle existierenden Rechtecke
+                // Nur rechnen, wenn das Bild fertig ist
+                if (imageId.status !== Image.Ready || imageId.paintedWidth <= 0 || imageId.paintedHeight <= 0)
+                    return;
+
+                // vorhandene Overlays entfernen
                 for (var i = excludeRectContainer.children.length - 1; i >= 0; i--) {
                     excludeRectContainer.children[i].destroy();
                 }
 
-                if (excludeAereaList && excludeAereaList.length > 0) {
+                if (!excludeAereaList || excludeAereaList.length === 0)
+                    return;
 
-                    var scaleX = imgRealWidth / imageId.sourceSize.width;
-                    var scaleY = imgRealHeight / imageId.sourceSize.height;
+                // PreserveAspectFit: ein einheitlicher Scale + Offsets (Letterboxing)
+                var scale = imageId.paintedWidth / imageId.sourceSize.width;
+                var offX  = (imageId.width  - imageId.paintedWidth ) / 2;
+                var offY  = (imageId.height - imageId.paintedHeight) / 2;
 
-                    for (i = 0; i < excludeAereaList.length; i++) {
-                        var area = excludeAereaList[i];
-                        var rectX = area.rect.x * scaleX + (imageId.width - imgRealWidth) / 2;
-                        var rectY = area.rect.y * scaleY + (imageId.height - imgRealHeight) / 2;
-                        var rectWidth = area.rect.width * scaleX;
-                        var rectHeight = area.rect.height * scaleY;
-                        var rectColor = area.color;
-                        var rectTextColor = area.color;
-                        var rectBorderWith = 2
-                        var rectBorderColor = "black"
-                        var showQuestionText = false
-                        if (area.isBackgroundRectancle) {
-                            rectBorderWith = 0
-                            rectBorderColor = pageRectId.backColorPage
-                            rectColor = pageRectId.backColorPage
-                            showQuestionText = true
-                        }
-                        var rectObject = rectangleComponent.createObject(excludeRectContainer, {
-                            x: rectX,
-                            y: rectY,
-                            width: rectWidth,
-                            height: rectHeight,
-                            rotation: area.rotationAngle,
-                            backColor: rectColor,
-                            textColor: rectTextColor,
-                            borderWidth: rectBorderWith,
-                            borderColor: rectBorderColor,
-                            showQuestionText
-                        })
+                for (var i = 0; i < excludeAereaList.length; i++) {
+                    var area = excludeAereaList[i];
+
+                    var rectX = offX + area.rect.x      * scale;
+                    var rectY = offY + area.rect.y      * scale;
+                    var rectW =        area.rect.width  * scale;
+                    var rectH =        area.rect.height * scale;
+
+                    var rectColor      = area.color;
+                    var rectTextColor  = area.color;
+                    var rectBorderWith = 2;
+                    var rectBorderColor = "black";
+                    var showQuestionText = false;
+
+                    if (area.isBackgroundRectancle) {
+                        rectBorderWith   = 0;
+                        rectBorderColor  = pageRectId.backColorPage;
+                        rectColor        = pageRectId.backColorPage;
+                        showQuestionText = true;
                     }
+
+                    rectangleComponent.createObject(excludeRectContainer, {
+                        x: rectX,
+                        y: rectY,
+                        width: rectW,
+                        height: rectH,
+                        rotation: area.rotationAngle,   // wird gleich um die Mitte rotiert (siehe Patch 2)
+                        backColor: rectColor,
+                        textColor: rectTextColor,
+                        borderWidth: rectBorderWith,
+                        borderColor: rectBorderColor,
+                        showQuestionText: showQuestionText
+                    });
                 }
             }
             Component.onCompleted: {
@@ -1904,13 +1901,26 @@ Page {
                 answerArea.visible = false;
             }
         }
+        // Dünne Linie unterhalb des Bildes
+        Rectangle {
+            id: imageLicenseSeparator
+            height: 1
+            width: imageId.paintedWidth
+            color: "#808080"                // dezentes Grau
+            anchors.horizontalCenter: imageId.horizontalCenter
+            anchors.top: imageId.top
+            anchors.topMargin: (imageId.height - imageId.paintedHeight) / 2
+                             + imageId.paintedHeight + 10
+            z: imageId.z + 1
+            visible: licencelink.visible    // nur zeigen, wenn Lizenztext sichtbar ist
+        }
         Rectangle {
             id: licencelink
             z: imageId.z + 1
-            width:parent.width
-            anchors.top: imageId.bottom
-            anchors.topMargin: - (((imageId.height - imageId.imgRealHeight) / 2) + 1)
-            anchors.horizontalCenter: parent.horizontalCenter  // Horizontales Zentrieren im parent
+            width: imageId.paintedWidth
+            anchors.top: imageLicenseSeparator.bottom
+            //anchors.topMargin: (imageId.height - imageId.paintedHeight) / 2 + imageId.paintedHeight + 2
+            anchors.horizontalCenter: imageId.horizontalCenter
             height: 25
             color: "transparent"
 
