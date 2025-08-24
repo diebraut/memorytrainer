@@ -1659,17 +1659,17 @@ Page {
 
                 TextMetrics {
                     id: txtMeter
-                    //font.family: "Courier"
+                    font.bold: true
                     font.pixelSize: 14 // Setze initiale Schriftgröße auf maximal 12
                     text: answerAreaQuestionTxt.textToShow
 
                     onTextChanged: {
                         // Verkleinere die Schriftgröße, aber nicht unter 12 Pixel
-                        while (txtMeter.width > answerAreaQuestionTxt.width && txtMeter.font.pixelSize > 14) {
+                        while (txtMeter.width > answerAreaQuestionTxt.width && txtMeter.font.pixelSize > 7) {
                             txtMeter.font.pixelSize--;
                         }
                         // Vergrößere die Schriftgröße, aber nicht über 12 Pixel
-                        while (txtMeter.width < answerAreaQuestionTxt.width && txtMeter.font.pixelSize < 14) {
+                        while (txtMeter.width < answerAreaQuestionTxt.width && txtMeter.font.pixelSize < 7) {
                             txtMeter.font.pixelSize++;
                         }
                     }
@@ -1694,16 +1694,17 @@ Page {
                 anchors.bottomMargin: 10 // Unterer Rand von 10px
                 color: "transparent"
                 visible: true
-
+                /*
                 Image {
                     id: answerAreaQuestionImage
-                    height: parent.height - 5
+                    height: parent.height / 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     visible: true
-                    fillMode: Image.PreserveAspectFit
+                    //fillMode: Image.PreserveAspectFit
                     source: ""
                 }
+                */
             }
         }
         Image {
@@ -1711,7 +1712,7 @@ Page {
             anchors.top: questionArea.top
             anchors.topMargin: 4
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: customProgressBar.height + 30
+            anchors.bottomMargin: customProgressBar.height + 50
             anchors.left: parent.left
             anchors.right: parent.right
             visible: true
@@ -2616,7 +2617,7 @@ Page {
             if (entryDesc.imageFilenameAntwort) {
                 licencelink.visible = true
                 container.callSetImage(false,packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameAntwort,true)
-                answerAreaQuestionImage.source = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage;
+                //answerAreaQuestionImage.source = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage;
                 answerAreaQuestionTxt.textToShow = (entryDesc.frageSubjekt.indexOf("Frage_") !== -1)?"": entryDesc.frageSubjekt;
             } else if (imageId.visible) { //ev. bleibt fragebild sichtbar.
                 licencelink.visible = true
