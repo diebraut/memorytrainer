@@ -19,6 +19,7 @@ public:
     QList<EntryDesc *> getExercizeList(QString exercizeType, int idxPackage, QList<EntryDesc *> listEntries, QList<Entry> *filterEntries = NULL);
     QString getÜbungsTitel() const;
     bool isSequential() const;
+    bool isHideAuthorByQuestion() const;
     bool existMainList() const;
     bool existReverseList() const;
     QString getFrageText() const;

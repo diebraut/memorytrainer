@@ -19,6 +19,7 @@ PackageDesc::PackageDesc(QString packageName,bool customPackage,bool fromCustomP
         this->mainQuestionReverse = this->xmlParser->getFrageTextUmgekehrt();
         this->uebungsTitel = this->xmlParser->getÜbungsTitel();
         this->displayExercizesInSequence = this->xmlParser->isSequential();
+        this->hideAuthorByQuestion_      = this->xmlParser->isHideAuthorByQuestion();  // <<< NEU
         this->isXMLDescripted = true;
         this->mainQuestions = getCountEntries(DISPLAY_MAIN);
         this->reverseQuestions = getCountEntries(DISPLAY_REVERSE);

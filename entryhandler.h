@@ -73,7 +73,10 @@ public:
     Q_INVOKABLE PackageDesc getActPackageDescriptionIdx(int idx);
 
     Q_INVOKABLE void setQuestionOptionInActPackageIdx(int idx,PackageDesc::DisplayOption option);
+
     Q_INVOKABLE void setDisplayExercizesInSequenceInActPackageIdx(int idx,bool inSequence);
+
+    Q_INVOKABLE bool hideAuthorByQuestionInActPackageIdx(int idx);
 
     Q_INVOKABLE EntryDesc getActEntryDescription();
     Q_INVOKABLE LicenceInfo getActLicenceInfo();

@@ -378,6 +378,14 @@ void EntryHandler::setQuestionOptionInActPackageIdx(int idx,PackageDesc::Display
     }
 }
 
+bool EntryHandler::hideAuthorByQuestionInActPackageIdx(int idx) {
+    int sizePackages = this->actExercisePackages.size();
+    if ( sizePackages > idx ) {
+        return this->actExercisePackages[idx]->hideAuthorByQuestion();
+    }
+    return false;
+}
+
 void EntryHandler::setDisplayExercizesInSequenceInActPackageIdx(int idx,bool inSequence) {
     int sizePackages = this->actExercisePackages.size();
     if ( sizePackages > idx ) {

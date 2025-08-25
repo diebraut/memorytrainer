@@ -147,6 +147,13 @@ QString XMLParser::getÜbungsTitel() const {
     return ÜbungenElement.attribute("name");
 }
 
+bool XMLParser::isHideAuthorByQuestion() const {
+    if (uebungenElement.isNull())
+        return false;
+    const QString v = uebungenElement.attribute("hideAuthorByQuestion").trimmed();
+    return v.compare("true", Qt::CaseInsensitive) == 0 || v == QLatin1String("1");
+}
+
 bool  XMLParser::isSequential() const {
     return (uebungenElement.attribute("sequentiell") == "true")?true:false;
 }
@@ -274,6 +281,7 @@ bool XMLParser::addMainUebungslisteIfNeeded(const QString &packageName, bool seq
     QDomElement uebungenElem = doc.createElement("Übungen");
     uebungenElem.setAttribute("name", packageName);
     uebungenElem.setAttribute("sequentiell", sequential ? "true" : "false");
+    uebungenElem.setAttribute("hideAuthorByQuestion", "false"); // <<< NEU: Default
     uebungenElem.setAttribute("umgekehrt", reverse ? "true" : "false");
 
     QDomElement mainListElem = doc.createElement("MainÜbungsliste");

@@ -65,6 +65,10 @@ Item {
         ImageHandler.setDisplayExercizesInSequenceInActPackageIdx(idx,inSequence);
     }
 
+    function hideAuthorByQuestionInActPackageIdx(idx,inSequence) {
+        return ImageHandler.hideAuthorByQuestionInActPackageIdx(idx);
+    }
+
     function getActEntryDescription() {
         return ImageHandler.getActEntryDescription();
     }

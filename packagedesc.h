@@ -20,6 +20,7 @@ class PackageDesc : public QObject {
     Q_PROPERTY(QString mainQuestionReverse READ getMainQuestionReverse CONSTANT)
     Q_PROPERTY(bool isXMLDescripted READ getIsXMLDescripted CONSTANT);
     Q_PROPERTY(bool displayExercizesInSequence READ getDisplayExercizesInSequence CONSTANT)
+    Q_PROPERTY(bool hideAuthorByQuestion READ hideAuthorByQuestion CONSTANT)   // <<< NEU
     Q_PROPERTY(QString fullPathToPackage READ getFullPathToPackage CONSTANT)
     Q_PROPERTY(int mainQuestions READ sizeMainQuestions CONSTANT)
     Q_PROPERTY(int reverseQuestions READ sizeReverseQuestions CONSTANT)
@@ -37,6 +38,7 @@ public:
         this->mainQuestion = other.mainQuestion;
         this->mainQuestionReverse = other.mainQuestionReverse;
         this->displayExercizesInSequence = other.displayExercizesInSequence;
+        this->hideAuthorByQuestion_ = other.hideAuthorByQuestion_;            // <<< NEU
         this->isXMLDescripted = other.isXMLDescripted;
         this->showList = other.showList;
         this->mainQuestions = other.mainQuestions;
@@ -55,6 +57,7 @@ public:
             this->mainQuestion = other.mainQuestion;
             this->mainQuestionReverse = other.mainQuestionReverse;
             this->displayExercizesInSequence = other.displayExercizesInSequence;
+            this->hideAuthorByQuestion_ = other.hideAuthorByQuestion_;
             this->isXMLDescripted = other.isXMLDescripted;
             this->showList = other.showList;
             this->fullPathToPackage = other.fullPathToPackage;
@@ -75,6 +78,7 @@ public:
             this->mainQuestion = other->mainQuestion;
             this->mainQuestionReverse = other->mainQuestionReverse;
             this->displayExercizesInSequence = other->displayExercizesInSequence;
+            this->hideAuthorByQuestion_ = other->hideAuthorByQuestion_;
             this->isXMLDescripted = other->isXMLDescripted;
             this->showList = other->showList;
             this->fullPathToPackage = other->fullPathToPackage;
@@ -125,6 +129,14 @@ public:
 
     void setDisplayExercizesInSequence(bool inSequence)  {
         displayExercizesInSequence = inSequence;
+    }
+
+    bool hideAuthorByQuestion() const {
+        return hideAuthorByQuestion_;
+    }
+
+    void setHideAuthorByQuestion(bool inHideAuthor) {
+        hideAuthorByQuestion_ = inHideAuthor;
     }
 
     bool getIsXMLDescripted() const {
@@ -194,7 +206,9 @@ private:
     QString mainQuestion;
     QString mainQuestionReverse;
     bool isXMLDescripted = false;
-    bool            displayExercizesInSequence;
+    bool displayExercizesInSequence;
+    bool hideAuthorByQuestion_ = false;
+
     DisplayOption   showList;
     XMLParser *xmlParser = nullptr;
     XMLParser *getXMLDescription(QString packageName);

@@ -1,14 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-
 import QtQuick.Dialogs
-
 import QtQuick.Controls.Material 2.15
-
 import QtCore 6.5 as QtCore  // Verwende die passende Qt-Version
-
 import QtQuick.Layouts 1.12
-
 import QtWebEngine 1.12 // Import WebEngine module // Import WebEngine module
 
 import "../model"
@@ -1999,12 +1994,17 @@ Page {
                 return text.length * averageCharWidth;
             }
 
-            function buildLicenceInfoLink(text, licenceInfo, isQuestion) {
+            function buildLicenceInfoLink(text, licenceInfo, isQuestion, withoutAuthor=false) {
                 // Bereite den Linktext vor
+
                 let value1 = isQuestion ? licenceInfo.infoURLFrage : licenceInfo.infoURLAntwort;
                 let value2 = isQuestion ? licenceInfo.imageFrageBildDescription : licenceInfo.imageAntwortBildDescription;
 
                 let authorData = isQuestion ? licenceInfo.imageFrageAuthor : licenceInfo.imageAntwortAuthor;
+                if (isHideAuthor() && isQuestion) {
+                    authorData = "-????????-";
+                }
+
                 let licenseData = isQuestion ? licenceInfo.imageFrageLizenz : licenceInfo.imageAntwortLizenz;
 
                 let authorParts = authorData ? authorData.split("[") : ["", ""];
@@ -2013,15 +2013,15 @@ Page {
                 authorParts[1] = authorParts[1] ? authorParts[1].replace("]", "") : null;
                 licenseParts[1] = licenseParts[1] ? licenseParts[1].replace("]", "") : null;
 
-                let value3 = authorParts[1] ? `<a href="${authorParts[1]}">` : "<b>";
+                let value3 = authorParts[1] ? "${authorParts[1]}" : "";
                 let value4 = authorParts[0];
-                let closeTagForValue3 = authorParts[1] ? "</a>" : "</b>";
+                //let closeTagForValue3 = authorParts[1] ? "</a>" : "</b>";
 
                 let value5 = licenseParts[1] ? `<a href="${licenseParts[1]}">` : "<b>";
                 let value6 = licenseParts[0];
                 let closeTagForValue5 = licenseParts[1] ? "</a>" : "</b>";
 
-                let formattedString = `Info aus <a href="${value1}">Wikipedia</a>, Bildquelle: <a href="${value2}">Wikimedia Commons</a> von ${value3}${value4}${closeTagForValue3} unter Lizenz: ${value5}${value6}${closeTagForValue5}`;
+                let formattedString = `Info aus <a href="${value1}">Wikipedia</a>, Bildquelle: <a href="${value2}">Wikimedia Commons</a> von ${value3}${value4} unter Lizenz: ${value5}${value6}${closeTagForValue5}`;
 
                 // Setze den formatierten Text im Text-Element
                 text.text = formattedString;
@@ -2368,7 +2368,7 @@ Page {
             if (setRecognized) dataModel.setActEntryRecognizedState(recognized)
         }
 
-         dataModel.setNextQuestion();
+        dataModel.setNextQuestion();
         container.setXMLBasedMode(isXMLBased());
         setActQuestion();
         dataModel.debugPt();
@@ -2590,6 +2590,7 @@ Page {
         var imageFileName = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage
 
         answerArea.writeAnswer("")
+
         licencelink.visible = false
         if (entryDesc.imageFilenameFrage) {
             licencelink.visible = true
@@ -2629,6 +2630,10 @@ Page {
         }
     }
 
+    function isHideAuthor() {
+        var packageDesc = dataModel.getActPackageDescription()
+        return packageDesc.hideAuthorByQuestion
+    }
 
     function isXMLBased() {
         var packageDesc = dataModel.getActPackageDescription()
