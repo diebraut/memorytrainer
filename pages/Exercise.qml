@@ -18,6 +18,8 @@ import com.memorytrainer.network 1.0
 
 import "../pages" as ScoreDisplayComponent
 
+
+
 Page {
 
     id: page
@@ -71,6 +73,20 @@ Page {
     property int initHeightWideFormat:0
     property int initHeightLongFormat:0
 
+    // neben deinen Text-Items anlegen
+    TextMetrics { id: tm }       // für Breite
+    FontMetrics { id: fm }       // für Höhe
+
+    function widthOf(item) {
+        tm.font = item.font
+        tm.text = item.text
+        return tm.advanceWidth        // robust & schnell
+    }
+
+    function heightOf(item) {
+        fm.font = item.font
+        return fm.height              // Zeilenhöhe der aktuellen Font
+    }
 
     Rectangle
     {
@@ -1535,49 +1551,79 @@ Page {
                     id: followingText
                     text: ""
                     horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.NoWrap
+                    textFormat: Text.PlainText  // damit „< >“ nicht als HTML interpretiert werden
                     anchors.horizontalCenter: parent.horizontalCenter
+                    renderType: Text.NativeRendering   // (optional) stabilere Metriken
+
                 }
             }
 
-            function adjustFontSize(textWebPageUrl, maxHeight, maxFontSize) {
-                var currentFontSize = maxFontSize;
-                textWebPageUrl.font.pointSize = currentFontSize;
+            function fitFontToBoxPx(item, maxH, maxW, startPx, minPx, capPx) {
+                const min = Math.max(1, minPx || 6)
+                const cap = Math.max(min, capPx || 512)
 
-                while (textWebPageUrl.height > maxHeight && currentFontSize > 1) {
-                    currentFontSize -= 1;
-                    textWebPageUrl.font.pointSize = currentFontSize;
+                // wir arbeiten *nur* mit pixelSize – punktgrößen bitte nicht mischen
+                item.font.pixelSize = Math.max(min, Math.round(startPx || 16))
+
+                function fits(px) {
+                    item.font.pixelSize = px
+                    const w = widthOf(item)
+                    const h = heightOf(item)
+                    return h <= maxH && (maxW <= 0 || w <= maxW)
                 }
+
+                // obere Schranke finden (exponentiell erhöhen bis es nicht mehr passt oder cap)
+                let lo = min
+                let hi = Math.min(cap, Math.max(item.font.pixelSize, min))
+                while (hi < cap && fits(hi)) {
+                    lo = hi
+                    hi = Math.min(cap, Math.floor(hi * 1.5) + 1)
+                }
+                if (lo < min) lo = min
+                if (hi < lo) hi = lo
+
+                // binäre Suche: größtes px das noch passt
+                let best = lo
+                let L = lo, R = hi
+                for (let i = 0; i < 20; i++) {           // 2^20 ~ fein genug
+                    const mid = Math.floor((L + R) / 2)
+                    if (fits(mid)) { best = mid; L = mid + 1 } else { R = mid - 1 }
+                }
+                item.font.pixelSize = best
             }
 
             function writeQuestion(question, subject, subjektPrefix) {
-                var parts = question.split("[FrageSubjekt]");
-                var formattedQuestion = parts[0] || "";
+                const h = questionArea.height
+                const parts = question.split("[FrageSubjekt]")
 
-                // Berechne die maximale Schriftgröße basierend auf der Höhe von questionArea
-                var questionMaxFontSize = Math.round(questionArea.height * 0.15);
-                var questionMaxFontSizeNoSubjekt = Math.round(questionArea.height * 0.40);
-                var subjectMaxFontSize = Math.round(questionArea.height * 0.40);
-                var followingMaxFontSize = Math.round(questionArea.height * 0.30);
+                const qMaxPx  = Math.round(h * 0.15)
+                const qNoSub  = Math.round(h * 0.40)
+                const sMaxPx  = Math.round(h * 0.40)
+                const fMaxPx  = Math.round(h * 0.30)
 
                 if (parts.length > 1) {
-                    var followingTextVar = parts[1];
-                    questionText.text = formattedQuestion + subjektPrefix;
-                    subjectText.text = "<" + subject + ">";
-                    followingText.text = followingTextVar + "?";
+                    questionText.text = (parts[0] || "") + subjektPrefix
+                    subjectText.text  = "<" + subject + ">"
+                    followingText.text = (parts[1] || "") + "?"
 
-                    // Passe die Schriftgrößen dynamisch an, um in das Rechteck zu passen
-                    adjustFontSize(questionText, questionArea.height * 0.3, questionMaxFontSize);
-                    adjustFontSize(subjectText, questionArea.height * 0.4, subjectMaxFontSize);
-                    adjustFontSize(followingText, questionArea.height * 0.3, followingMaxFontSize);
+                    // 1) Links/Rechts nur auf Höhe fitten
+                    fitFontToBoxPx(questionText,  h * 0.30, 0, qMaxPx)
+                    fitFontToBoxPx(followingText, h * 0.30, 0, fMaxPx)
+
+                    // 2) Verfügbare Breite für das Subjekt (100% – links – rechts – kleine Luft)
+                    const gap = 2
+                    const usedLeft  = widthOf(questionText)
+                    const usedRight = widthOf(followingText)
+                    const avail = Math.max(0, questionArea.width - usedLeft - usedRight - gap)
+                    // 3) Subjekt: Höhe *und* Breite fitten, maximal groß
+                    fitFontToBoxPx(subjectText, h * 0.40, avail, sMaxPx)
+
                 } else {
-                    // Kein [FrageSubjekt] gefunden
-                    questionText.text = question;
-                    subjectText.text = "";
-                    followingText.text = "";
-
-                    // Passe die Schriftgröße des questionText auf 40% der Höhe an
-                    adjustFontSize(questionText, questionArea.height * 0.4, questionMaxFontSizeNoSubjekt);
+                    questionText.text = question
+                    subjectText.text  = ""
+                    followingText.text = ""
+                    fitFontToBoxPx(questionText, h * 0.40, 0, qNoSub)
                 }
             }
         }
@@ -1621,26 +1667,33 @@ Page {
             }
 
             function writeAnswer(answer) {
-                // Setze den Text für answerText
+                // Texte setzen
                 answerText.text = answer;
 
-                // Berechne die anfängliche Schriftgröße basierend auf der Höhe von answerArea
-                var headerInitialFontSize = Math.round(answerArea.height * 0.20);
-                var textInitialFontSize = Math.round(answerArea.height * 0.30);
+                // Startgrößen (in px, nicht pointSize mischen!)
+                const H = answerArea.height;
+                const W = Math.max(0, answerArea.width - 2); // kleine Luft
+                const headerStartPx = Math.round(H * 0.20);
+                const textStartPx   = Math.round(H * 0.30);
 
-                // Setze die initiale Schriftgröße
-                answerHeader.font.pointSize = headerInitialFontSize;
-                answerText.font.pointSize = textInitialFontSize;
+                // 1) Header: max. 30% Höhe, volle Breite
+                questionArea.fitFontToBoxPx(answerHeader, H * 0.30, W, headerStartPx, 6, 512);
 
-                // Passe die Schriftgröße an, falls der Text nicht in den Bereich passt
-                adjustFontSizeToFit(answerHeader, answerArea.height * 0.30, headerInitialFontSize);
-                adjustFontSizeToFit(answerText, answerArea.height * 0.60, textInitialFontSize);
+                // 2) Text: max. 60% Höhe, volle Breite
+                questionArea.fitFontToBoxPx(answerText,   H * 0.60, W, textStartPx,   6, 1024);
 
-                // Positioniere answerText vertikal zwischen answerHeader und dem unteren Rand
-                var remainingSpace = answerArea.height - answerHeader.height - answerText.height;
-                answerText.anchors.verticalCenterOffset = remainingSpace / 2 - answerArea.height / 2;
+                // 3) Block (Header+Text) vertikal in answerArea zentrieren
+                const blockH = answerHeader.height + answerText.height;
+                const topY   = Math.max(0, (H - blockH) / 2);
+
+                // y-Position direkt setzen (achte darauf, dass keine kollidierenden anchors aktiv sind)
+                answerHeader.anchors.top = undefined;
+                answerText.anchors.top   = undefined;
+                answerText.anchors.verticalCenter = undefined;
+
+                answerHeader.y = topY;
+                answerText.y   = topY + answerHeader.height;
             }
-
             Rectangle {
                 id: answerAreaQuestionTxt
                 anchors.top: parent.top
@@ -1800,6 +1853,8 @@ Page {
                     border.color: borderColor
                     border.width: borderWidth
                     // zentrierter „?“-Teppich, einzeilig, ~90% der Rechteckgröße
+                    //erstmal raus
+                    /*
                     Text {
                         id: q
                         anchors.centerIn: parent
@@ -1878,6 +1933,7 @@ Page {
                         onFontChanged:         recompute()
                         onVisibleChanged:      if (visible) recompute()
                     }
+                    **/
                 }
             }
         }
