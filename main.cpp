@@ -11,7 +11,7 @@
 #include <QList>
 #include <QDebug>
 
-//#include <QtWebEngineQuick>
+
 
 #include "processaimagem.h"
 #include "provedorimagem.h"
@@ -31,7 +31,13 @@
 
 #include "networkchecker.h"
 
+#ifdef Q_OS_IOS
+#include <QtWebView>
+#include "ios_file_protection.h"    // <- unsere Helper-API
+#else
+#include <QQuickView>
 #include <QtWebEngineQuick>
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -47,25 +53,26 @@ int main(int argc, char *argv[])
     qmlRegisterType<processaImagem>("ProcessaImagemQml", 1, 0, "ProcessaImagem");
 
     QGuiApplication app(argc, argv);
+#ifdef Q_OS_IOS
+    QtWebView::initialize(); // ✅
+#else
     QtWebEngineQuick::initialize(); // ✅
-
+#endif
     Environment env;
-    //create neccessary directorys
-    QString dir = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + "/" + DEFAULT_LEARNLIST_DIR ;
-    // Sicherstellen, dass das Verzeichnis existiert
-    if (!QDir(dir).exists()) {
-        if (!QDir().mkpath(dir)) {
-            qDebug() << "Fatal error: can't create learnlist directory ";
-        }
-    }
-    //create dir for customized packages
-    QString dirCustom = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + "/" + DEFAULT_MIXED_PACKAGE_DIR ;
-    // Sicherstellen, dass das Verzeichnis existiert
-    if (!QDir(dirCustom).exists()) {
-        if (!QDir().mkpath(dirCustom)) {
-            qDebug() << "Fatal error: can't create customized packages  directory -> " << dirCustom;
-        }
-    }
+
+    // create neccessary directories
+    const QString base = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR;
+    const QString dirLearn  = base + "/" + DEFAULT_LEARNLIST_DIR;
+    const QString dirCustom = base + "/" + DEFAULT_MIXED_PACKAGE_DIR;
+
+    QDir().mkpath(dirLearn);
+    QDir().mkpath(dirCustom);
+
+#ifdef Q_OS_IOS
+    // optional auch einen Import-Ordner anlegen
+    QDir().mkpath(base + "/Import");
+    iosSetNoProtectionTree(base);      // jetzt rekursiv Attribute setzen
+#endif
 
     // Singleton-Instanz von ExerciceEntryManager
     LearnListEntryManager *learnListEntryManager = new LearnListEntryManager();
