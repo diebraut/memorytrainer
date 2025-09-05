@@ -1988,59 +1988,121 @@ Page {
                 color: "black"
                 font.pointSize: 10
                 textFormat: Text.RichText
+                renderType: Text.NativeRendering   // präzisere Glyph-Layouts
+                //wrapMode: Text.WordWrap            // wenn du umbrechen lässt
                 // Aktiviert den Link bei direktem Klick auf den Text
                 onLinkActivated: function(link) {
                     licencelink.showLink(link);
                 }
             }
 
+            // Maussteuerung exakt über dem Text
             MouseArea {
-                id: extendedMouseArea
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-                height: parent.height * 2 // Doppelte Höhe des Textbereichs
-                anchors.verticalCenter: parent.verticalCenter
+                id: linkMouseArea
+                anchors.fill: licensceInfoId          // exakt gleiche Fläche
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton
+                cursorShape: hoveredHref ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-                cursorShape: Qt.PointingHandCursor
+                // aktuell „getroffener“ href (genau der Wert aus dem <a href="...">)
+                property string hoveredHref: ""
 
-                onClicked: function(mouse) {
-                    // Mappe die Klick-Koordinaten auf das Text-Element `licensceInfoId`
-                    var mappedPosition = extendedMouseArea.mapToItem(licensceInfoId, mouse.x, mouse.y);
-                    var localX = mappedPosition.x;
+                // kleine vertikale Toleranz, falls Baseline knapp verfehlt wird
+                property int vTol: 6
+                property int vStep: 2
 
-                    // Finde den Link, dessen horizontaler Bereich den Klickpunkt abdeckt
-                    var selectedLink = null;
+                onPositionChanged: (mouse) => {
+                    const p = mapToItem(licensceInfoId, mouse.x, mouse.y);
+                    let href = licensceInfoId.linkAt(p.x, p.y);
 
-                    for (var i = 0; i < licencelink.linkPositions.length; i++) {
-                        var link = licencelink.linkPositions[i];
-
-                        // Prüfen, ob die Klickposition (localX) innerhalb der geschätzten Breite des Links liegt
-                        if (localX >= link.x && localX <= (link.x + link.width)) {
-                            selectedLink = link;
-                            break;
+                    // vertikale Toleranz prüfen
+                    if (!href) {
+                        for (let dy = -vTol; dy <= vTol && !href; dy += vStep) {
+                            href = licensceInfoId.linkAt(p.x, Math.max(0, Math.min(p.y + dy, licensceInfoId.height - 1)));
                         }
                     }
 
-                    // Aktiviere den gefundenen Link, falls vorhanden
-                    if (selectedLink) {
-                        licencelink.showLink(selectedLink.url);
-                    }
+                    hoveredHref = href || "";
+                    cursorShape = hoveredHref ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                }
+
+                onClicked: (mouse) => {
+                    if (!hoveredHref) return;
+                    licencelink.showLink(hoveredHref);   // deine bestehende Normalisierung/Öffnen
                 }
             }
+            // ------- Helper: HTML Escapes -------
+            function escapeHtml(s) {
+                if (s === undefined || s === null) return "";
+                return String(s)
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;");
+            }
+            function escapeHtmlAttr(s) {
+                if (s === undefined || s === null) return "";
+                return String(s)
+                        .replace(/&/g, "&amp;")
+                        .replace(/"/g, "&quot;");
+            }
 
+            // ------- Helper: URL normalisieren für href und zum Öffnen -------
+            function _decodeAmp(u) {
+                // doppelt kodiertes &amp; entschärfen (2x reicht praktisch)
+                return String(u).replace(/&amp;/gi, '&').replace(/&amp;/gi, '&');
+            }
+            function normalizeForHref(raw) {
+                if (!raw) return "";
+                var u = _decodeAmp(String(raw).trim());
+                if (u.indexOf("//") === 0) u = "https:" + u;
+                else if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+                // am Ende einmal korrekt fürs HTML-Attribut escapen
+                return escapeHtmlAttr(u);
+            }
+            function normalizeForOpen(raw) {
+                if (!raw) return "";
+                var u = _decodeAmp(String(raw).trim());
+                if (u.indexOf("//") === 0) u = "https:" + u;
+                else if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+                // Leerzeichen absichern
+                return u.replace(/\s/g, "%20");
+            }
             function showLink(link) {
-                if (!link.startsWith("http")) link = "https:" + link
-                if (typeof mainFocusScope.showWebPage === "function") {
-                    mainFocusScope.showWebPage(link);
+                if (!link) return;
+
+                let u = String(link).trim();
+
+                // HTML-Entities entschärfen (auch doppelte)
+                // erst mehrfach &amp; -> &, dann normalisieren Leerzeichen
+                u = u.replace(/&amp;/gi, '&');
+                u = u.replace(/&amp;/gi, '&'); // falls doppelt kodiert
+
+                // Protokoll ergänzen
+                if (u.startsWith("//")) {
+                    u = "https:" + u;
+                } else if (!/^https?:\/\//i.test(u)) {
+                    u = "https://" + u;  // nackte Domains wie "commons.wikimedia.org/..."
+                }
+
+                // Leerzeichen absichern
+                u = u.replace(/\s/g, "%20");
+
+                // Öffnen
+                if (typeof mainFocusScope?.showWebPage === "function") {
+                    mainFocusScope.showWebPage(u);
                 } else {
-                    Qt.openUrlExternally(link);
+                    Qt.openUrlExternally(u);
                 }
             }
 
+            // ------- Öffentliche API: von außen aufrufen (z.B. nach Bild/Seite-Laden) -------
             function setLicenseInfo(isQuestionImage) {
-                var licenceInfo = dataModel.getActLicenceInfo();
+                var licenceInfo = dataModel.getActLicenceInfo && dataModel.getActLicenceInfo();
                 if (licenceInfo) {
                     buildLicenceInfoLink(licensceInfoId, licenceInfo, isQuestionImage);
+                } else {
+                    licensceInfoId.text = "";
+                    licencelink.linkPositions = [];
                 }
             }
 
@@ -2050,76 +2112,171 @@ Page {
                 return text.length * averageCharWidth;
             }
 
-            function buildLicenceInfoLink(text, licenceInfo, isQuestion, withoutAuthor=false) {
-                // Bereite den Linktext vor
+            function ensureHttps(u) {
+                if (!u) return "";
+                if (u.startsWith("//")) return "https:" + u;
+                if (u.startsWith("http://") || u.startsWith("https://")) return u;
+                // falls mal nur ein Pfad kommt, versuche https:// davor
+                return "https://" + u.replace(/^\/+/, "");
+            }
+            function hrefToOpenUrl(raw) {
+                if (!raw) return "";
+                var u = String(raw);
 
-                let value1 = isQuestion ? licenceInfo.infoURLFrage : licenceInfo.infoURLAntwort;
-                let value2 = isQuestion ? licenceInfo.imageFrageBildDescription : licenceInfo.imageAntwortBildDescription;
+                // &amp;amp; -> &amp; -> &
+                for (var i = 0; i < 3; ++i) u = u.replace(/&amp;/gi, '&');
 
-                let authorData = isQuestion ? licenceInfo.imageFrageAuthor : licenceInfo.imageAntwortAuthor;
-                if (isHideAuthor() && isQuestion) {
-                    authorData = "-????????-";
+                // Protokoll ergänzen
+                if (u.indexOf("//") === 0) u = "https:" + u;
+                else if (!/^https?:\/\//i.test(u)) u = "https://" + u.replace(/^\/+/, "");
+
+                // Leerzeichen absichern
+                u = u.replace(/\s/g, "%20");
+
+                return u;
+            }
+
+            function openHref(rawHref) {
+                var url = hrefToOpenUrl(rawHref);
+                if (!url) return;
+                if (typeof mainFocusScope.showWebPage === "function") mainFocusScope.showWebPage(url);
+                else Qt.openUrlExternally(url);
+            }
+
+            // ------- Kernfunktion: baut den Text (mit/ohne Links je nach Daten) -------
+            //  licenceInfo Felder (deinem Schema gemäß):
+            //   - infoURLFrage / infoURLAntwort
+            //   - imageFrageBildDescription / imageAntwortBildDescription
+            //   - imageFrageAuthor / imageAntwortAuthor         -> "Name[URL]" oder nur "Name"
+            //   - imageFrageLizenz / imageAntwortLizenz         -> "Lizenzname[URL]" oder nur "Lizenzname"
+            function buildLicenceInfoLink(textItem, licenceInfo, isQuestion, withoutAuthor) {
+                if (!textItem || !licenceInfo) return;
+
+                // --- Helper: Hostname extrahieren (ohne www.)
+                function extractHostname(u) {
+                    if (!u) return "";
+                    // bereits normalisiert für Öffnen
+                    var m = String(u).match(/^https?:\/\/([^\/?#:]+)([:\/?#]|$)/i);
+                    var host = m ? m[1] : "";
+                    // "www." entfernen
+                    host = host.replace(/^www\./i, "");
+                    return host;
+                }
+                function isWikipediaHost(host) {
+                    host = String(host || "").toLowerCase();
+                    // trifft z. B. de.wikipedia.org, en.m.wikipedia.org, wikipedia.org
+                    return /(^|\.)wikipedia\.org$/.test(host);
                 }
 
-                let licenseData = isQuestion ? licenceInfo.imageFrageLizenz : licenceInfo.imageAntwortLizenz;
+                // --- URLs / Rohdaten holen ---
+                var wikiUrl   = isQuestion ? licenceInfo.infoURLFrage               : licenceInfo.infoURLAntwort;
+                var fileUrl   = isQuestion ? licenceInfo.imageFrageBildDescription  : licenceInfo.imageAntwortBildDescription;
 
-                let authorParts = authorData ? authorData.split("[") : ["", ""];
-                let licenseParts = licenseData ? licenseData.split("[") : ["", ""];
+                var authorRaw = isQuestion ? licenceInfo.imageFrageAuthor           : licenceInfo.imageAntwortAuthor;
+                if (typeof isHideAuthor === "function" && isHideAuthor() && isQuestion) {
+                    authorRaw = ""; // Autor ggf. in der Frage ausblenden
+                }
+                var licenseRaw= isQuestion ? licenceInfo.imageFrageLizenz           : licenceInfo.imageAntwortLizenz;
 
-                authorParts[1] = authorParts[1] ? authorParts[1].replace("]", "") : null;
-                licenseParts[1] = licenseParts[1] ? licenseParts[1].replace("]", "") : null;
+                // --- Autor parsen: "Name[URL]" oder nur "Name"
+                var authorName = "";
+                var authorUrl  = "";
+                if (authorRaw && !withoutAuthor) {
+                    var mA = String(authorRaw).match(/^(.*?)\[(.*?)\]$/);
+                    if (mA) { authorName = (mA[1] || "").trim(); authorUrl = (mA[2] || "").trim(); }
+                    else    { authorName = String(authorRaw).trim(); }
+                }
 
-                let value3 = authorParts[1] ? "${authorParts[1]}" : "";
-                let value4 = authorParts[0];
-                //let closeTagForValue3 = authorParts[1] ? "</a>" : "</b>";
+                // --- Lizenz parsen: "Lizenz[URL]" oder nur "Lizenz"
+                var licenseName = "";
+                var licenseUrl  = "";
+                if (licenseRaw) {
+                    var mL = String(licenseRaw).match(/^(.*?)\[(.*?)\]$/);
+                    if (mL) { licenseName = (mL[1] || "").trim(); licenseUrl = (mL[2] || "").trim(); }
+                    else    { licenseName = String(licenseRaw).trim(); }
+                }
 
-                let value5 = licenseParts[1] ? `<a href="${licenseParts[1]}">` : "<b>";
-                let value6 = licenseParts[0];
-                let closeTagForValue5 = licenseParts[1] ? "</a>" : "</b>";
+                // --- Hrefs erzeugen (nur wenn URLs vorhanden) ---
+                var wikiHref    = wikiUrl   ? normalizeForHref(wikiUrl)   : "";
+                var fileHref    = fileUrl   ? normalizeForHref(fileUrl)   : "";
+                var authorHref  = authorUrl ? normalizeForHref(authorUrl) : "";
+                var licenseHref = licenseUrl? normalizeForHref(licenseUrl): "";
 
-                let formattedString = `Info aus <a href="${value1}">Wikipedia</a>, Bildquelle: <a href="${value2}">Wikimedia Commons</a> von ${value3}${value4} unter Lizenz: ${value5}${value6}${closeTagForValue5}`;
+                var parts = [];
+                var candidates = []; // für MouseArea/Click-Mapping (url + sichtbarer Linktext)
 
-                // Setze den formatierten Text im Text-Element
-                text.text = formattedString;
+                // --- "Info aus …" mit Wikipedia- oder Domain-Label ---
+                if (wikiHref) {
+                    var wikiOpen  = normalizeForOpen(wikiUrl);
+                    var host      = extractHostname(wikiOpen);
+                    var wikiLabel = isWikipediaHost(host) ? "Wikipedia" : host;
+                    parts.push('Info aus <a href="' + wikiHref + '">' + escapeHtml(wikiLabel) + '</a>');
+                    candidates.push({ url: wikiOpen, label: wikiLabel });
+                }
 
-                // Lösche die vorherige Link-Positionsliste
+                // --- "Bildquelle:" nur wenn Bildbeschreibung-URL vorhanden ---
+                if (fileHref) {
+                    var fileOpen = normalizeForOpen(fileUrl);
+                    var fileLabel = "Wikimedia Commons";
+                    parts.push('Bildquelle: <a href="' + fileHref + '">' + fileLabel + '</a>');
+                    candidates.push({ url: fileOpen, label: fileLabel });
+                }
+
+                // --- "von <Autor>" nur wenn Autorname vorhanden (Link optional) ---
+                if (authorName) {
+                    var authorHtml;
+                    if (authorHref) {
+                        var authorOpen = normalizeForOpen(authorUrl);
+                        authorHtml = '<a href="' + authorHref + '">' + escapeHtml(authorName) + '</a>';
+                        candidates.push({ url: authorOpen, label: authorName });
+                    } else {
+                        authorHtml = escapeHtml(authorName);
+                    }
+                    parts.push('von ' + authorHtml);
+                }
+
+                // --- "unter Lizenz: <Lizenz>" nur wenn Lizenzname vorhanden (Link optional) ---
+                if (licenseName) {
+                    var licenseHtml;
+                    if (licenseHref) {
+                        var licenseOpen = normalizeForOpen(licenseUrl);
+                        licenseHtml = '<a href="' + licenseHref + '">' + escapeHtml(licenseName) + '</a>';
+                        candidates.push({ url: licenseOpen, label: licenseName });
+                    } else {
+                        licenseHtml = '<b>' + escapeHtml(licenseName) + '</b>';
+                    }
+                    parts.push('unter Lizenz: ' + licenseHtml);
+                }
+
+                // Ergebnis setzen oder leeren
+                var formatted = parts.join(', ');
+                textItem.text = formatted;
                 licencelink.linkPositions = [];
 
-                // Ermitteln der Linkpositionen und Breiten im Textfeld
+                if (!formatted) return;
+
+                // --- Linkpositionen grob ermitteln (Raster-Sampling) ---
                 var y = 0;
-                while (y < text.height) {
+                while (y < textItem.height) {
                     var x = 0;
-                    while (x < text.width) {
-                        var link = text.linkAt(x, y);
-                        if (link) {
-                            var linkWidth = 0;
-
-                            // Berechne die Breite abhängig vom Linkinhalt
-                            if (link === value1) {
-                                linkWidth = estimateTextWidth("Wikipedia", text.font);
-                            } else if (link === value2) {
-                                linkWidth = estimateTextWidth("Wikimedia Commons", text.font);
-                            } else if (link === authorParts[1]) {
-                                linkWidth = estimateTextWidth(value4, text.font);
-                            } else if (link === licenseParts[1]) {
-                                linkWidth = estimateTextWidth(value6, text.font);
-                            }
-
-                            // Stelle sicher, dass wir diesen Link nur einmal speichern
-                            if (!licencelink.linkPositions.some(l => l.url === link)) {
-                                licencelink.linkPositions.push({ url: link, x: x, y: y, width: linkWidth });
+                    while (x < textItem.width) {
+                        var linkAtPoint = textItem.linkAt(x, y);
+                        if (linkAtPoint) {
+                            for (var i = 0; i < candidates.length; ++i) {
+                                var c = candidates[i];
+                                var already = licencelink.linkPositions.some(function (l) { return l.url === c.url; });
+                                if (!already) {
+                                    var w = licencelink.estimateTextWidth(c.label, textItem.font);
+                                    licencelink.linkPositions.push({ url: c.url, x: x, y: y, width: w });
+                                }
                             }
                         }
-                        x += 10;  // Schritte in x-Richtung, um horizontal zu durchsuchen
+                        x += 8;
                     }
-                    y += 10;  // Schritte in y-Richtung, um vertikal zu durchsuchen
+                    y += 8;
                 }
             }
-            function getPageUrl() {
-                return linkUrl;
-            }
         }
-
         function callSetImage(isQuestion,imgName, entryDesc) {
             imageId.source = imgName;
             if (entryDesc) {
