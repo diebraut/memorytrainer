@@ -1,18 +1,21 @@
-*.o
-*.obj
-*.exe
-*.user
-*.pro.user
-*.user.*
-*.autosave
-*.qmlc
-*.jsc
-moc_*
-qrc_*
-ui_*
-Makefile*
+# exakt ein Verzeichnis ignorieren
+build/
+
+# alle build-Ordner-Varianten (Qt/CMake/Xcode)
 build-*/
-debug/
-release/
+cmake-build-*/
+DerivedData/
+
+# Beispiel: deine Trainingspakete
+exercisepackages/
+
+# IDE/OS-Kleinkram
+*.pro.user
+*.user
+*.qmlproject.user
+.qmake.stash
+.DS_Store
 .idea/
 .vscode/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
