@@ -3,11 +3,14 @@ build/
 
 # alle build-Ordner-Varianten (Qt/CMake/Xcode)
 build-*/
+memorytrainer.build*/
+memorytrainer.pro*/
 cmake-build-*/
 DerivedData/
+Makefile
 
 # Beispiel: deine Trainingspakete
-exercisepackages/
+excercisedata/
 
 # IDE/OS-Kleinkram
 *.pro.user
