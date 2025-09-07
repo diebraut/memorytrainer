@@ -4,7 +4,6 @@ import QtQuick.Dialogs
 import QtQuick.Controls.Material 2.15
 import QtCore 6.5 as QtCore  // Verwende die passende Qt-Version
 import QtQuick.Layouts 1.12
-import QtWebEngine 1.12 // Import WebEngine module // Import WebEngine module
 
 import "../model"
 
@@ -17,7 +16,6 @@ import com.memoryhandler.LicenceInfo 1.0
 import com.memorytrainer.network 1.0
 
 import "../pages" as ScoreDisplayComponent
-
 
 
 Page {

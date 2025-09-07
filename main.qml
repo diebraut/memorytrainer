@@ -34,7 +34,7 @@ ApplicationWindow {
         id: mainFocusScope
         anchors.fill: parent
         focus: true
-        activeFocusOnTab: true
+        //activeFocusOnTab: true
         z: 1
 
         // WebBrowser-Container
