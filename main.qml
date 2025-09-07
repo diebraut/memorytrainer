@@ -7,9 +7,6 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Controls.Universal 2.3
 
-
-import QtWebEngine 1.12 // Import WebEngine module
-
 import QtCore 6.5 as QtCore
 
 import "model"
@@ -40,6 +37,19 @@ ApplicationWindow {
         activeFocusOnTab: true
         z: 1
 
+        // WebBrowser-Container
+        // Container für die dynamische Erstellung der WebEngineView-Instanz
+        Item {
+            id: webViewContainerId
+            anchors.fill: parent
+            Keys.onPressed: (event) => {
+                if (event.key === Qt.Key_Escape) {
+                    mainFocusScope.closeWebPage();
+                    event.accepted = true;
+                }
+            }
+        }
+
         Timer {
             id: delayedDestroyTimer
             interval: 100  // Warte 100ms
@@ -58,18 +68,6 @@ ApplicationWindow {
         // URL, die geladen wird
         property string webUrl: "https://www.wikipedia.org"
         property var webEngineInstance: null
-
-        // Container für die dynamische Erstellung der WebEngineView-Instanz
-        Item {
-            id: webViewContainerId
-            anchors.fill: parent
-            Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Escape) {
-                    mainFocusScope.closeWebPage();
-                    event.accepted = true;
-                }
-            }
-        }
 
         function showWebPage(url) {
             console.log("Loading page in application window...");
@@ -98,28 +96,20 @@ ApplicationWindow {
         }
         function closeWebPage() {
             if (webEngineInstance) {
-                 console.log("Initiating close process for WebEngineView...");
-                const webView = webEngineInstance.children[0];
-                if (webView) {
-                    webView.url = "about:blank";  // Entlädt die Seite
+                const browser = webEngineInstance.children[0];
+                if (browser && browser.hasOwnProperty("url")) {
+                    browser.url = "about:blank";
                 }
-                delayedDestroyTimer.start();  // Startet den Timer, um das Objekt verzögert zu zerstören
+                delayedDestroyTimer.start();
             }
         }
-
         // WebEngineView-Komponente
         Component {
             id: webViewComponentId
             Item {
-                width: parent.width
-                height: parent.height
-
-                WebEngineView  {
-                    id: webEngineViewId
-                    anchors.fill: parent
-                    focus: true
-                    url: ""  // Die URL wird später gesetzt
-                }
+                width: parent ? parent.width : 0
+                height: parent ? parent.height : 0
+                Browser { anchors.fill: parent; url: "" } // <- unser Wrapper
             }
         }
     }

@@ -70,5 +70,8 @@
         <file>StatusBar.qml</file>
         <file>images/state_off.png</file>
         <file>images/state_on.png</file>
+        <file>Browser.qml</file>
+        <file>BrowserWebEngine.qml</file>
+        <file>BrowserWebView.qml</file>
     </qresource>
 </RCC>

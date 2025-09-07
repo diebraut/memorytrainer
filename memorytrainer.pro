@@ -53,7 +53,3 @@ ios {
     TARGET = memorytrainer
     QMAKE_INFO_PLIST = Info.plist
 }
-
-!ios:!android {
-    LIBS += -lavformat -lavcodec -lavutil -lswresample -lswscale
-}
