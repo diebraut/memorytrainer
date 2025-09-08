@@ -34,83 +34,65 @@ ApplicationWindow {
         id: mainFocusScope
         anchors.fill: parent
         focus: true
-        //activeFocusOnTab: true
         z: 1
 
-        // WebBrowser-Container
-        // Container für die dynamische Erstellung der WebEngineView-Instanz
+        // Container über allem
         Item {
             id: webViewContainerId
             anchors.fill: parent
+            z: 1000
+            visible: webLoader.active
+
             Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Escape) {
-                    mainFocusScope.closeWebPage();
-                    event.accepted = true;
+                if (event.key === Qt.Key_Escape) { mainFocusScope.closeWebPage(); event.accepted = true }
+            }
+
+            Loader {
+                id: webLoader
+                anchors.fill: parent
+                active: false
+                asynchronous: true
+                source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos")
+                        ? "qrc:/BrowserIOS.qml"
+                        : "qrc:/BrowserDesktop.qml"
+
+                onStatusChanged: console.log("qml: webLoader status:", status, "src:", source)
+                onLoaded: {
+                    console.log("qml: webLoader loaded item:", item)
+                    mainFocusScope.__applyPendingUrl()
+                    webViewContainerId.forceActiveFocus()
                 }
             }
         }
 
-        Timer {
-            id: delayedDestroyTimer
-            interval: 100  // Warte 100ms
-            repeat: false
-            onTriggered: {
-                if (mainFocusScope.webEngineInstance) {
-                    console.log("Destroying WebEngineView instance...");
-                    mainFocusScope.webEngineInstance.destroy();
-                    mainFocusScope.webEngineInstance = null;
-                    gc();  // Garbage Collection
-                    console.log("WebEngineView instance destroyed and garbage collected.");
-                }
-            }
-        }
-
-        // URL, die geladen wird
+        // URL-State & API
         property string webUrl: "https://www.wikipedia.org"
-        property var webEngineInstance: null
+        property string __pendingUrl: ""
 
-        function showWebPage(url) {
-            console.log("Loading page in application window...");
-            openWebPage(url);  // Lädt die Seite im Main Window
+        function __applyPendingUrl() {
+            if (!webLoader.item || !__pendingUrl) return
+            const w = webLoader.item
+            if (typeof w.load === "function") w.load(__pendingUrl)
+            if (w.hasOwnProperty("url")) w.url = __pendingUrl
         }
+
+        function showWebPage(url) { openWebPage(url) }
 
         function openWebPage(url) {
-            closeWebPage();  // Bestehende WebView-Instanz schließen
-
-            // WebEngineView-Instanz dynamisch erstellen
-            webEngineInstance = webViewComponentId.createObject(webViewContainerId, {
-                width: webViewContainerId.width,
-                height: webViewContainerId.height,
-                focus: true
-            });
-
-            if (webEngineInstance) {
-                // Setze die URL für das WebEngineView
-                const webEngineView = webEngineInstance.children[0];
-                if (webEngineView) {
-                    webEngineView.url = url || webUrl;  // URL festlegen
-                }
-            }
-            appId.setWebView(webEngineInstance);
-            webViewContainerId.forceActiveFocus();
+            __pendingUrl = url || webUrl
+            console.log("OPEN:", __pendingUrl)
+            webLoader.active = true
+            __applyPendingUrl()
+            appId.setWebView(webLoader.item) // dein Exit-Button hook
         }
+
         function closeWebPage() {
-            if (webEngineInstance) {
-                const browser = webEngineInstance.children[0];
-                if (browser && browser.hasOwnProperty("url")) {
-                    browser.url = "about:blank";
-                }
-                delayedDestroyTimer.start();
+            if (webLoader.item) {
+                if (typeof webLoader.item.stop  === "function") webLoader.item.stop()
+                if (typeof webLoader.item.clear === "function") webLoader.item.clear()
             }
-        }
-        // WebEngineView-Komponente
-        Component {
-            id: webViewComponentId
-            Item {
-                width: parent ? parent.width : 0
-                height: parent ? parent.height : 0
-                Browser { anchors.fill: parent; url: "" } // <- unser Wrapper
-            }
+            webLoader.active = false
+            __pendingUrl = ""
         }
     }
 

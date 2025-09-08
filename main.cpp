@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
     PackageManager::registerSingleton(&engine);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    //engine.load(QUrl(QStringLiteral("qrc:/TestWeb.qml")));
 
     // Fix: use a reference to rootObjects()
     const QObjectList &rootObjects = engine.rootObjects();
