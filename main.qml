@@ -4,7 +4,6 @@ import QtQuick.Controls.Material 2.15
 
 //import Qt.labs.settings 1.0
 import QtQuick.Layouts 1.12
-import QtQuick.Controls.Material 2.12
 import QtQuick.Controls.Universal 2.3
 
 import QtCore 6.5 as QtCore
