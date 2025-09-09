@@ -1,11 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-
-//import Qt.labs.settings 1.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Universal 2.3
-
 import QtCore 6.5 as QtCore
 
 import "model"
@@ -16,98 +13,128 @@ ApplicationWindow {
     visible: true
     title: "Start Training"
 
-    property bool isInternetAvailable: false  // Update this based on network status
-
     width: 768
     height: 1024
 
-    Util {
-        id: utilID
-    }
+    // Optional: falls du das brauchst
+    property bool isInternetAvailable: false
 
-    DataModel {
-        id: dataModel
-    }
+    Util { id: utilID }
+    DataModel { id: dataModel }
 
+    /* =======================
+       Haupt-FocusScope & Web-Overlay
+       ======================= */
     FocusScope {
         id: mainFocusScope
         anchors.fill: parent
         focus: true
         z: 1
 
-        // Container über allem
-        Item {
-            id: webViewContainerId
-            anchors.fill: parent
-            z: 1000
-            visible: webLoader.active
-
-            Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Escape) { mainFocusScope.closeWebPage(); event.accepted = true }
-            }
-
-            Loader {
-                id: webLoader
-                anchors.fill: parent
-                active: false
-                asynchronous: true
-                source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos")
-                        ? "qrc:/BrowserIOS.qml"
-                        : "qrc:/BrowserDesktop.qml"
-
-                onStatusChanged: console.log("qml: webLoader status:", status, "src:", source)
-                onLoaded: {
-                    console.log("qml: webLoader loaded item:", item)
-                    mainFocusScope.__applyPendingUrl()
-                    webViewContainerId.forceActiveFocus()
-                }
-            }
-        }
-
-        // URL-State & API
+        // Web-Overlay-Status & URL-Pipeline
+        property bool webShown: false
         property string webUrl: "https://www.wikipedia.org"
         property string __pendingUrl: ""
 
+        // URL anwenden, wenn der Loader ein Item hat
         function __applyPendingUrl() {
-            if (!webLoader.item || !__pendingUrl) return
+            if (!__pendingUrl) return
+            if (!webLoader.item) {
+                Qt.callLater(__applyPendingUrl)
+                return
+            }
             const w = webLoader.item
-            if (typeof w.load === "function") w.load(__pendingUrl)
-            if (w.hasOwnProperty("url")) w.url = __pendingUrl
+            Qt.callLater(function() {
+                if (typeof w.load === "function") w.load(__pendingUrl)
+                if (w.hasOwnProperty("url"))      w.url = __pendingUrl
+            })
         }
 
+        // API (extern nutzbar)
         function showWebPage(url) { openWebPage(url) }
 
         function openWebPage(url) {
             __pendingUrl = url || webUrl
-            console.log("OPEN:", __pendingUrl)
-            webLoader.active = true
-            __applyPendingUrl()
-            appId.setWebView(webLoader.item) // dein Exit-Button hook
+            webShown = true                                   // 1) zeigen
+            Qt.callLater(() => {                              // 2) nach 1 Frame fokussieren & URL setzen
+                webViewContainerId.forceActiveFocus()
+                __applyPendingUrl()
+            })
         }
 
         function closeWebPage() {
-            if (webLoader.item) {
-                if (typeof webLoader.item.stop  === "function") webLoader.item.stop()
-                if (typeof webLoader.item.clear === "function") webLoader.item.clear()
-            }
-            webLoader.active = false
+            mainFocusScope.forceActiveFocus()                 // Fokus weg vom Overlay
+            // NICHT stop() auf WKWebView — reduziert "connection invalid"
+            if (webLoader.item && typeof webLoader.item.clear === "function")
+                webLoader.item.clear()                        // setzt nur about:blank (siehe unten)
+            webShown = false
             __pendingUrl = ""
+        }
+
+        // Overlay über allem – enthält den persistenten Loader
+        Item {
+            id: webViewContainerId
+            anchors.fill: parent
+            z: 1000
+            visible: mainFocusScope.webShown
+
+            // Eigener Fokusanker
+            FocusScope {
+                id: overlayFocus
+                anchors.fill: parent
+                focus: false   // wird gezielt gesetzt
+
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_Escape) {
+                        mainFocusScope.closeWebPage()
+                        event.accepted = true
+                    }
+                }
+
+                Loader {
+                    id: webLoader
+                    anchors.fill: parent
+                    active: true
+                    asynchronous: true
+                    source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos")
+                            ? "qrc:/BrowserIOS.qml"
+                            : "qrc:/BrowserDesktop.qml"
+
+                    onLoaded: {
+                        mainFocusScope.__applyPendingUrl()
+                        Qt.callLater(() => overlayFocus.forceActiveFocus())
+                    }
+                }
+            }
+
+            onVisibleChanged: {
+                if (visible) Qt.callLater(() => overlayFocus.forceActiveFocus())
+            }
         }
     }
 
-    Component.onCompleted: {
-        dataModel.setPlatform(utilID.ifMobile())
-    }
+    /* =======================
+       Lifecycle
+       ======================= */
+    Component.onCompleted: dataModel.setPlatform(utilID.ifMobile())
 
+    /* =======================
+       Shortcuts
+       ======================= */
     Shortcut {
         sequence: "Menu"
         onActivated: optionsMenu.open()
     }
 
+    /* =======================
+       Header / Toolbar
+       ======================= */
     header: ToolBar {
         id: headerId
         Material.foreground: "white"
+
         RowLayout {
+            id: headerRow
             spacing: 20
             anchors.fill: parent
             property QtCore.Settings p;
@@ -121,62 +148,56 @@ ApplicationWindow {
             ToolButton {
                 icon.name: stackView.depth > 1 ? "back" : "drawer"
                 property var wrongDatastore: undefined
+
                 onClicked: {
                     if (stackView.depth > 1) {
-                        const currentPage = stackView.currentItem;
-
+                        const currentPage = stackView.currentItem
                         if (currentPage && typeof currentPage.inProcess === "boolean") {
                             if (currentPage.inProcess) {
-                                console.log("Page is in process, close and recreating...");
-                                // Prüfen, ob die Seite eine Methode cleanup() hat, und diese aufrufen
+                                console.log("Page is in process, close and recreating...")
                                 if (typeof currentPage.myCleanup === "function") {
-                                    currentPage.myCleanup(); // Cleanup-Methode aufrufen
+                                    currentPage.myCleanup()
                                     if (locSetting.datastore) {
-                                        //dataModel.debugPt();
-                                        //var entryModelPackagesId = []
-                                        console.log("Datastore-Wert bei Überprüfung:", locSetting.datastore);
-                                        wrongDatastore = currentPage.work_datastore;
-                                        console.log("DatastoreWork-Wert bei Überprüfung:", wrongDatastore);
-                                        if (!wrongDatastore) {
-                                            wrongDatastore = undefined;
-                                        }
+                                        console.log("Datastore-Wert:", locSetting.datastore)
+                                        wrongDatastore = currentPage.work_datastore
+                                        console.log("DatastoreWork-Wert:", wrongDatastore)
+                                        if (!wrongDatastore) wrongDatastore = undefined
                                     }
                                 } else {
-                                    console.warn("Current page has no cleanup method.");
+                                    console.warn("Current page has no cleanup method.")
                                 }
-                                // Prüfen, ob die Quelle der Seite definiert ist
-                                const pageSource = currentPage.source;
+
+                                const pageSource = currentPage.source
                                 if (pageSource) {
-                                    stackView.pop(); // Aktuelle Seite entfernen
-                                    // Dynamische Neuanlage
-                                    const component = Qt.createComponent(pageSource);
+                                    stackView.pop()
+                                    const component = Qt.createComponent(pageSource)
                                     if (component.status === Component.Ready) {
-                                        //const newPage = component.createObject(stackView);
-                                        stackView.push(pageSource); // Neue Seite hinzufügen
+                                        stackView.push(pageSource)
                                         if (wrongDatastore && typeof currentPage.myStartup === "function") {
-                                            stackView.currentItem.myStartup(wrongDatastore); // Startup methode aufrufen
+                                            stackView.currentItem.myStartup(wrongDatastore)
                                         }
                                     } else {
-                                        console.error("Failed to load component:", component.errorString());
+                                        console.error("Failed to load component:", component.errorString())
                                     }
                                 } else {
-                                    console.error("Page source is undefined. Cannot recreate.");
+                                    console.error("Page source is undefined. Cannot recreate.")
                                 }
                             } else {
-                                console.log("Page is not in process, navigating to start page...");
-                                stackView.pop(); // Zur Startseite zurückkehren
-                                listView.currentIndex = -1;
+                                console.log("Page is not in process, navigating to start page...")
+                                stackView.pop()
+                                listView.currentIndex = -1
                             }
                         } else {
-                            console.log("No valid status, returning to start page...");
-                            stackView.pop(); // Fallback
-                            listView.currentIndex = -1;
+                            console.log("No valid status, returning to start page...")
+                            stackView.pop()
+                            listView.currentIndex = -1
                         }
                     } else {
-                        drawer.open();
+                        drawer.open()
                     }
                 }
             }
+
             Label {
                 id: titleLabel
                 text: listView.currentItem ? listView.currentItem.text : "Memory Trainer (" + Qt.platform.os + ")"
@@ -196,20 +217,14 @@ ApplicationWindow {
                     x: parent.width - width
                     transformOrigin: Menu.TopRight
 
-                    MenuItem {
-                        text: "Settings"
-                        // onTriggered: settingsDialog.open()
-                    }
-                    MenuItem {
-                        text: "About"
-                        onTriggered: aboutDialog.open()
-                    }
+                    MenuItem { text: "Settings" }
+                    MenuItem { text: "About"; onTriggered: aboutDialog.open() }
                 }
             }
 
             Button {
                 id: exitWebViewButton
-                visible: false
+                visible: mainFocusScope.webShown
                 height: parent.height
                 text: "Webseite schließen"
                 font.pixelSize: 14
@@ -217,28 +232,19 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 Layout.rightMargin: 10
 
+                // optional, falls du die Referenz brauchst
                 property var webEngineInstance: null
+                function setWebView(webView) { webEngineInstance = webView }
 
-                // Setzt das WebView-Objekt in der Schließen-Logik
-                function setWebView(webView) {
-                    webEngineInstance = webView;
-                    visible = true;  // Zeige den Button, wenn WebView gesetzt ist
-                }
-
-                // Zentrale Funktion zur Schließung
-                function closeWebView() {
-                    mainFocusScope.closeWebPage();  // Aufruf der zentralen close-Funktion
-                    webEngineInstance = null;
-                    visible = false;
-                }
-
-                onClicked: {
-                    closeWebView();  // Aufruf der Schließfunktion bei Button-Klick
-                }
+                // Wichtig: Direkt die Autorität rufen – kein Rückruf-Loop
+                onClicked: mainFocusScope.closeWebPage()
             }
         }
     }
 
+    /* =======================
+       Drawer / Navigation
+       ======================= */
     Drawer {
         id: drawer
         width: Math.min(appId.width, appId.height) / 3 * 2
@@ -263,9 +269,9 @@ ApplicationWindow {
             }
 
             model: ListModel {
-                ListElement { title: "Training"; source: "pages/Exercise.qml" }
-                ListElement { title: "Kamera"; source: "pages/MakeOwnPicture.qml" }
-                ListElement { title: "Paket Verwaltung"; source: "pages/PackageManager.qml" }
+                ListElement { title: "Training";          source: "pages/Exercise.qml" }
+                ListElement { title: "Kamera";            source: "pages/MakeOwnPicture.qml" }
+                ListElement { title: "Paket Verwaltung";  source: "pages/PackageManager.qml" }
                 ListElement { title: "Paket importieren"; source: "pages/PackageProvider.qml" }
             }
 
@@ -273,22 +279,21 @@ ApplicationWindow {
         }
     }
 
+    /* =======================
+       Hauptinhalt
+       ======================= */
     StackView {
         id: stackView
         anchors.fill: parent
 
-
         initialItem: Pane {
             id: pane
-            //anchors.fill: parent
 
             Image {
                 id: logo
                 width: pane.width / 2
                 height: pane.height / 3
                 anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.top: pane.top
-                //anchors.topMargin:300
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: -100
                 fillMode: Image.PreserveAspectFit
@@ -302,10 +307,8 @@ ApplicationWindow {
                 anchors.topMargin: pane.height / 6
                 anchors.right: logo.right
                 anchors.rightMargin: 70
-                z:1
-                //wrapMode: Label.Wrap
+                z: 1
             }
-
 
             Button {
                 id: startButton
@@ -322,30 +325,32 @@ ApplicationWindow {
                     border.color: "#000000"
                     border.width: 2
                 }
-                onClicked: {
-                    stackView.push("pages/Exercise.qml")
-                }
+                onClicked: stackView.push("pages/Exercise.qml")
             }
         }
     }
 
-    // Use the StatusBar component at the bottom
+    /* =======================
+       StatusBar unten
+       ======================= */
     StatusBar {
         id: statusBarComponent
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        width: parent.width / 2  // If you need a specific width
+        width: parent.width / 2
     }
 
+    /* =======================
+       About-Dialog
+       ======================= */
     Dialog {
         id: aboutDialog
         title: "About"
         standardButtons: Dialog.Ok
         visible: false
         onAccepted: visible = false
-
-        width: 400  // Manuelle Breite setzen
-        height: 200  // Manuelle Höhe setzen
+        width: 400
+        height: 200
 
         contentItem: Text {
             text: "Memory Trainer\nVersion 1.0\nDeveloped by [Your Name]"
@@ -355,12 +360,15 @@ ApplicationWindow {
         }
     }
 
+    /* =======================
+       Hooks für den Header-Button
+       ======================= */
     function setWebView(webView) {
-        exitWebViewButton.visible = true
-        exitWebViewButton.setWebView(webView);
+        if (exitWebViewButton && typeof exitWebViewButton.setWebView === "function")
+            exitWebViewButton.setWebView(webView)
     }
 
-    function closeWebView(webView) {
-        exitWebViewButton.closeWebView(webView);
+    function closeWebView() {
+        // no-op – Schließen macht ausschließlich mainFocusScope.closeWebPage()
     }
 }

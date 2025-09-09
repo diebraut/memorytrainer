@@ -41,7 +41,10 @@
 
 int main(int argc, char *argv[])
 {
+#ifndef Q_OS_IOS
     QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+#endif
+    // ...
     QGuiApplication::setApplicationName("Memory Trainerxx");
     QGuiApplication::setOrganizationName("QtProject");
 

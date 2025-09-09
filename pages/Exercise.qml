@@ -1969,66 +1969,58 @@ Page {
             z: imageId.z + 1
             width: imageId.paintedWidth
             anchors.top: imageLicenseSeparator.bottom
-            //anchors.topMargin: (imageId.height - imageId.paintedHeight) / 2 + imageId.paintedHeight + 2
             anchors.horizontalCenter: imageId.horizontalCenter
             height: 25
             color: "transparent"
 
             property bool isQuestionImage: true
-            property var linkPositions: [] // Speichert die Positionen und URLs der Links
+            property var linkPositions: []
 
+            // ---- Der Text mit RichText + eingebauter Link-Aktivierung ----
             Text {
                 id: licensceInfoId
                 anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter  // Horizontales Zentrieren im parent
                 anchors.topMargin: 2
+                anchors.horizontalCenter: parent.horizontalCenter
                 text: ""
                 color: "black"
                 font.pointSize: 10
                 textFormat: Text.RichText
-                renderType: Text.NativeRendering   // präzisere Glyph-Layouts
-                //wrapMode: Text.WordWrap            // wenn du umbrechen lässt
-                // Aktiviert den Link bei direktem Klick auf den Text
+
+                // iOS: keine MouseArea darüber → dieser Handler greift für alle <a href=...>
                 onLinkActivated: function(link) {
-                    licencelink.showLink(link);
+                    licencelink.showLink(link)
                 }
             }
 
-            // Maussteuerung exakt über dem Text
+            // ---- Desktop-only: eigene Klicklogik via linkAt(..) ----
             MouseArea {
                 id: linkMouseArea
-                anchors.fill: licensceInfoId          // exakt gleiche Fläche
+                anchors.fill: licensceInfoId
+                enabled: Qt.platform.os !== "ios"
+                visible: Qt.platform.os !== "ios"
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton
-                cursorShape: hoveredHref ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-                // aktuell „getroffener“ href (genau der Wert aus dem <a href="...">)
-                property string hoveredHref: ""
-
-                // kleine vertikale Toleranz, falls Baseline knapp verfehlt wird
-                property int vTol: 6
+                // kleine vertikale Toleranz
+                property int vTol: 8
                 property int vStep: 2
 
-                onPositionChanged: (mouse) => {
-                    const p = mapToItem(licensceInfoId, mouse.x, mouse.y);
-                    let href = licensceInfoId.linkAt(p.x, p.y);
-
-                    // vertikale Toleranz prüfen
+                onClicked: (mouse) => {
+                    const p = mapToItem(licensceInfoId, mouse.x, mouse.y)
+                    let href = licensceInfoId.linkAt(p.x, p.y)
                     if (!href) {
                         for (let dy = -vTol; dy <= vTol && !href; dy += vStep) {
-                            href = licensceInfoId.linkAt(p.x, Math.max(0, Math.min(p.y + dy, licensceInfoId.height - 1)));
+                            const yy = Math.max(0, Math.min(p.y + dy, licensceInfoId.height - 1))
+                            href = licensceInfoId.linkAt(p.x, yy)
                         }
                     }
-
-                    hoveredHref = href || "";
-                    cursorShape = hoveredHref ? Qt.PointingHandCursor : Qt.ArrowCursor;
-                }
-
-                onClicked: (mouse) => {
-                    if (!hoveredHref) return;
-                    licencelink.showLink(hoveredHref);   // deine bestehende Normalisierung/Öffnen
+                    if (href) licencelink.showLink(href)
+                    mouse.accepted = true
                 }
             }
+
+            // --- deine Helper + showLink(..) + buildLicenceInfoLink(..) bleiben wie gehabt ---
             // ------- Helper: HTML Escapes -------
             function escapeHtml(s) {
                 if (s === undefined || s === null) return "";

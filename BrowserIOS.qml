@@ -5,6 +5,7 @@ import QtWebView 1.1
 Item {
     id: root
     anchors.fill: parent
+
     property alias url: view.url
     signal loadStarted()
     signal loadFinished(bool ok)
@@ -14,22 +15,39 @@ Item {
         id: view
         anchors.fill: parent
 
-        // iOS: im selben View bleiben
-        onNewViewRequested: function(req) { if (req?.url) view.url = req.url }
-        onNavigationRequested: function(req) {
-            const u = req.url.toString()
-            if (u.startsWith("http")) req.action = WebView.AcceptRequest
-            else { req.action = WebView.IgnoreRequest; console.log("[WebView] blocked:", u) }
+        Component.onCompleted: console.log("[BrowserIOS] up. url:", view.url)
+
+        onLoadingChanged: function(req) {
+            if (req.status === WebView.LoadStartedStatus) {
+                console.log("[BrowserIOS] load started:", (req.url || ""))
+                root.loadStarted()
+                // Nur leichte Logik; evtl. fragwürdige URLs sanft stoppen
+                Qt.callLater(function() {
+                    const u = (req.url || "").toString()
+                    if (u && !u.startsWith("http")) delayedStop.restart()
+                })
+            } else if (req.status === WebView.LoadSucceededStatus) {
+                console.log("[BrowserIOS] load ok")
+                root.loadFinished(true)
+            } else if (req.status === WebView.LoadFailedStatus) {
+                console.log("[BrowserIOS] load failed:", req.errorString)
+                root.loadFinished(false)
+                root.loadFailed(req.errorString || "unknown")
+            }
         }
 
-        onLoadingChanged: function(ev) {
-            if (ev.status === WebView.LoadStartedStatus) root.loadStarted()
-            else if (ev.status === WebView.LoadSucceededStatus) root.loadFinished(true)
-            else if (ev.status === WebView.LoadFailedStatus) { root.loadFinished(false); root.loadFailed(ev.errorString||"unknown") }
+        Timer {
+            id: delayedStop
+            interval: 50
+            repeat: false
+            onTriggered: view.stop()
         }
     }
 
     function load(u) { url = u }
     function stop()  { view.stop() }
-    function clear() { url = "about:blank" }
+    function clear() {
+        // Kein view.stop() → vermeidet "connection invalid" beim frühen Load
+        Qt.callLater(function(){ url = "about:blank" })
+    }
 }
