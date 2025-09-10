@@ -1518,111 +1518,149 @@ Page {
             height: parent.height * 0.12
             anchors.top: parent.top
             anchors.topMargin: 15
-            color: "#C2B5B5" // Hitnergrundfarbe des Rechtecks
+            color: "#C2B5B5"
             visible: true
-            border.color: "black" // Farbe der Grenze
-            border.width: 2 // Breite der Grenze
+            border.color: "black"
+            border.width: 2
 
+            // Container für drei Zeilen: oben (links-Teil), Mitte (Subject), unten (rechts-Teil)
             Column {
+                id: qCol
                 anchors.centerIn: parent
                 width: parent.width - 20
+                spacing: 0
 
+                // Zeile 1: linker/erster Textteil
                 Text {
-                    id: questionText
+                    id: questionTop
                     text: ""
-                    horizontalAlignment: Text.AlignHCenter
+                    width: qCol.width
                     wrapMode: Text.WordWrap
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    textFormat: Text.PlainText
                 }
 
+                // Zeile 2: Subject (eigene Zeile, fett)
                 Text {
-                    id: subjectText
+                    id: subjectLine
                     text: ""
-                    color: "black"
+                    width: qCol.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    textFormat: Text.PlainText     // damit "<...>" wörtlich angezeigt wird
                     font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    anchors.horizontalCenter: parent.horizontalCenter
                 }
 
+                // Zeile 3: rechter/folgender Textteil
                 Text {
-                    id: followingText
+                    id: questionBottom
                     text: ""
+                    width: qCol.width
+                    wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.NoWrap
-                    textFormat: Text.PlainText  // damit „< >“ nicht als HTML interpretiert werden
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    renderType: Text.NativeRendering   // (optional) stabilere Metriken
-
+                    textFormat: Text.PlainText
                 }
             }
 
-            function fitFontToBoxPx(item, maxH, maxW, startPx, minPx, capPx) {
-                const min = Math.max(1, minPx || 6)
-                const cap = Math.max(min, capPx || 512)
-
-                // wir arbeiten *nur* mit pixelSize – punktgrößen bitte nicht mischen
-                item.font.pixelSize = Math.max(min, Math.round(startPx || 16))
-
-                function fits(px) {
-                    item.font.pixelSize = px
-                    const w = widthOf(item)
-                    const h = heightOf(item)
-                    return h <= maxH && (maxW <= 0 || w <= maxW)
-                }
-
-                // obere Schranke finden (exponentiell erhöhen bis es nicht mehr passt oder cap)
-                let lo = min
-                let hi = Math.min(cap, Math.max(item.font.pixelSize, min))
-                while (hi < cap && fits(hi)) {
-                    lo = hi
-                    hi = Math.min(cap, Math.floor(hi * 1.5) + 1)
-                }
-                if (lo < min) lo = min
-                if (hi < lo) hi = lo
-
-                // binäre Suche: größtes px das noch passt
-                let best = lo
-                let L = lo, R = hi
-                for (let i = 0; i < 20; i++) {           // 2^20 ~ fein genug
-                    const mid = Math.floor((L + R) / 2)
-                    if (fits(mid)) { best = mid; L = mid + 1 } else { R = mid - 1 }
-                }
-                item.font.pixelSize = best
+            // ===== Helpers =====
+            function normalizeSpaces(s) {
+                return (s || "")
+                    .replace(/\s+/g, " ")
+                    .replace(/\s+([!?.,;:])/g, "$1")
+                    .trim();
             }
 
+            function replaceToken(s, token, value) {
+                return (s || "").split(token).join(value || "");
+            }
+
+            // item: Text; boxH: max Höhe (px); boxW: max Breite (px) (<=0 ignorieren); maxPx: obere Schranke
+            function fitFontToBoxPx(item, boxH, boxW, maxPx) {
+                const EPS = 0.5;
+                const minPx = 6;
+                const widthCap = (boxW && boxW > 0) ? boxW : 1e6;
+
+                item.wrapMode = Text.WordWrap;
+                item.width = widthCap;
+
+                let lo = minPx;
+                let hi = Math.max(minPx, Math.floor(maxPx || boxH || 200));
+
+                while (hi - lo > 1) {
+                    const mid = Math.floor((lo + hi) / 2);
+                    item.font.pixelSize = mid;
+
+                    const fitsH = !boxH || item.paintedHeight <= boxH + EPS;
+                    const fitsW = !boxW || item.paintedWidth  <= boxW + EPS;
+
+                    if (fitsH && fitsW) lo = mid;
+                    else hi = mid - 1;
+                }
+                item.font.pixelSize = lo;
+            }
+
+            // ===== API: Frage setzen – Subject in eigener Zeile =====
+            // Platzhalter:
+            //  - [SubjektPrefixFrage]  -> subjektPrefix
+            //  - [FrageSubjekt]        -> <subject> (in eigener Zeile)
             function writeQuestion(question, subject, subjektPrefix) {
-                const h = questionArea.height
-                const parts = question.split("[FrageSubjekt]")
+                const H  = questionArea.height;
+                const W  = Math.max(0, questionArea.width - 20); // volle Breite (mit etwas Luft)
 
-                const qMaxPx  = Math.round(h * 0.15)
-                const qNoSub  = Math.round(h * 0.40)
-                const sMaxPx  = Math.round(h * 0.40)
-                const fMaxPx  = Math.round(h * 0.30)
+                const subjToken = "[FrageSubjekt]";
+                const prefToken = "[SubjektPrefixFrage]";
 
-                if (parts.length > 1) {
-                    questionText.text = (parts[0] || "") + subjektPrefix
-                    subjectText.text  = "<" + subject + ">"
-                    followingText.text = (parts[1] || "") + "?"
+                // Platzhalter ersetzen
+                let templ = String(question || "");
+                templ = replaceToken(templ, prefToken, String(subjektPrefix || "").trim());
 
-                    // 1) Links/Rechts nur auf Höhe fitten
-                    fitFontToBoxPx(questionText,  h * 0.30, 0, qMaxPx)
-                    fitFontToBoxPx(followingText, h * 0.30, 0, fMaxPx)
+                let topTxt = "", subjTxt = "", botTxt = "";
 
-                    // 2) Verfügbare Breite für das Subjekt (100% – links – rechts – kleine Luft)
-                    const gap = 2
-                    const usedLeft  = widthOf(questionText)
-                    const usedRight = widthOf(followingText)
-                    const avail = Math.max(0, questionArea.width - usedLeft - usedRight - gap)
-                    // 3) Subjekt: Höhe *und* Breite fitten, maximal groß
-                    fitFontToBoxPx(subjectText, h * 0.40, avail, sMaxPx)
-
+                const idx = templ.indexOf(subjToken);
+                if (idx !== -1) {
+                    topTxt = normalizeSpaces(templ.slice(0, idx));
+                    botTxt = normalizeSpaces(templ.slice(idx + subjToken.length));
+                    subjTxt = String(subject || "").trim();
                 } else {
-                    questionText.text = question
-                    subjectText.text  = ""
-                    followingText.text = ""
-                    fitFontToBoxPx(questionText, h * 0.40, 0, qNoSub)
+                    // kein [FrageSubjekt] → alles in obere Zeile
+                    topTxt = normalizeSpaces(templ);
+                    subjTxt = ""; botTxt = "";
                 }
+
+                // Texte setzen
+                questionTop.text   = topTxt;
+                subjectLine.text   = subjTxt ? "<" + subjTxt + ">" : "";
+                questionBottom.text= botTxt;
+
+                // Gewichte nur für vorhandene Zeilen (Top: 0.30, Subject: 0.40, Bottom: 0.30)
+                var wTop = topTxt   ? 0.30 : 0.0;
+                var wSub = subjTxt  ? 0.40 : 0.0;
+                var wBot = botTxt   ? 0.30 : 0.0;
+                var wSum = wTop + wSub + wBot;
+
+                if (wSum <= 0) { // Fallback
+                    wTop = 1.0; wSub = 0.0; wBot = 0.0; wSum = 1.0;
+                }
+
+                // 90% der verfügbaren Höhe nutzen, rest als Luft
+                const usableH = Math.round(H * 0.90);
+                const scale   = usableH / wSum;
+
+                const boxTopH = Math.max(0, Math.round(wTop * scale));
+                const boxSubH = Math.max(0, Math.round(wSub * scale));
+                const boxBotH = Math.max(0, Math.round(wBot * scale));
+
+                // Fonts so groß wie möglich wählen (Cap = jeweilige Boxhöhe)
+                if (wTop > 0) fitFontToBoxPx(questionTop,   boxTopH, W, boxTopH);
+                else          questionTop.font.pixelSize = 1;
+
+                if (wSub > 0) fitFontToBoxPx(subjectLine,   boxSubH, W, boxSubH);
+                else          subjectLine.font.pixelSize = 1;
+
+                if (wBot > 0) fitFontToBoxPx(questionBottom, boxBotH, W, boxBotH);
+                else          questionBottom.font.pixelSize = 1;
+
+                // Column zentriert die Gesamthöhe automatisch; kein zusätzliches y nötig
             }
         }
         Rectangle {
@@ -1630,67 +1668,76 @@ Page {
             anchors.top: questionArea.top
             width: parent.width
             height: parent.height * 0.12
-            border.color: "black" // Farbe der Grenze
-            color: "#CDEEBF" // Hintergrundfarbe des Bildes
+            border.color: "black"
+            border.width: 2
+            color: "#CDEEBF"
             visible: false
-            border.width: 2 // Breite der Grenze
+            clip: true
+
+            // ≈5% Seitenrand links/rechts
+            property real sideMargin: width * 0.05
+
+            // Innen-Container mit echten Margins
+            Item {
+                id: answerContent
+                anchors.fill: parent
+                anchors.leftMargin: answerArea.sideMargin
+                anchors.rightMargin: answerArea.sideMargin
+            }
 
             Text {
                 id: answerHeader
+                parent: answerContent
                 text: "Antwort"
                 color: "#484C49"
                 horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 10
+                // y wird in writeAnswer gesetzt
             }
 
             Text {
                 id: answerText
+                parent: answerContent
                 text: ""
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere   // <- bricht auch lange Tokens
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: answerHeader.bottom
-                // Anpassung der vertikalen Position
-                anchors.verticalCenterOffset: (answerArea.height - answerHeader.height - answerText.height) / 2 - answerText.height / 2
-            }
-
-            function adjustFontSizeToFit(textWebPageUrl, maxHeight, initialFontSize) {
-                textWebPageUrl.font.pointSize = initialFontSize;
-                while (textWebPageUrl.height > maxHeight && textWebPageUrl.font.pointSize > 1) {
-                    textWebPageUrl.font.pointSize -= 1;
-                }
+                // y wird in writeAnswer gesetzt
             }
 
             function writeAnswer(answer) {
-                // Texte setzen
-                answerText.text = answer;
+                // Text setzen
+                answerText.text = String(answer || "");
 
-                // Startgrößen (in px, nicht pointSize mischen!)
                 const H = answerArea.height;
-                const W = Math.max(0, answerArea.width - 2); // kleine Luft
                 const headerStartPx = Math.round(H * 0.20);
                 const textStartPx   = Math.round(H * 0.30);
 
-                // 1) Header: max. 30% Höhe, volle Breite
-                questionArea.fitFontToBoxPx(answerHeader, H * 0.30, W, headerStartPx, 6, 512);
+                // Fitting erst NACH Layout (Margins/Width), sonst messen wir falsche Breite
+                Qt.callLater(function() {
+                    const W = Math.max(0, answerContent.width); // echte Innenbreite mit 5%-Rändern
 
-                // 2) Text: max. 60% Höhe, volle Breite
-                questionArea.fitFontToBoxPx(answerText,   H * 0.60, W, textStartPx,   6, 1024);
+                    // 1) Header max. 30% Höhe, volle Innenbreite
+                    questionArea.fitFontToBoxPx(answerHeader, H * 0.30, W, headerStartPx);
 
-                // 3) Block (Header+Text) vertikal in answerArea zentrieren
-                const blockH = answerHeader.height + answerText.height;
-                const topY   = Math.max(0, (H - blockH) / 2);
+                    // 2) Antworttext max. 60% Höhe, volle Innenbreite
+                    questionArea.fitFontToBoxPx(answerText,   H * 0.60, W, textStartPx);
 
-                // y-Position direkt setzen (achte darauf, dass keine kollidierenden anchors aktiv sind)
-                answerHeader.anchors.top = undefined;
-                answerText.anchors.top   = undefined;
-                answerText.anchors.verticalCenter = undefined;
+                    // 3) Vertikal zentrieren (keine Anchor-Kollisionen)
+                    const blockH = answerHeader.height + answerText.height;
+                    const topY   = Math.max(0, (H - blockH) / 2);
 
-                answerHeader.y = topY;
-                answerText.y   = topY + answerHeader.height;
+                    // vertikale Anchors lösen
+                    answerHeader.anchors.top = undefined;
+                    answerText.anchors.top = undefined;
+                    answerText.anchors.verticalCenter = undefined;
+
+                    // Positionieren
+                    answerHeader.y = topY;
+                    answerText.y   = topY + answerHeader.height;
+                });
             }
             Rectangle {
                 id: answerAreaQuestionTxt
@@ -2133,6 +2180,22 @@ Page {
                 else Qt.openUrlExternally(url);
             }
 
+            function stripUnsupportedTags(s) {
+                // entfernt <bdi ...> und </bdi>, trailing [] am Ende
+                s = String(s || "");
+                s = s.replace(/<\/?bdi[^>]*>/gi, "");
+                s = s.replace(/\[\s*\]$/, "");
+                return s;
+            }
+
+            function htmlAttrEscape(s) { // fürs href-Attribut
+                s = String(s || "");
+                s = s.replace(/&/g, "&amp;");
+                s = s.replace(/"/g, "&quot;");
+                s = s.replace(/</g, "&lt;");
+                s = s.replace(/>/g, "&gt;");
+                return s;
+            }
             // ------- Kernfunktion: baut den Text (mit/ohne Links je nach Daten) -------
             //  licenceInfo Felder (deinem Schema gemäß):
             //   - infoURLFrage / infoURLAntwort
@@ -2214,15 +2277,43 @@ Page {
 
                 // --- "von <Autor>" nur wenn Autorname vorhanden (Link optional) ---
                 if (authorName) {
+                    var nameRaw = stripUnsupportedTags(String(authorName).trim()); // z.B. <bdi>…</bdi> entfernen
+                    var href = (authorUrl || "").trim(); // dein separates URL-Feld (kann leer sein)
+
                     var authorHtml;
-                    if (authorHref) {
-                        var authorOpen = normalizeForOpen(authorUrl);
-                        authorHtml = '<a href="' + authorHref + '">' + escapeHtml(authorName) + '</a>';
-                        candidates.push({ url: authorOpen, label: authorName });
+
+                    // CASE A: authorName enthält bereits HTML-Link (<a ...>)
+                    if (/<\s*a[\s>]/i.test(nameRaw)) {
+                        // Optional: Interwiki/Protokoll normalisieren
+                        var sanitized = nameRaw
+                            // //example.com -> https://example.com
+                            .replace(/href="\/\/([^"]+)"/gi, 'href="https://$1"')
+                            // Wikipedia-Interwiki wie /wiki/en:Leonardo_da_Vinci -> /wiki/Leonardo_da_Vinci
+                            .replace(/href="([^"]*\/wiki\/)en:/i, 'href="$1');
+
+                        authorHtml = sanitized; // WICHTIG: NICHT escapen!
+
+                        // Für deine Click-Map (candidates) HREF extrahieren:
+                        var m = sanitized.match(/href="([^"]+)"/i);
+                        if (m && m[1]) {
+                            var openUrl = normalizeForOpen(m[1]);
+                            // sichtbaren Text als Label extrahieren:
+                            var label = sanitized.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+                            candidates.push({ url: openUrl, label: label || "Autor" });
+                        }
+
                     } else {
-                        authorHtml = escapeHtml(authorName);
+                        // CASE B: Nur Text in authorName → ggf. eigenen Link bauen
+                        if (href) {
+                            var openUrl2 = normalizeForOpen(href);
+                            authorHtml = '<a href="' + htmlAttrEscape(href) + '">' + escapeHtml(nameRaw) + '</a>';
+                            candidates.push({ url: openUrl2, label: nameRaw });
+                        } else {
+                            authorHtml = escapeHtml(nameRaw);
+                        }
                     }
-                    parts.push('von ' + authorHtml);
+
+                    parts.push("von " + authorHtml);
                 }
 
                 // --- "unter Lizenz: <Lizenz>" nur wenn Lizenzname vorhanden (Link optional) ---
