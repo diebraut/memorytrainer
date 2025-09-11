@@ -2196,6 +2196,23 @@ Page {
                 s = s.replace(/>/g, "&gt;");
                 return s;
             }
+            // HTML → reiner Text (entfernt <script>, <style>, und display:none-Inhalte)
+            function htmlToPlainText(html) {
+                let s = String(html || "");
+
+                // Unsichtbare Inhalte (display:none) entfernen
+                s = s.replace(/<[^>]*style=["'][^"']*display\s*:\s*none[^"']*["'][^>]*>[\s\S]*?<\/[^>]*>/gi, "");
+
+                // style/script-Bereiche entfernen
+                s = s.replace(/<style[\s\S]*?<\/style>/gi, "");
+                s = s.replace(/<script[\s\S]*?<\/script>/gi, "");
+
+                // alle übrigen Tags entfernen, Whitespaces normalisieren
+                s = s.replace(/<[^>]+>/g, " ");
+                s = s.replace(/\s+/g, " ").trim();
+                return s;
+            }
+
             // ------- Kernfunktion: baut den Text (mit/ohne Links je nach Daten) -------
             //  licenceInfo Felder (deinem Schema gemäß):
             //   - infoURLFrage / infoURLAntwort
@@ -2277,6 +2294,7 @@ Page {
 
                 // --- "von <Autor>" nur wenn Autorname vorhanden (Link optional) ---
                 if (authorName) {
+                    console.log("in author=" + authorName)
                     var nameRaw = stripUnsupportedTags(String(authorName).trim()); // z.B. <bdi>…</bdi> entfernen
                     var href = (authorUrl || "").trim(); // dein separates URL-Feld (kann leer sein)
 
@@ -2303,15 +2321,19 @@ Page {
                         }
 
                     } else {
-                        // CASE B: Nur Text in authorName → ggf. eigenen Link bauen
+                        // CASE B: Kein <a> im Namen → ggf. HTML-Hülle entfernen und Text extrahieren
+                        var textOnly = /<\s*[a-z][^>]*>/i.test(nameRaw) ? htmlToPlainText(nameRaw) : nameRaw;
+                        if (!textOnly) textOnly = "Unknown author";   // Fallback
+
                         if (href) {
                             var openUrl2 = normalizeForOpen(href);
-                            authorHtml = '<a href="' + htmlAttrEscape(href) + '">' + escapeHtml(nameRaw) + '</a>';
-                            candidates.push({ url: openUrl2, label: nameRaw });
+                            authorHtml = '<a href="' + htmlAttrEscape(href) + '">' + escapeHtml(textOnly) + '</a>';
+                            candidates.push({ url: openUrl2, label: textOnly });
                         } else {
-                            authorHtml = escapeHtml(nameRaw);
+                            authorHtml = escapeHtml(textOnly);
                         }
                     }
+                    console.log("out authorHtml=" + authorHtml)
 
                     parts.push("von " + authorHtml);
                 }
