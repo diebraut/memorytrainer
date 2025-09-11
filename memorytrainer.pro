@@ -49,7 +49,15 @@ RESOURCES += images/images.qrc qml.qrc
 
 ios {
     QMAKE_IOS_DEPLOYMENT_TARGET = 17.5
-    QMAKE_TARGET_BUNDLE_PREFIX = com.yourcompany
+    QMAKE_TARGET_BUNDLE_PREFIX = com.yourcompany   
     TARGET = memorytrainer
+    # Asset Catalog(s) einbinden
+    QMAKE_ASSET_CATALOGS += $$PWD/ios/Assets.xcassets
+
+    # Name des Icon-Sets (Verzeichnisname ohne .appiconset)
+    QMAKE_ASSET_CATALOGS_APP_ICON = AppIcon
+
+    # Optional: eigene Info.plist (wenn du zusätzliche Keys brauchst)
+    # QMAKE_INFO_PLIST = $$PWD/ios/Info.plist
     QMAKE_INFO_PLIST = Info.plist
 }
