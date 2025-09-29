@@ -237,12 +237,28 @@ Page {
         }
     }
 
+    function restorePrioritizationFromOptions(orderOptions) {
+        var idx = -1;
+        if (orderOptions && typeof orderOptions.prioritizedIndex === "number")
+            idx = orderOptions.prioritizedIndex;
+
+        // Guard: Index muss existieren
+        if (idx >= 0 && idx < listViewPacketsId.model.count) {
+            listViewPacketsId.prioritizedIndex = idx;
+        } else {
+            listViewPacketsId.prioritizedIndex = -1;
+        }
+    }
+
 
     function serializePackageOptions() {
         return {
-            mainOrderIsSelected: showMainQuestionId.checked,
-            revertedOrderIsSelected: showMainQuestionRevertedId.checked,
-            sequentiellOrderIsSelected: presentInOrderId.checked
+            mainOrderIsSelected:      showMainQuestionId.checked,
+            revertedOrderIsSelected:  showMainQuestionRevertedId.checked,
+            sequentiellOrderIsSelected: presentInOrderId.checked,
+            // NEU: Priorisierung (exklusiv)
+            prioritizedIndex:         (typeof listViewPacketsId?.prioritizedIndex === "number"
+                                       ? listViewPacketsId.prioritizedIndex : -1)
         };
     }
 
@@ -320,7 +336,8 @@ Page {
             showMainQuestionId.checked = orderOptions.mainOrderIsSelected;
             showMainQuestionRevertedId.checked = orderOptions.revertedOrderIsSelected;
             presentInOrderId.checked = orderOptions.sequentiellOrderIsSelected;
-
+            // NEU: Priorisierung wiederherstellen (nachdem das Model aufgebaut ist)
+            restorePrioritizationFromOptions(orderOptions);
         }
         startEvaluationId.setQuestionOptions(false);
         activateLearnListId.actualizeCountLearnList();
@@ -481,6 +498,7 @@ Page {
                 height : parent.height * 0.8
                 property int delegateWidth: width * 0.80 ;
                 property int delegateHeight: parent.height / 4  - 7;
+                property int prioritizedIndex: -1   // -1 = keins priorisiert
                 spacing: 5
                 ScrollBar.vertical: ScrollBar {
                     policy: listViewPacketsId.contentHeight > listViewPacketsId.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -532,99 +550,243 @@ Page {
                         opacity: {
                             opacity = delegateItem.itemOpacity
                         }
-                        Row {
-
-                            id: itemRowId
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 3
-                            Text {
-                                id: itemRowIdTxt1
-                                font.pixelSize: 14
-                                text:(index === -1)?"":(isPackagePart)?"(P" + index + ") " + name:name
-                            }
-                            Text {
-                                id: itemRowIdTxt2
-                                font.pixelSize: 14
-                                text: '(' + count + ')'
-                            }
-
-                        }
-                        Component.onCompleted: {
-                            var isPart = listViewPacketsId.model.get(index).isPackagePart;
-                            if (isPart && index > 0) { //parts starts from 1 index
-                                //delegateItem.activatePackagePart((index===1)?true:false,index);
-                                width = width * 0.9
-                                itemRowIdTxt1.font.pixelSize = 13
-                                itemRowIdTxt1.font.italic = true
-                                itemRowIdTxt2.font.pixelSize = 13
-                                itemRowIdTxt2.font.italic = true
-                                var isPartActive = listViewPacketsId.model.get(index).isPackagePartActive;
-                                if (isPartActive) {
-                                    delegateItem.opacity = 1;
-                                }
-                                else {
-                                    delegateItem.opacity = 0.3;
-                                }
-                            }
-                        }
                         MouseArea {
                             id: mouseArea
-                            anchors.fill: parent
+                            anchors.fill: dragRect
                             drag.target: dragRect
-
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            drag.onActiveChanged: {
-                                if (mouseArea.drag.active) {
-                                    listViewPacketsId.dragItemIndex = index;
+
+                            // Wenn im rechten Bereich geklickt wurde: hier *nichts* tun
+                            onClicked: (m) => {
+                                if (prioritySwitchArea.visible) {
+                                    const p = prioritySwitchArea.mapFromItem(mouseArea, m.x, m.y);
+                                    if (p.x >= 0 && p.x <= prioritySwitchArea.width && p.y >= 0 && p.y <= prioritySwitchArea.height) {
+                                        m.accepted = true;
+                                        return;
+                                    }
                                 }
+
+                                // dein bestehendes Kontextmenü für "Part (De)Aktivieren" etc.
+                                var itemScript = listViewPacketsId.createPopUpItemScript(index);
+                                var newObject  = Qt.createQmlObject(itemScript, delegateItem);
+                                newObject.popup();
+                                if (Qt.platform.os === "ios") {
+                                    newObject.x = dragRect.width / 10;
+                                    newObject.y = dragRect.height / 2;
+                                }
+                            }
+
+                            drag.onActiveChanged: {
+                                if (mouseArea.drag.active) listViewPacketsId.dragItemIndex = index;
                                 dragRect.Drag.drop();
                             }
-                            // Verwende formale Parameter für den onClicked-Handler
-                            onClicked: (mouse) => {
-                                console.log("mouse clicked");
-                                if (mouse.button === Qt.LeftButton) {
-                                    var itemScript = listViewPacketsId.createPopUpItemScript(index);
-                                    var newObject = Qt.createQmlObject(itemScript, delegateItem);
-                                    newObject.popup();
-                                    if (Qt.platform.os === "ios") {
-                                        newObject.x = dragRect.width / 10;
-                                        newObject.y = dragRect.height / 2;
-                                    }
-                                } else if (mouse.button === Qt.RightButton) {
-                                    console.log("Right");
+                        }
+
+                        // Linke Inhaltsfläche (nimmt den Platz links der Schalterfläche ein)
+                        Item {
+                            id: leftContentArea
+                            anchors.left: parent.left
+                            anchors.right: prioritySwitchArea.visible ? prioritySwitchArea.left : parent.right
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
+                            Row {
+                                id: itemRowId
+                                anchors.centerIn: parent            // <- wieder schön zentriert
+                                spacing: 6
+
+                                // Kleines Icon wenn priorisiert (Stern)
+                                Text {
+                                    id: prioritizedBadgeBefore
+                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    text: " ★"
+                                    font.pixelSize: itemRowIdTxt1.font.pixelSize
+                                    color: "#2d7a2d"
+                                }
+                                Text {
+                                    id: itemRowIdTxt1
+                                    font.pixelSize: 14
+                                    text: (index === -1) ? "" : (isPackagePart ? "(P" + index + ") " + name : name)
+                                    elide: Text.ElideRight
+                                }
+                                Text {
+                                    id: itemRowIdTxt2
+                                    font.pixelSize: 14
+                                    text: "(" + count + ")"
+                                    elide: Text.ElideRight
+                                }
+                                // Kleines Icon wenn priorisiert (Stern)
+                                Text {
+                                    id: prioritizedBadgeAfter
+                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    text: " ★"
+                                    font.pixelSize: itemRowIdTxt1.font.pixelSize
+                                    color: "#2d7a2d"
                                 }
                             }
                         }
+                        function isActiveForPrio() {
+                            if (typeof isPackagePartActive !== "undefined") return !!isPackagePartActive;
+                            if (typeof isActive !== "undefined")            return !!isActive;
+                            if (typeof active !== "undefined")              return !!active;
+                            return false;
+                        }
+                        // rechte Priorisieren-Fläche (bei aktivem Part sichtbar)
+                        Rectangle {
+                            id: prioritySwitchArea
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
+                            anchors.right: parent.right
+                            width: Math.floor(parent.width * 0.25)
+                            // sichtbar NUR wenn dieses Element aktiv ist
+                            visible: (isPackagePartActive === true)
+                            enabled: (isPackagePartActive === true)
+
+                            z: 1000
+
+                            color: (index === listViewPacketsId.prioritizedIndex) ? "#c8f5c1" : "#eeeeee"
+                            border.color: (index === listViewPacketsId.prioritizedIndex) ? "#2d7a2d" : "#c8c8c8"
+                            border.width: 1
+                            radius: Math.min(parent.radius, 15)
+
+                            Row {
+                                id: prioRow
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                // Linker Stern – nur sichtbar, wenn dieses Item priorisiert ist
+                                Text {
+                                    id: prioStarLeft
+                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    text: "★"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#2d7a2d"
+                                    // optional: gleiche Höhe wie Label
+                                    // font.pixelSize: prioLabel.font.pixelSize
+                                }
+
+                                // Label
+                                Text {
+                                    id: prioLabel
+                                    text: (index === listViewPacketsId.prioritizedIndex) ? qsTr("Priorisiert") : qsTr("Priorisieren")
+                                    font.pixelSize: 12
+                                    font.bold: (index === listViewPacketsId.prioritizedIndex)
+                                    elide: Text.ElideRight
+                                }
+
+                                // Rechter Stern – nur sichtbar, wenn dieses Item priorisiert ist
+                                Text {
+                                    id: prioStarRight
+                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    text: "★"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#2d7a2d"
+                                    // optional: gleiche Höhe wie Label
+                                    // font.pixelSize: prioLabel.font.pixelSize
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                preventStealing: true
+                                propagateComposedEvents: false
+                                visible: (isPackagePartActive === true)
+                                enabled: (isPackagePartActive === true)
+
+                                onPressed: (m) => m.accepted = true
+                                onClicked: (m) => {
+                                    m.accepted = true;
+                                    if (m.button === Qt.LeftButton) {
+                                        listViewPacketsId.prioritizedIndex =
+                                            (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
+                                        return;
+                                    }
+                                    // Rechtsklick-Popup
+                                    const pt = prioritySwitchArea.mapToItem(page, m.x, m.y);
+                                    prioMenu.parent = page;
+                                    prioMenu.x = Math.max(0, pt.x);
+                                    prioMenu.y = Math.max(0, pt.y);
+                                    prioMenu.open();
+                                }
+                            }
+
+                            Menu {
+                                id: prioMenu
+                                MenuItem {
+                                    text: (index === listViewPacketsId.prioritizedIndex)
+                                          ? qsTr("Priorisieren aus") : qsTr("Priorisieren an")
+                                    enabled: (isPackagePartActive === true)
+                                    onTriggered: {
+                                        listViewPacketsId.prioritizedIndex =
+                                            (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
+                                    }
+                                }
+                            }
+                        }
+
                         states: [
                             State {
                                 when: dragRect.Drag.active
-                                ParentChange {
-                                    target: dragRect
-                                    parent: page
-                                }
-
+                                ParentChange { target: dragRect; parent: page }
                                 AnchorChanges {
                                     target: dragRect
                                     anchors.horizontalCenter: undefined
                                     anchors.verticalCenter: undefined
                                 }
-
                             }
                         ]
-
                         Drag.active: mouseArea.drag.active
                         Drag.hotSpot.x: dragRect.width / 2
                         Drag.hotSpot.y: dragRect.height / 2
 
+                        Component.onCompleted: {
+                            if (isPackagePart && index > 0) {
+                                width = width * 0.9
+                                itemRowIdTxt1.font.pixelSize = 13
+                                itemRowIdTxt1.font.italic = true
+                                itemRowIdTxt2.font.pixelSize = 13
+                                itemRowIdTxt2.font.italic = true
+                                delegateItem.opacity = isPackagePartActive ? 1 : 0.3;
+                            }
+                        }
                     }
-                    function activatePackagePart(activatePart,idxPart) {
-                        opacity = (activatePart)?1:0.5
-                        entryModelPackagesId.setProperty(idxPart,"isPackagePartActive",activatePart);
-                        dataModel.setSinglePackageLearningPart(activatePart,idxPart-1);
+
+                    function togglePrioritized(idxPart) {
+                        // Nur für Parts
+                        if (!listViewPacketsId.model.get(idxPart).isPackagePart) return;
+
+                        // Nur wenn aktiv erlaubt
+                        if (!listViewPacketsId.model.get(idxPart).isPackagePartActive) return;
+
+                        const cur = listViewPacketsId.model.get(idxPart).isPrioritized === true;
+                        listViewPacketsId.model.setProperty(idxPart, "isPrioritized", !cur);
+
+                        // Optional: weiterreichen ins Datenmodell, falls vorhanden
+                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                            // Achtung: deine Parts sind 1-basiert im View; Model/Backend evtl. 0-basiert
+                            dataModel.setSinglePackageLearningPartPrioritized(idxPart-1, !cur);
+                        }
+                    }
+
+                    function activatePackagePart(activatePart, idxPart) {
+                        // Nur dieses Element ändern – KEINE anderen deaktivieren
+                        entryModelPackagesId.setProperty(idxPart, "isPackagePartActive", activatePart);
+
+                        if (typeof dataModel.setSinglePackageLearningPart === "function") {
+                            dataModel.setSinglePackageLearningPart(activatePart, idxPart - 1);
+                        }
+
+                        // Wenn der gerade priorisierte Eintrag deaktiviert wird -> Priorisierung löschen
+                        if (!activatePart && listViewPacketsId.prioritizedIndex === idxPart) {
+                            listViewPacketsId.prioritizedIndex = -1;
+                        }
+
+                        // Optik dieses Delegates
+                        delegateItem.opacity = activatePart ? 1 : 0.3;
                     }
                 }
-
                 function getMenuWidth(firstTextLen,secondTextLen) {
                     var textComputed = 0;
                     if (firstTextLen > secondTextLen) {
@@ -809,6 +971,9 @@ Page {
                     for (var i=0; i < packList.length; i++) {
                         var isPartActive = listViewPacketsId.model.get(i+1).isPackagePartActive;
                         dataModel.setSinglePackageLearningPart(isPartActive,i);
+                        if (listViewPacketsId.model.get(i).isPackagePart && listViewPacketsId.model.get(i).isPrioritized === undefined) {
+                            listViewPacketsId.model.setProperty(i, "isPrioritized", false);
+                        }
                     }
                     packetAvailableId.enabled = false;
                     packetAvailableId.opacity = 0.3;
@@ -823,7 +988,16 @@ Page {
                     dataModel.debugPt();
                     dataModel.setSinglePackageLearning(true,packList,packageName);
                     for (var i=packList.length-1; i >= 0;i--) {
-                        listViewPacketsId.model.insert(1,{"name":packageName,"count":parseInt(packList[i]),"isPackagePart":true,"isPackagePartActive":(i===0)?true:false});
+                        listViewPacketsId.model.insert(
+                            1,
+                            {
+                              "name": packageName,
+                              "count": parseInt(packList[i]),
+                              "isPackagePart": true,
+                              "isPackagePartActive": (i===0)?true:false,
+                              "isPrioritized": false
+                            }
+                        );
                         dataModel.setSinglePackageLearningPart((i!== 0)?false:true,i)
                         //decorate
                     }
