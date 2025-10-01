@@ -86,6 +86,7 @@ public:
 
     Q_INVOKABLE void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "");
     Q_INVOKABLE void setSinglePackageLearningPart(bool setToActive,int partIdx);
+    Q_INVOKABLE void setSinglePackageLearningPartPrioritized(bool setToPrioritized,int partIdx);
 
     Q_INVOKABLE int  sizeActExercisePackages();
 

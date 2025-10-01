@@ -257,9 +257,9 @@ Page {
             revertedOrderIsSelected:  showMainQuestionRevertedId.checked,
             sequentiellOrderIsSelected: presentInOrderId.checked,
             // NEU: Priorisierung (exklusiv)
-            prioritizedIndex:         (typeof listViewPacketsId?.prioritizedIndex === "number"
-                                       ? listViewPacketsId.prioritizedIndex : -1)
-        };
+            prioritizedIndex: (typeof listViewPacketsId !== "undefined"
+                               && typeof listViewPacketsId.prioritizedIndex === "number")
+                              ? listViewPacketsId.prioritizedIndex : -1        };
     }
 
     function myCleanup() {
@@ -338,6 +338,13 @@ Page {
             presentInOrderId.checked = orderOptions.sequentiellOrderIsSelected;
             // NEU: Priorisierung wiederherstellen (nachdem das Model aufgebaut ist)
             restorePrioritizationFromOptions(orderOptions);
+            // nach restorePrioritizationFromOptions(orderOptions);
+            if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                const idx = listViewPacketsId.prioritizedIndex;
+                if (idx >= 0)
+                    dataModel.setSinglePackageLearningPartPrioritized(true, idx - 1);
+            }
+
         }
         startEvaluationId.setQuestionOptions(false);
         activateLearnListId.actualizeCountLearnList();
@@ -547,9 +554,7 @@ Page {
                         border.color: Qt.darker(color)
                         radius: 15
                         color:"#eee"
-                        opacity: {
-                            opacity = delegateItem.itemOpacity
-                        }
+                        opacity: delegateItem.itemOpacity
                         MouseArea {
                             id: mouseArea
                             anchors.fill: dragRect
@@ -699,10 +704,14 @@ Page {
                                 onClicked: (m) => {
                                     m.accepted = true;
                                     if (m.button === Qt.LeftButton) {
-                                        listViewPacketsId.prioritizedIndex =
-                                            (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
-                                        return;
-                                    }
+                                        const make = (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
+                                        listViewPacketsId.prioritizedIndex = make;
+
+                                        // BACKEND: Priorisierung setzen/aufheben (0-basiert; Parts starten ab index 1 im View)
+                                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                                            dataModel.setSinglePackageLearningPartPrioritized(make !== -1, index - 1);
+                                        }
+                                                   return;                                    }
                                     // Rechtsklick-Popup
                                     const pt = prioritySwitchArea.mapToItem(page, m.x, m.y);
                                     prioMenu.parent = page;
@@ -719,8 +728,12 @@ Page {
                                           ? qsTr("Priorisieren aus") : qsTr("Priorisieren an")
                                     enabled: (isPackagePartActive === true)
                                     onTriggered: {
-                                        listViewPacketsId.prioritizedIndex =
-                                            (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
+                                        const make = (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
+                                        listViewPacketsId.prioritizedIndex = make;
+
+                                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                                            dataModel.setSinglePackageLearningPartPrioritized(make !== -1, index - 1);
+                                        }
                                     }
                                 }
                             }
@@ -766,7 +779,7 @@ Page {
                         // Optional: weiterreichen ins Datenmodell, falls vorhanden
                         if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
                             // Achtung: deine Parts sind 1-basiert im View; Model/Backend evtl. 0-basiert
-                            dataModel.setSinglePackageLearningPartPrioritized(idxPart-1, !cur);
+                            dataModel.setSinglePackageLearningPartPrioritized(!cur, idxPart - 1);
                         }
                     }
 
@@ -777,12 +790,14 @@ Page {
                         if (typeof dataModel.setSinglePackageLearningPart === "function") {
                             dataModel.setSinglePackageLearningPart(activatePart, idxPart - 1);
                         }
-
-                        // Wenn der gerade priorisierte Eintrag deaktiviert wird -> Priorisierung löschen
                         if (!activatePart && listViewPacketsId.prioritizedIndex === idxPart) {
                             listViewPacketsId.prioritizedIndex = -1;
-                        }
 
+                            // BACKEND: Priorisierung aufheben (0-basiert!)
+                            if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                                dataModel.setSinglePackageLearningPartPrioritized(false, idxPart - 1);
+                            }
+                        }
                         // Optik dieses Delegates
                         delegateItem.opacity = activatePart ? 1 : 0.3;
                     }
@@ -839,7 +854,7 @@ Page {
                                 itemScript = itemScript.replace("##func##","activatePackagePart(true," + packageIdx + ")")
                             }
                         } else {
-                            itemScript = itemScript.replace("##text##","Packet-Lernmodus beeenden")
+                            itemScript = itemScript.replace("##text##","Packet-Lernmodus beenden")
                             itemScript = itemScript.replace("##func##","listViewPacketsId.finishSinglePackageLearnig(false," + packageIdx + ")")
 
                         }
@@ -971,8 +986,9 @@ Page {
                     for (var i=0; i < packList.length; i++) {
                         var isPartActive = listViewPacketsId.model.get(i+1).isPackagePartActive;
                         dataModel.setSinglePackageLearningPart(isPartActive,i);
-                        if (listViewPacketsId.model.get(i).isPackagePart && listViewPacketsId.model.get(i).isPrioritized === undefined) {
-                            listViewPacketsId.model.setProperty(i, "isPrioritized", false);
+                        if (listViewPacketsId.model.get(i+1).isPackagePart
+                            && listViewPacketsId.model.get(i+1).isPrioritized === undefined) {
+                            listViewPacketsId.model.setProperty(i+1, "isPrioritized", false);
                         }
                     }
                     packetAvailableId.enabled = false;
@@ -1218,9 +1234,7 @@ Page {
 
                 delegate: Item {
                     id: delegateItem01
-                    anchors.horizontalCenter: {
-                        if (parent.horizontalCenter) anchors.horizontalCenter = parent.horizontalCenter;
-                    }
+                    anchors.horizontalCenter: parent.horizontalCenter
                     width: listViewAvailablePacketsId.delegateWidth
                     height: listViewAvailablePacketsId.delegateHeight
                     Rectangle {
@@ -1425,7 +1439,8 @@ Page {
                         packetAvailableId.visible = true;
                         dataModel.initExercisePackages();
                         for (var i= 0;i < entryModelPackagesId.count;i++) {
-                            dataModel.addExercisePackage(entryModelPackagesId.get(i).name,entryModelPackagesId.get(i).customPackage);
+                            dataModel.addExercisePackage(entryModelPackagesId.get(i).name,
+                                                         entryModelPackagesId.get(i).isCustomPackage);
                         }
                         startEvaluationId.setQuestionOptions(false)
                         if (entryModelPackagesId.count === 0) {
@@ -2162,7 +2177,7 @@ Page {
                imageId.anchors.top = questionArea.bottom
                questionArea.visible = true;
                answerArea.visible = true;
-               imageId.height = container.containerHeight * 0.6
+               imageId.height = container.height * 0.6
                imageId.width = container.width * 0.6
             } else {
                 imageId.anchors.top = container.top
@@ -2299,7 +2314,7 @@ Page {
                 u = u.replace(/\s/g, "%20");
 
                 // Öffnen
-                if (typeof mainFocusScope?.showWebPage === "function") {
+                if (typeof mainFocusScope !== "undefined" && typeof mainFocusScope.showWebPage === "function") {
                     mainFocusScope.showWebPage(u);
                 } else {
                     Qt.openUrlExternally(u);
@@ -3107,7 +3122,7 @@ Page {
             licencelink.visible = false
             if (entryDesc.imageFilenameAntwort) {
                 licencelink.visible = true
-                container.callSetImage(false,packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameAntwort,true)
+                container.callSetImage(false, packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameAntwort, entryDesc)
                 //answerAreaQuestionImage.source = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage;
                 answerAreaQuestionTxt.textToShow = (entryDesc.frageSubjekt.indexOf("Frage_") !== -1)?"": entryDesc.frageSubjekt;
             } else if (imageId.visible) { //ev. bleibt fragebild sichtbar.

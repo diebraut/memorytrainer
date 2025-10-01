@@ -87,9 +87,15 @@ QList<EntryDesc *> PackageDesc::getEntriesForList(QList<EntryDesc *> listEntries
         return  returnList;
     }
     if (singlePackageLearning) {
+        //check exist an priorizesed packagePart.
+        bool isExistPrioritizedPackagePart = existPrioritizedPackagePart();
         for (int i=0; i < listEntries.size();i++) {
-            if (isSinglePackageLearning() && !isActiveItemFromLearningPackageList(i)) {
+            if (!isActiveItemFromLearningPackageList(i)) {
                 continue;
+            } else {
+                if (!isPrioritizedItemFromLearningPackageList(i) && isExistPrioritizedPackagePart) {
+                    continue;
+                }
             }
             returnList.append(listEntries[i]);
         }
@@ -98,15 +104,26 @@ QList<EntryDesc *> PackageDesc::getEntriesForList(QList<EntryDesc *> listEntries
     return listEntries;
 }
 
+bool PackageDesc::existPrioritizedPackagePart() {
+    if (this->singlePackageLearning) {
+        for (int i = 0; i < this->packageLearningParts.count(); i++) {
+            if (this->packageLearningParts[i].prioritized) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void PackageDesc::setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName) {
     this->singlePackageLearning = activedSinglePackageLearning;
     this->packageLearningParts.clear();
     if (activedSinglePackageLearning) {
         this->singlePackageLearningName = packageName;
         for (int i=0; i < parts.count();i++) {
-            bool active = false;
-            if (i == 0) active = true;
-            this->packageLearningParts.append(QPair<bool,int>(active,parts.value(i)));
+            PackagePartState *packagePartState = new PackagePartState(false,false,parts.value(i));
+            if (i == 0) packagePartState->active = true;
+            this->packageLearningParts.append(*packagePartState);
         }
     }
 }
@@ -114,29 +131,60 @@ void PackageDesc::setSinglePackageLearning(bool activedSinglePackageLearning,con
 void PackageDesc::setSinglePackageLearningPart(bool setToActive,int partIdx) {
 
     if (partIdx < this->packageLearningParts.size()) {
-        QPair<bool,int> p =  this->packageLearningParts.value(partIdx);
-        p.first = setToActive;
-        this->packageLearningParts.replace(partIdx,p);
+        PackagePartState packagePartState =  this->packageLearningParts.value(partIdx);
+        packagePartState.active = setToActive;
+        this->packageLearningParts.replace(partIdx,packagePartState);
     }
     return;
 }
 
+void PackageDesc::setSinglePackageLearningPartPrioritized(bool setToPrioritized,int partIdx) {
+    for (int i = 0; i < this->packageLearningParts.size();i++ ) {
+       PackagePartState packagePartState =  this->packageLearningParts.value(i);
+       packagePartState.prioritized = false;
+       if (partIdx == i && setToPrioritized) {
+           packagePartState.prioritized = true;
+       }
+       this->packageLearningParts.replace(i,packagePartState);
+    }
+    return;
+}
+
+
 bool PackageDesc::isActiveItemFromLearningPackageList(int idxItem) {
     int firstIdx = 0;
     for (int i=0; i < this->packageLearningParts.count();i++) {
-        QPair<bool,int> pair = this->packageLearningParts.value(i);
-        if (pair.first) { //active flag
+        PackagePartState packagePartState = this->packageLearningParts.value(i);
+        if (packagePartState.active) { //active flag
             //set range
             int from = firstIdx;
-            int to   = firstIdx + pair.second - 1 ;
+            int to   = firstIdx + packagePartState.count - 1 ;
             if (idxItem >= from && idxItem <= to) {
                 return true;
             }
         }
-        firstIdx += pair.second;
+        firstIdx += packagePartState.count;
     }
     return false;
 }
+
+bool PackageDesc::isPrioritizedItemFromLearningPackageList(int idxItem) {
+    int firstIdx = 0;
+    for (int i=0; i < this->packageLearningParts.count();i++) {
+        PackagePartState packagePartState = this->packageLearningParts.value(i);
+        if (packagePartState.prioritized) { //prioritized flag
+            //set range
+            int from = firstIdx;
+            int to   = firstIdx + packagePartState.count - 1 ;
+            if (idxItem >= from && idxItem <= to) {
+                return true;
+            }
+        }
+        firstIdx += packagePartState.count;
+    }
+    return false;
+}
+
 
 LicenceInfo PackageDesc::getLicenceInfo(int number,bool isReverse) {
     if (this->xmlParser != NULL) {

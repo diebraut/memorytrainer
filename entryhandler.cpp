@@ -652,6 +652,18 @@ void EntryHandler::setSinglePackageLearningPart(bool setToActive,int partIdx) {
     }
 }
 
+void EntryHandler::setSinglePackageLearningPartPrioritized(bool setToPrioritized,int partIdx) {
+
+    //looking for package with singlePackageLerning is true (only one is allowed)
+    for (int i = 0; i < actExercisePackages.size();i++) {
+        if (actExercisePackages[i]->isSinglePackageLearning()) {
+            actExercisePackages[i]->setSinglePackageLearningPartPrioritized(setToPrioritized,partIdx);
+            this->actExercisePackagesChanged = true;
+            return;
+        }
+    }
+}
+
 
 int  EntryHandler::cntEntriesInRecognizedState(bool state) {
     int cnt =  0;

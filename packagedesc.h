@@ -1,6 +1,7 @@
 #ifndef PACKAGEDESC_H
 #define PACKAGEDESC_H
 
+#pragma once
 #include <QObject>
 #include <QString>
 #include <QMetaType>
@@ -11,6 +12,36 @@
 #include "xmlparser.h"
 
 #include "exerciceentrymanager.h"
+
+class PackagePartState {
+public:
+    // Felder
+    bool active      = false;  // vormals QPair.first
+    bool prioritized = false;  // NEU
+    int  count       = 0;      // vormals QPair.second
+
+    // Konstruktoren
+    constexpr PackagePartState() noexcept = default;
+
+    constexpr PackagePartState(bool active_,
+                               bool prioritized_,
+                               int  count_) noexcept
+        : active(active_), prioritized(prioritized_), count(count_) {}
+
+    // Vergleich (optional, praktisch für Tests)
+    friend constexpr bool operator==(const PackagePartState& a,
+                                     const PackagePartState& b) noexcept {
+        return a.active == b.active &&
+               a.prioritized == b.prioritized &&
+               a.count == b.count;
+    }
+    friend constexpr bool operator!=(const PackagePartState& a,
+                                     const PackagePartState& b) noexcept {
+        return !(a == b);
+    }
+};
+
+Q_DECLARE_METATYPE(PackagePartState)
 
 class PackageDesc : public QObject {
     Q_GADGET
@@ -167,11 +198,11 @@ public:
         this->singlePackageLearning = singlePackageLearning;
     }
 
-    QList<QPair<bool, int>> getPackageLearningParts() const {
+    QList<PackagePartState> getPackageLearningParts() const {
         return this->packageLearningParts;
     }
 
-    void setPackageLearningParts(const QList<QPair<bool, int>> &parts) {
+    void setPackageLearningParts(const  QList<PackagePartState> &parts) {
         this->packageLearningParts = parts;
     }
 
@@ -193,7 +224,12 @@ public:
 
     void setSinglePackageLearningPart(bool setToActive,int partIdx);
 
+    void setSinglePackageLearningPartPrioritized(bool prioritized, int idx);
+
+
     bool isActiveItemFromLearningPackageList(int idxItem);
+
+    bool isPrioritizedItemFromLearningPackageList(int idxItem);
 
     QList<EntryDesc *> getEntriesForList(QList<EntryDesc *> listEntries,int idxPackageList, QList<Entry> *filterEntries = NULL);
 
@@ -220,11 +256,16 @@ private:
     bool                    singlePackageLearning = false;
     bool                    randomizeSinglePackages = true;
     QString                 singlePackageLearningName;
-    QList<QPair<bool,int>>  packageLearningParts;
+    QList<PackagePartState> packageLearningParts;  // statt QList<QPair<bool,int>>
 
+    // Komfort-APIs (neu), damit QML/DataModel bequem exklusiv priorisieren kann
+    int prioritizedIndex() const;
+    void setPrioritizedIndex(int idx);     // -1 => keine Priorisierung
+    void clearPrioritization();
     bool customPackage = false;
     bool fromCustomPackageCreated = false;
 
+    bool existPrioritizedPackagePart();
 
 };
 

@@ -204,6 +204,11 @@ Item {
         return ImageHandler.setSinglePackageLearningPart(activatePart,partIdx);
     }
 
+    function setSinglePackageLearningPartPrioritized(activatePartPrioritized,partIdx) {
+        return ImageHandler.setSinglePackageLearningPartPrioritized(activatePartPrioritized,partIdx);
+    }
+
+
     function setSinglePackageLearning(activatePackageLearning,listCntParts,packageName) {
         return ImageHandler.setSinglePackageLearning(activatePackageLearning,listCntParts,packageName);
     }
