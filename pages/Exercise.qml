@@ -22,6 +22,19 @@ Page {
 
     id: page
 
+    Component.onCompleted: {
+        myStartup();
+        console.log("Exercise.qml loaded. inProcess:", inProcess)
+    }
+
+    onInProcessChanged: {
+        console.log("inProcess changed:", inProcess)
+    }
+
+    onVisibleChanged: {
+        console.log("Exercise visible:", visible)
+    }
+
     DataModel {
       id: dataModel
     }
@@ -348,11 +361,6 @@ Page {
         }
         startEvaluationId.setQuestionOptions(false);
         activateLearnListId.actualizeCountLearnList();
-    }
-
-
-    Component.onCompleted: {
-        myStartup();
     }
 
     QtCore.Settings {

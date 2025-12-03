@@ -9,7 +9,6 @@
 #include <QDebug>
 #include <QList>
 
-#include <Qt3DRender/QCamera>
 #include <QDebug>
 #include <QUrl>
 #include <QQmlEngine>

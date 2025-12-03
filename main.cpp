@@ -33,10 +33,12 @@
 
 #ifdef Q_OS_IOS
 #include <QtWebView>
-#include "ios_file_protection.h"    // <- unsere Helper-API
+#include "ios_file_protection.h"    // iOS: eigene Helper-API
+#elif defined(Q_OS_ANDROID)
+#include <QtWebView>                // Android: WebView, kein WebEngine
 #else
 #include <QQuickView>
-#include <QtWebEngineQuick>
+#include <QtWebEngineQuick>         // Desktop: WebEngine
 #endif
 
 int main(int argc, char *argv[])
@@ -58,6 +60,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 #ifdef Q_OS_IOS
     QtWebView::initialize(); // ✅
+#elif defined(Q_OS_ANDROID)
+    QtWebView::initialize();
 #else
     QtWebEngineQuick::initialize(); // ✅
 #endif

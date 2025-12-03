@@ -6,6 +6,14 @@ ios {
     QT += webview
     OBJECTIVE_SOURCES += ios_file_protection.mm
     HEADERS += ios_file_protection.h
+} else:android {
+        QT += webview
+        # ---- OpenSSL Einbindung ----
+        ANDROID_EXTRA_LIBS += \
+            $$PWD/android_openssl/lib/x86_64/libssl_3.so \
+            $$PWD/android_openssl/lib/x86_64/libcrypto.so \
+            $$PWD/android_openssl/lib/x86_64/libcrypto_3.so
+
 } else {
     QT += webenginequick
     SOURCES += ios_file_protection_stub.cpp

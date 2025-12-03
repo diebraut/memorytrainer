@@ -16,6 +16,12 @@ ApplicationWindow {
     width: 768
     height: 1024
 
+    QtObject {
+        id: nav
+        property var stack: stackView
+    }
+
+
     // Optional: falls du das brauchst
     property bool isInternetAvailable: false
 
@@ -96,7 +102,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     active: true
                     asynchronous: true
-                    source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos")
+                    source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos" || Qt.platform.os === "android")
                             ? "qrc:/BrowserIOS.qml"
                             : "qrc:/BrowserDesktop.qml"
 
@@ -131,6 +137,9 @@ ApplicationWindow {
        ======================= */
     header: ToolBar {
         id: headerId
+        z: 9999
+        visible: true
+
         Material.foreground: "white"
 
         RowLayout {
@@ -146,54 +155,66 @@ ApplicationWindow {
             }
 
             ToolButton {
+                id: backButton
+                z: 999999
                 icon.name: stackView.depth > 1 ? "back" : "drawer"
-                property var wrongDatastore: undefined
 
-                onClicked: {
-                    if (stackView.depth > 1) {
-                        const currentPage = stackView.currentItem
-                        if (currentPage && typeof currentPage.inProcess === "boolean") {
-                            if (currentPage.inProcess) {
-                                console.log("Page is in process, close and recreating...")
-                                if (typeof currentPage.myCleanup === "function") {
-                                    currentPage.myCleanup()
-                                    if (locSetting.datastore) {
-                                        console.log("Datastore-Wert:", locSetting.datastore)
-                                        wrongDatastore = currentPage.work_datastore
-                                        console.log("DatastoreWork-Wert:", wrongDatastore)
-                                        if (!wrongDatastore) wrongDatastore = undefined
-                                    }
-                                } else {
-                                    console.warn("Current page has no cleanup method.")
-                                }
+                onPressed: console.log("BACK PRESSED")
+                onCanceled: console.log("BACK CANCELED")
+                onReleased: console.log("BACK RELEASED")
+                onClicked: console.log("BACK CLICKED")
 
-                                const pageSource = currentPage.source
-                                if (pageSource) {
-                                    stackView.pop()
-                                    const component = Qt.createComponent(pageSource)
-                                    if (component.status === Component.Ready) {
-                                        stackView.push(pageSource)
-                                        if (wrongDatastore && typeof currentPage.myStartup === "function") {
-                                            stackView.currentItem.myStartup(wrongDatastore)
-                                        }
-                                    } else {
-                                        console.error("Failed to load component:", component.errorString())
-                                    }
-                                } else {
-                                    console.error("Page source is undefined. Cannot recreate.")
-                                }
-                            } else {
-                                console.log("Page is not in process, navigating to start page...")
+                // HARDCODED FIX: prevent stealing
+                TapHandler {
+                    id: tap
+                    acceptedButtons: Qt.LeftButton
+                    gesturePolicy: TapHandler.DragThreshold
+                    onTapped: {
+                        onClicked: console.log("BACK CLICKED")
+                        console.log("Platform:", Qt.platform.os)
+                        console.log("stackView.depth:", stackView.depth)
+
+                        if (stackView.depth > 1) {
+                            const currentPage = stackView.currentItem
+                            console.log("currentPage:", currentPage)
+
+                            if (!currentPage) {
+                                console.log("ERROR: currentPage == null → simple pop()")
                                 stackView.pop()
-                                listView.currentIndex = -1
+                                console.log("---- BACK END ----")
+                                return
+                            }
+
+                            const hasCleanup = (typeof currentPage.myCleanup === "function")
+                            const hasStartup = (typeof currentPage.myStartup === "function")
+                            const src        = currentPage.source
+
+                            console.log("currentPage.inProcess:", currentPage.inProcess)
+                            console.log("hasCleanup:", hasCleanup, "hasStartup:", hasStartup, "source:", src)
+
+                            if (currentPage.inProcess === true && src) {
+                                console.log("PATH: inProcess == TRUE → cleanup & reload")
+
+                                if (hasCleanup) {
+                                    console.log("Calling myCleanup()…")
+                                    currentPage.myCleanup()
+                                } else {
+                                    console.log("myCleanup() NOT FOUND")
+                                }
+
+                                console.log("Reloading page:", src)
+                                stackView.pop()
+                                stackView.push(src)
+
+                            } else {
+                                console.log("PATH: inProcess == FALSE oder keine source → simple pop()")
+                                stackView.pop()
                             }
                         } else {
-                            console.log("No valid status, returning to start page...")
-                            stackView.pop()
-                            listView.currentIndex = -1
+                            console.log("PATH: depth == 1 → drawer")
+                            drawer.open()
                         }
-                    } else {
-                        drawer.open()
+                        console.log("---- BACK END ----")
                     }
                 }
             }
@@ -285,6 +306,8 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors.fill: parent
+        property alias navigator: stackView
+
 
         initialItem: Pane {
             id: pane
