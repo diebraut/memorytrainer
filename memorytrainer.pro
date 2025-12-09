@@ -8,11 +8,26 @@ ios {
     HEADERS += ios_file_protection.h
 } else:android {
         QT += webview
-        # ---- OpenSSL Einbindung ----
-        ANDROID_EXTRA_LIBS += \
-            $$PWD/android_openssl/lib/x86_64/libssl_3.so \
-            $$PWD/android_openssl/lib/x86_64/libcrypto.so \
-            $$PWD/android_openssl/lib/x86_64/libcrypto_3.so
+
+        # Basis-Pfad zu deinen OpenSSL-Libs
+        OPENSSL_DIR = $$PWD/android_openssl/lib
+
+        # ---- ABI-spezifische Bibliotheken wählen ----
+        contains(ANDROID_TARGET_ARCH, arm64-v8a) {
+            message("Using arm64-v8a OpenSSL libraries")
+            ANDROID_EXTRA_LIBS += \
+                $$OPENSSL_DIR/arm64-v8a/libssl_3.so \
+                #$$OPENSSL_DIR/arm64-v8a/libcrypto.so \
+                $$OPENSSL_DIR/arm64-v8a/libcrypto_3.so
+        }
+
+        contains(ANDROID_TARGET_ARCH, x86_64) {
+            message("Using x86_64 OpenSSL libraries")
+            ANDROID_EXTRA_LIBS += \
+            $$OPENSSL_DIR/x86_64/libssl_3.so \
+            #$$OPENSSL_DIR/x86_64/libcrypto.so \
+            $$OPENSSL_DIR/x86_64/libcrypto_3.so
+        }
 
 } else {
     QT += webenginequick

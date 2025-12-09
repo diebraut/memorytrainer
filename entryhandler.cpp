@@ -76,12 +76,14 @@ int EntryHandler::getPackageEntries(QString packageName,bool isCustomPackage,boo
     } else {
         QDir directory(env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + packageName);
         PackageDesc *packageDesc = new PackageDesc(directory.dirName(),false,false);
+        qDebug() << "DIRECTORY=" + directory.dirName();
         if (packageDesc->getIsXMLDescripted()) {
             if (onlyMainEntries) {
                 retSize = packageDesc->getCountEntries(PackageDesc::DISPLAY_MAIN);
             } else {
                 retSize = packageDesc->getCountEntries(PackageDesc::DISPLAY_ALL);
             }
+            qDebug() << "Package size: =" + std::to_string(retSize) ;
         } else {
             QStringList images = directory.entryList(QStringList()  << "*.jpg" << "*.JPG",QDir::Files);
             retSize =images.size();

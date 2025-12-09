@@ -73,5 +73,6 @@
         <file>BrowserIOS.qml</file>
         <file>BrowserDesktop.qml</file>
         <file>TestWeb.qml</file>
+        <file>BrowserAndroid.qml</file>
     </qresource>
 </RCC>

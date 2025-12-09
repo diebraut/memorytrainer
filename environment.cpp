@@ -13,7 +13,9 @@ Environment::Environment()
 QString Environment::getWritableDirectionForOS() {
 
     if (QSysInfo::productType() == "android") {
+        //return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
         return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        //return "/sdcard/Documents/memorytrainer";
     }
     else if (QSysInfo::productType() == "ios" || QSysInfo::productType() == "osx") {
          return QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];

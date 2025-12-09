@@ -2216,6 +2216,7 @@ Page {
             anchors.horizontalCenter: imageId.horizontalCenter
             height: 25
             color: "transparent"
+            property string linkStyle: 'style="color:#00008B; text-decoration:underline; font-style:italic;"'
 
             property bool isQuestionImage: true
             property var linkPositions: []
@@ -2228,7 +2229,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: ""
                 color: "black"
-                font.pointSize: 10
+                font.pointSize: 12
                 textFormat: Text.RichText
 
                 // iOS: keine MouseArea darüber → dieser Handler greift für alle <a href=...>
@@ -2477,7 +2478,7 @@ Page {
                     var wikiOpen  = normalizeForOpen(wikiUrl);
                     var host      = extractHostname(wikiOpen);
                     var wikiLabel = isWikipediaHost(host) ? "Wikipedia" : host;
-                    parts.push('Info aus <a href="' + wikiHref + '">' + escapeHtml(wikiLabel) + '</a>');
+                    parts.push('Info aus <a '+ licencelink.linkStyle + ' href="' + wikiHref + '">' + escapeHtml(wikiLabel) + '</a>');
                     candidates.push({ url: wikiOpen, label: wikiLabel });
                 }
 
@@ -2485,7 +2486,7 @@ Page {
                 if (fileHref) {
                     var fileOpen = normalizeForOpen(fileUrl);
                     var fileLabel = "Wikimedia Commons";
-                    parts.push('Bildquelle: <a href="' + fileHref + '">' + fileLabel + '</a>');
+                    parts.push('Bildquelle: <a '+ licencelink.linkStyle + ' href="' + fileHref + '">' + fileLabel + '</a>');
                     candidates.push({ url: fileOpen, label: fileLabel });
                 }
 
@@ -2524,7 +2525,7 @@ Page {
 
                         if (href) {
                             var openUrl2 = normalizeForOpen(href);
-                            authorHtml = '<a href="' + htmlAttrEscape(href) + '">' + escapeHtml(textOnly) + '</a>';
+                            authorHtml = '<a '+ licencelink.linkStyle + ' href="' + htmlAttrEscape(href) + '">' + escapeHtml(textOnly) + '</a>';
                             candidates.push({ url: openUrl2, label: textOnly });
                         } else {
                             authorHtml = escapeHtml(textOnly);
@@ -2540,7 +2541,7 @@ Page {
                     var licenseHtml;
                     if (licenseHref) {
                         var licenseOpen = normalizeForOpen(licenseUrl);
-                        licenseHtml = '<a href="' + licenseHref + '">' + escapeHtml(licenseName) + '</a>';
+                        licenseHtml = '<a '+ licencelink.linkStyle + ' href="' + licenseHref + '">' + escapeHtml(licenseName) + '</a>';
                         candidates.push({ url: licenseOpen, label: licenseName });
                     } else {
                         licenseHtml = '<b>' + escapeHtml(licenseName) + '</b>';

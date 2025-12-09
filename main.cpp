@@ -46,12 +46,15 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_IOS
     QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 #endif
-    // ...
-    QGuiApplication::setApplicationName("Memory Trainerxx");
+    /* ToDo...Skalierung für Handies
+    qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
+    qputenv("QT_SCALE_FACTOR", "0.5");   // 1 / 4.3
+    */
+
+    QGuiApplication::setApplicationName("Memory Trainer");
     QGuiApplication::setOrganizationName("QtProject");
 
     Environment::setStyleForOS();
-
 
     //QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
@@ -71,6 +74,7 @@ int main(int argc, char *argv[])
     const QString base = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR;
     const QString dirLearn  = base + "/" + DEFAULT_LEARNLIST_DIR;
     const QString dirCustom = base + "/" + DEFAULT_MIXED_PACKAGE_DIR;
+    qDebug() << "BaseDir=" + base;
 
     QDir().mkpath(dirLearn);
     QDir().mkpath(dirCustom);

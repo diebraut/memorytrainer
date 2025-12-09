@@ -11,6 +11,8 @@ XMLParser::XMLParser(const QString& xmlFilePath) {
     QFile file(xmlFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         // Fehlerbehandlung: Datei konnte nicht geöffnet werden
+        qWarning() << "File open error for:" << file.fileName()
+                   << "Error:" << file.errorString();
         return;
     }
     if (!doc.setContent(&file)) {

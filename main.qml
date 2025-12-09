@@ -21,7 +21,6 @@ ApplicationWindow {
         property var stack: stackView
     }
 
-
     // Optional: falls du das brauchst
     property bool isInternetAvailable: false
 
@@ -37,12 +36,10 @@ ApplicationWindow {
         focus: true
         z: 1
 
-        // Web-Overlay-Status & URL-Pipeline
         property bool webShown: false
         property string webUrl: "https://www.wikipedia.org"
         property string __pendingUrl: ""
 
-        // URL anwenden, wenn der Loader ein Item hat
         function __applyPendingUrl() {
             if (!__pendingUrl) return
             if (!webLoader.item) {
@@ -56,39 +53,41 @@ ApplicationWindow {
             })
         }
 
-        // API (extern nutzbar)
         function showWebPage(url) { openWebPage(url) }
 
         function openWebPage(url) {
             __pendingUrl = url || webUrl
-            webShown = true                                   // 1) zeigen
-            Qt.callLater(() => {                              // 2) nach 1 Frame fokussieren & URL setzen
+            webShown = true
+            Qt.callLater(() => {
                 webViewContainerId.forceActiveFocus()
                 __applyPendingUrl()
             })
         }
 
         function closeWebPage() {
-            mainFocusScope.forceActiveFocus()                 // Fokus weg vom Overlay
-            // NICHT stop() auf WKWebView — reduziert "connection invalid"
+            mainFocusScope.forceActiveFocus()
             if (webLoader.item && typeof webLoader.item.clear === "function")
-                webLoader.item.clear()                        // setzt nur about:blank (siehe unten)
+                webLoader.item.clear()
             webShown = false
             __pendingUrl = ""
         }
 
-        // Overlay über allem – enthält den persistenten Loader
+        /* =======================
+           WebView-Overlay
+           ======================= */
         Item {
             id: webViewContainerId
             anchors.fill: parent
             z: 1000
             visible: mainFocusScope.webShown
 
-            // Eigener Fokusanker
             FocusScope {
                 id: overlayFocus
                 anchors.fill: parent
-                focus: false   // wird gezielt gesetzt
+                // Nur Android bekommt einen Top-Abstand für die Toolbar
+                //anchors.topMargin: Qt.platform.os === "android" ? headerId.height : 0
+
+                focus: false
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Escape) {
@@ -100,11 +99,21 @@ ApplicationWindow {
                 Loader {
                     id: webLoader
                     anchors.fill: parent
-                    active: true
+                    // Android: Abstand nach unten setzen
+                    //anchors.topMargin: Qt.platform.os === "android" ? headerId.height : 0
+                    // Android benötigt ein echtes Reload → active ist dynamisch
+                    //active: Qt.platform.os === "android" ? mainFocusScope.webShown : true
+                    active: mainFocusScope.webShown
+
                     asynchronous: true
-                    source: (Qt.platform.os === "ios" || Qt.platform.os === "tvos" || Qt.platform.os === "android")
+
+                    // ANDROID FIX: WebView nur dort austauschen!
+                    source:
+                        (Qt.platform.os === "ios" || Qt.platform.os === "tvos")
                             ? "qrc:/BrowserIOS.qml"
-                            : "qrc:/BrowserDesktop.qml"
+                        : (Qt.platform.os === "android"
+                            ? "qrc:/BrowserAndroid.qml"
+                            : "qrc:/BrowserDesktop.qml")
 
                     onLoaded: {
                         mainFocusScope.__applyPendingUrl()
@@ -122,7 +131,10 @@ ApplicationWindow {
     /* =======================
        Lifecycle
        ======================= */
-    Component.onCompleted: dataModel.setPlatform(utilID.ifMobile())
+    Component.onCompleted: {
+        console.log("RATIO XXXXX", Screen.devicePixelRatio, "density", Screen.pixelDensity, "scale", Qt.application.scaleFactor)
+        dataModel.setPlatform(utilID.ifMobile())
+    }
 
     /* =======================
        Shortcuts
@@ -164,13 +176,13 @@ ApplicationWindow {
                 onReleased: console.log("BACK RELEASED")
                 onClicked: console.log("BACK CLICKED")
 
-                // HARDCODED FIX: prevent stealing
                 TapHandler {
                     id: tap
                     acceptedButtons: Qt.LeftButton
                     gesturePolicy: TapHandler.DragThreshold
+
                     onTapped: {
-                        onClicked: console.log("BACK CLICKED")
+                        console.log("BACK CLICKED")
                         console.log("Platform:", Qt.platform.os)
                         console.log("stackView.depth:", stackView.depth)
 
@@ -179,39 +191,22 @@ ApplicationWindow {
                             console.log("currentPage:", currentPage)
 
                             if (!currentPage) {
-                                console.log("ERROR: currentPage == null → simple pop()")
                                 stackView.pop()
                                 console.log("---- BACK END ----")
                                 return
                             }
 
                             const hasCleanup = (typeof currentPage.myCleanup === "function")
-                            const hasStartup = (typeof currentPage.myStartup === "function")
-                            const src        = currentPage.source
-
-                            console.log("currentPage.inProcess:", currentPage.inProcess)
-                            console.log("hasCleanup:", hasCleanup, "hasStartup:", hasStartup, "source:", src)
+                            const src = currentPage.source
 
                             if (currentPage.inProcess === true && src) {
-                                console.log("PATH: inProcess == TRUE → cleanup & reload")
-
-                                if (hasCleanup) {
-                                    console.log("Calling myCleanup()…")
-                                    currentPage.myCleanup()
-                                } else {
-                                    console.log("myCleanup() NOT FOUND")
-                                }
-
-                                console.log("Reloading page:", src)
+                                if (hasCleanup) currentPage.myCleanup()
                                 stackView.pop()
                                 stackView.push(src)
-
                             } else {
-                                console.log("PATH: inProcess == FALSE oder keine source → simple pop()")
                                 stackView.pop()
                             }
                         } else {
-                            console.log("PATH: depth == 1 → drawer")
                             drawer.open()
                         }
                         console.log("---- BACK END ----")
@@ -253,11 +248,9 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 Layout.rightMargin: 10
 
-                // optional, falls du die Referenz brauchst
                 property var webEngineInstance: null
                 function setWebView(webView) { webEngineInstance = webView }
 
-                // Wichtig: Direkt die Autorität rufen – kein Rückruf-Loop
                 onClicked: mainFocusScope.closeWebPage()
             }
         }
@@ -308,7 +301,6 @@ ApplicationWindow {
         anchors.fill: parent
         property alias navigator: stackView
 
-
         initialItem: Pane {
             id: pane
 
@@ -354,7 +346,7 @@ ApplicationWindow {
     }
 
     /* =======================
-       StatusBar unten
+       StatusBar
        ======================= */
     StatusBar {
         id: statusBarComponent
@@ -384,7 +376,7 @@ ApplicationWindow {
     }
 
     /* =======================
-       Hooks für den Header-Button
+       Hooks für den Header
        ======================= */
     function setWebView(webView) {
         if (exitWebViewButton && typeof exitWebViewButton.setWebView === "function")
@@ -392,6 +384,6 @@ ApplicationWindow {
     }
 
     function closeWebView() {
-        // no-op – Schließen macht ausschließlich mainFocusScope.closeWebPage()
+        // handled by mainFocusScope
     }
 }
