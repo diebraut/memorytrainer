@@ -2094,88 +2094,6 @@ Page {
                     color: backColor
                     border.color: borderColor
                     border.width: borderWidth
-                    // zentrierter „?“-Teppich, einzeilig, ~90% der Rechteckgröße
-                    //erstmal raus
-                    /*
-                    Text {
-                        id: q
-                        anchors.centerIn: parent
-                        width:  parent.width  * 0.8
-                        height: parent.height * 0.8
-                        visible: parent.showQuestionText
-                        font.family: "monospace"
-
-                        color: parent.textColor
-                        wrapMode: Text.NoWrap
-                        elide: Text.ElideNone
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment:   Text.AlignVCenter
-                        renderType: Text.NativeRendering
-
-                        // WICHTIG: niemals 0/NaN
-                        font.pixelSize: Math.max(1, Math.floor(parent.height * 0.8))
-
-                        // Ergebnis
-                        property string computedText: ""
-                        text: computedText
-
-                        // --- Messung per TextMetrics (kein Scenegraph-Layout nötig) ---
-                        TextMetrics {
-                            id: measure
-                            font: q.font
-                            text: ""
-                            elide: Text.ElideNone
-                        }
-
-                        // Cache für Strings
-                        property var _cache: ({})
-                        function _qs(n) { if (!_cache[n]) _cache[n] = Array(n + 1).join("?"); return _cache[n]; }
-
-                        function widthOf(n) {
-                            measure.text = _qs(n);
-                            var w = measure.advanceWidth;                 // stabiler als paintedWidth
-                            return (isFinite(w) && w >= 0) ? w : 1e12;    // Guard gegen NaN
-                        }
-
-                        // Reentrancy-Guard gegen Kettenevents
-                        property bool _busy: false
-
-                        function recompute() {
-                            if (_busy) return;
-                            _busy = true;
-                            try {
-                                const W = q.width;
-                                if (!(W > 0)) { computedText = ""; return; }
-
-                                const EPS = 1;       // kleine Toleranz in px
-                                const MAX = 20000;   // harte Obergrenze
-
-                                // 1) Exponentiell hoch
-                                let low = 0, high = 1;
-                                while (high < MAX && widthOf(high) <= W + EPS) { low = high; high <<= 1; }
-
-                                // 2) Binärsuche
-                                while (low + 1 < high) {
-                                    const mid = (low + high) >> 1;
-                                    if (widthOf(mid) <= W + EPS) low = mid; else high = mid;
-                                }
-
-                                // 3) Letztes bisschen „auffüllen“
-                                while (low + 1 <= MAX && widthOf(low + 1) <= W + EPS) low++;
-
-                                computedText = _qs(Math.max(1, low));
-                            } finally {
-                                _busy = false;
-                            }
-                        }
-
-                        Component.onCompleted: recompute()
-                        onWidthChanged:        recompute()
-                        onHeightChanged:       recompute()
-                        onFontChanged:         recompute()
-                        onVisibleChanged:      if (visible) recompute()
-                    }
-                    **/
                 }
             }
         }
@@ -2581,7 +2499,10 @@ Page {
         function callSetImage(isQuestion,imgName, entryDesc) {
             imageId.source = imgName;
             if (entryDesc) {
-                imageId.excludeAereaList = entryDesc.excludeAerea;
+                if (isQuestion)
+                    imageId.excludeAereaList = entryDesc.excludeAerea;
+                else
+                    imageId.excludeAereaList = "" //no secrets by answer neccessary
                 imageId.updateExcludeRects();
                 licencelink.setLicenseInfo(isQuestion)
             }
