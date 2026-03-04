@@ -284,7 +284,7 @@ ApplicationWindow {
 
             model: ListModel {
                 ListElement { title: "Training";          source: "pages/Exercise.qml" }
-                ListElement { title: "Kamera";            source: "pages/MakeOwnPicture.qml" }
+                //ListElement { title: "Kamera";            source: "pages/MakeOwnPicture.qml" }
                 ListElement { title: "Paket Verwaltung";  source: "pages/PackageManager.qml" }
                 ListElement { title: "Paket importieren"; source: "pages/PackageProvider.qml" }
             }

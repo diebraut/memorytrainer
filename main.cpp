@@ -13,8 +13,8 @@
 
 
 
-#include "processaimagem.h"
-#include "provedorimagem.h"
+//#include "processaimagem.h"
+//#include "provedorimagem.h"
 #include "environment.h"
 
 #include "learnlistentrymanager.h"
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     //QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    qmlRegisterType<processaImagem>("ProcessaImagemQml", 1, 0, "ProcessaImagem");
+    //qmlRegisterType<processaImagem>("ProcessaImagemQml", 1, 0, "ProcessaImagem");
 
     QGuiApplication app(argc, argv);
 #ifdef Q_OS_IOS
@@ -117,9 +117,11 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    /* erstmal raus
     provedorImagem *provedorImg = new provedorImagem;
     engine.rootContext()->setContextProperty("ProvedorImagem", provedorImg);
     engine.addImageProvider("provedor", provedorImg);
+    */
 
     EntryHandler::registerSingleton(&engine);
     PackageProvider::registerSingleton(&engine);

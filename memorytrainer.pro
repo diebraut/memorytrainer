@@ -36,11 +36,11 @@ ios {
 } else {
     QT += webenginequick
     SOURCES += ios_file_protection_stub.cpp
-    HEADERS += ios_file_protection.h \
-               processaimagem.h \
-               provedorimagem.h
-    SOURCES += processaimagem.cpp \
-               provedorimagem.cpp
+    HEADERS += ios_file_protection.h
+    #           processaimagem.h \
+    #          provedorimagem.h
+    #SOURCES += processaimagem.cpp \
+    #          provedorimagem.cpp
 }
 
 HEADERS += \
