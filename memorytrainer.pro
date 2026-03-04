@@ -28,10 +28,19 @@ ios {
             #$$OPENSSL_DIR/x86_64/libcrypto.so \
             $$OPENSSL_DIR/x86_64/libcrypto_3.so
         }
+        HEADERS += processaimagem.h \
+                   provedorimagem.h
+        SOURCES += processaimagem.cpp \
+                   provedorimagem.cpp
 
 } else {
     QT += webenginequick
     SOURCES += ios_file_protection_stub.cpp
+    HEADERS += ios_file_protection.h \
+               processaimagem.h \
+               provedorimagem.h
+    SOURCES += processaimagem.cpp \
+               provedorimagem.cpp
 }
 
 HEADERS += \
@@ -47,8 +56,6 @@ HEADERS += \
     packagedesc.h \
     packagemanager.h \
     packageprovider.h \
-    processaimagem.h \
-    provedorimagem.h \
     xmlaccess.h \
     xmlparser.h
 
@@ -63,8 +70,6 @@ SOURCES += \
     packagedesc.cpp \
     packagemanager.cpp \
     packageprovider.cpp \
-    processaimagem.cpp \
-    provedorimagem.cpp \
     xmlaccess.cpp \
     xmlparser.cpp
 
