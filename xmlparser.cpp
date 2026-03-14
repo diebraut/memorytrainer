@@ -145,8 +145,16 @@ ExcludeAereaList XMLParser::parseExcludeAereaStr(const QString& excludeAereaStr)
 }
 
 QString XMLParser::getÜbungsTitel() const {
-    QDomElement ÜbungenElement = uebungenElement.firstChildElement("Übungen");
-    return ÜbungenElement.attribute("name");
+    if (uebungenElement.isNull())
+        return "";
+    return uebungenElement.attribute("name");
+}
+
+QString XMLParser::getFrageType() const {
+    if (uebungenElement.isNull())
+        return "";
+    const QString v = uebungenElement.attribute("frageType").trimmed();
+    return v;
 }
 
 bool XMLParser::isHideAuthorByQuestion() const {

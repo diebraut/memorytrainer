@@ -2,6 +2,19 @@
 
 #include "packagedesc.h"
 
+PackageDesc::PackageDesc(QString pathToXmlFile,QString packageName, QObject *parent)
+    : QObject(parent),
+    packageName(packageName),
+    displayExercizesInSequence(false),
+    showList(DISPLAY_MAIN),
+    customPackage(false),
+    fromCustomPackageCreated(false)
+{
+    this->fullPathToPackage = pathToXmlFile;
+    this->xmlParser = getXMLParser(pathToXmlFile);
+}
+
+
 PackageDesc::PackageDesc(QString packageName,bool customPackage,bool fromCustomPackageCreated, QObject *parent)
     : QObject(parent),
     packageName(packageName),
@@ -10,44 +23,43 @@ PackageDesc::PackageDesc(QString packageName,bool customPackage,bool fromCustomP
     customPackage(customPackage),
     fromCustomPackageCreated(fromCustomPackageCreated)
 {
-    this->xmlParser = getXMLDescription(packageName);
     QString dir = env.getWritableDirectionForOS();
     this->fullPathToPackage = "file:"+ dir + "/" + DEFAULT_PACK_DIR + "/" +  packageName + "/";
 
-    if (this->xmlParser != NULL) {
-        this->mainQuestion = this->xmlParser->getFrageText();
-        this->mainQuestionReverse = this->xmlParser->getFrageTextUmgekehrt();
-        this->uebungsTitel = this->xmlParser->getÜbungsTitel();
-        this->displayExercizesInSequence = this->xmlParser->isSequential();
-        this->hideAuthorByQuestion_      = this->xmlParser->isHideAuthorByQuestion();  // <<< NEU
-        this->isXMLDescripted = true;
-        this->mainQuestions = getCountEntries(DISPLAY_MAIN);
-        this->reverseQuestions = getCountEntries(DISPLAY_REVERSE);
-        if (!this->mainQuestion.isEmpty() && !this->mainQuestionReverse.isEmpty()) {
-            this->showList = DISPLAY_ALL;
-        }
-        else if (!this->mainQuestion.isEmpty()) {
-            this->showList = DISPLAY_MAIN;
-        }
-        else if (!this->mainQuestionReverse.isEmpty()) {
-            this->showList = DISPLAY_REVERSE;
-        }
-        else {
-            this->showList = DISPLAY_NOTHING;
-        }
-    }
+    QString pathToXmlFile = dir + DEFAULT_PACK_DIR + packageName + "/" + XML_DESCRIPTION_FILENAME;
+    this->xmlParser = getXMLParser(pathToXmlFile);
 }
 
-XMLParser* PackageDesc::getXMLDescription(QString packageName) {
+XMLParser* PackageDesc::getXMLParser(QString pathToXmlFile) {
     try {
         // Build filename to description file
-        QString entryDir = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + packageName + "/" + XML_DESCRIPTION_FILENAME;
 
         // Erstelle das XMLParser-Objekt
-        XMLParser* parser = new XMLParser(entryDir);
+        XMLParser* parser = new XMLParser(pathToXmlFile);
 
         // Überprüfe, ob der Parser gültig ist
         if (parser->isValid()) {
+            this->mainQuestion = parser->getFrageText();
+            this->mainQuestionReverse = parser->getFrageTextUmgekehrt();
+            this->uebungsTitel = parser->getÜbungsTitel();
+            this->frageType = parser->getFrageType();
+            this->displayExercizesInSequence = parser->isSequential();
+            this->hideAuthorByQuestion_      = parser->isHideAuthorByQuestion();  // <<< NEU
+            this->isXMLDescripted = true;
+            this->mainQuestions = getCountEntries(parser,DISPLAY_MAIN);
+            this->reverseQuestions = getCountEntries(parser,DISPLAY_REVERSE);
+            if (!this->mainQuestion.isEmpty() && !this->mainQuestionReverse.isEmpty()) {
+                this->showList = DISPLAY_ALL;
+            }
+            else if (!this->mainQuestion.isEmpty()) {
+                this->showList = DISPLAY_MAIN;
+            }
+            else if (!this->mainQuestionReverse.isEmpty()) {
+                this->showList = DISPLAY_REVERSE;
+            }
+            else {
+                this->showList = DISPLAY_NOTHING;
+            }
             return parser; // Erfolgreich, gib den Parser zurück
         } else {
             delete parser; // Parser ist ungültig, Speicher freigeben
@@ -61,15 +73,20 @@ XMLParser* PackageDesc::getXMLDescription(QString packageName) {
 
 
 int PackageDesc::getCountEntries(DisplayOption dispOpt) {
+    return getCountEntries(this->xmlParser,dispOpt);
+}
+
+int PackageDesc::getCountEntries(XMLParser* parser,DisplayOption dispOpt) {
 
     if (dispOpt == DISPLAY_ALL) {
-        return xmlParser->countExercizeElements("MainÜbungsliste") * ((xmlParser->existReverseList())?2:1);
+        return parser->countExercizeElements("MainÜbungsliste") * ((parser->existReverseList())?2:1);
     }
     else if (dispOpt == DISPLAY_MAIN) {
-        return xmlParser->countExercizeElements("MainÜbungsliste");
+        return parser->countExercizeElements("MainÜbungsliste");
     }
-    return (xmlParser->existReverseList())?xmlParser->countExercizeElements("MainÜbungsliste"):0;
+    return (parser->existReverseList())?parser->countExercizeElements("MainÜbungsliste"):0;
 }
+
 
 
 QList<EntryDesc *> PackageDesc::getEntriesForList(QList<EntryDesc *> listEntries,int idxPackageList,QList<Entry> *filterEntries) {

@@ -166,6 +166,10 @@ Item {
         return ImageHandler.getPackages(onlyXMLPackages,withCustomPackages);
     }
 
+    function getXMLQuestionTypes(packageName) {
+        return ImageHandler.getXMLQuestionTypes(packageName);
+    }
+
     function removeExercisePackage(packageName) {
         return ImageHandler.removeExercisePackage(packageName);
     }

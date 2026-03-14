@@ -18,6 +18,7 @@ public:
     int countExercizeElements(QString exercizeType);
     QList<EntryDesc *> getExercizeList(QString exercizeType, int idxPackage, QList<EntryDesc *> listEntries, QList<Entry> *filterEntries = NULL);
     QString getÜbungsTitel() const;
+    QString getFrageType() const;
     bool isSequential() const;
     bool isHideAuthorByQuestion() const;
     bool existMainList() const;

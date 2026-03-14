@@ -94,52 +94,94 @@ int EntryHandler::getPackageEntries(QString packageName,bool isCustomPackage,boo
 }
 
 
+QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCustomPackages)
+{
+    qDeleteAll(m_packages);
+    m_packages.clear();
 
-QStringList EntryHandler::getPackages(bool onlyXMLPackages, bool withCustomPackages) {
-    QStringList entryList;  // Ergebnisliste
-    QString packageDir;
-    QDir directory;
+    QList<PackageDesc *> result;
 
-    // Standardpakete ermitteln
-    packageDir = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR;
-    directory.setPath(packageDir);
+    QString packageDir = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR;
+    QDir directory(packageDir);
 
-    // Liste der Verzeichnisse holen (ohne "." und "..")
-    entryList = directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    const QStringList dirEntries =
+        directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
-    // Prüfen und entfernen der Verzeichnisse
-    for (int i = entryList.size() - 1; i >= 0; i--) {
-        QString dirPath = packageDir + "/" + entryList.value(i);
+    for (const auto &entryName : std::as_const(dirEntries)) {
 
-        // Entferne Verzeichnisse, die mit "__" beginnen
-        if (entryList.value(i).startsWith("__")) {
-            entryList.removeAt(i);
+        if (entryName.startsWith("__"))
             continue;
-        }
 
-        // Entferne Verzeichnisse ohne "package.xml", wenn onlyXMLPackages = true
-        if (onlyXMLPackages) {
-            QDir subDir(dirPath);
-            if (!subDir.exists("package.xml")) {
-                entryList.removeAt(i);
+        const QString dirPath = packageDir + "/" + entryName;
+        QDir subDir(dirPath);
+
+        const QStringList xmlFiles = subDir.entryList(
+            QStringList() << "package*.xml",
+            QDir::Files,
+            QDir::Name
+            );
+
+        bool hasMatchingXml = false;
+
+        for (const auto &fileName : std::as_const(xmlFiles)) {
+
+            int exercizeUnit = -1;
+
+            if (fileName == "package.xml") {
+                exercizeUnit = 0;
+            } else if (fileName.size() == 14 &&
+                       fileName.startsWith("package_") &&
+                       fileName.endsWith(".xml")) {
+                bool ok = false;
+                const int nr = fileName.mid(8, 2).toInt(&ok);
+                if (!ok || nr < 1 || nr > 99)
+                    continue;
+                exercizeUnit = nr;
+            } else {
                 continue;
             }
+
+            hasMatchingXml = true;
+
+            PackageDesc *packageDesc =
+                new PackageDesc(subDir.filePath(fileName), entryName, this);
+
+            packageDesc->setExercizeUnit(exercizeUnit);
+
+            m_packages.append(packageDesc);
+            result.append(packageDesc);
+        }
+
+        if (!hasMatchingXml && !onlyXMLPackages) {
+            PackageDesc *packageDesc = new PackageDesc(entryName, false, false, this);
+            m_packages.append(packageDesc);
+            result.append(packageDesc);
         }
     }
 
-    // Wenn benutzerdefinierte Pakete eingeschlossen werden sollen
     if (withCustomPackages) {
         packageDir = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + DEFAULT_MIXED_PACKAGE_DIR;
-        QStringList customPackages = getTxtFilesWithoutSuffix(packageDir);
-        // Präfix "CUST//" zu jedem Eintrag hinzufügen
-        for (QString &entry : customPackages) {
-            entry = "CUST//" + entry;
+        const QStringList customPackages = getTxtFilesWithoutSuffix(packageDir);
+
+        for (const auto &entryName : std::as_const(customPackages)) {
+            PackageDesc *packageDesc = new PackageDesc(entryName, true, false, this);
+            packageDesc->setShowList(PackageDesc::DISPLAY_ALL);
+
+            const QString fullFileName =
+                env.getWritableDirectionForOS()
+                + DEFAULT_PACK_DIR
+                + DEFAULT_MIXED_PACKAGE_DIR
+                + entryName
+                + ".txt";
+
+            packageDesc->setFullPathToPackage(fullFileName);
+
+            m_packages.append(packageDesc);
+            result.append(packageDesc);
         }
-        // Füge die benutzerdefinierten Pakete vor den bestehenden Einträgen ein
-        entryList = customPackages + entryList;  // Liste kombinieren: customPackages zuerst
     }
 
-    return entryList;  // Rückgabe der Liste
+    return result;
 }
 
 QStringList EntryHandler::getTxtFilesWithoutSuffix(const QString &directoryName) {
@@ -348,27 +390,27 @@ LicenceInfo EntryHandler::getActLicenceInfo() {
 }
 
 
-PackageDesc EntryHandler::getActPackageDescriptionIdx(int idx) {
-    int sizePackages = this->actExercisePackages.size();
-    if ( sizePackages > idx ) {
-        PackageDesc* packageDesc = this->actExercisePackages[idx];
-        if (packageDesc) {
-            return *packageDesc;  // Dereferenzieren des Zeigers und Rückgabe einer Kopie
-        }
+PackageDesc* EntryHandler::getActPackageDescriptionIdx(int idx)
+{
+    const int sizePackages = this->actExercisePackages.size();
+
+    if (idx >= 0 && idx < sizePackages) {
+        return this->actExercisePackages[idx];
     }
-    return PackageDesc();
+
+    return nullptr;
 }
 
+PackageDesc* EntryHandler::getActPackageDescription()
+{
+    const int sizePackages = this->actExercisePackages.size();
+    const int idx = m_entryDesc.getIdxActExercisePackages();
 
-PackageDesc EntryHandler::getActPackageDescription() {
-    int sizePackages = this->actExercisePackages.size();
-    if ( m_entryDesc.getIdxActExercisePackages() < sizePackages && sizePackages > 0 && m_entryDesc.getIdxActExercisePackages() >= 0) {
-        PackageDesc* packageDesc = this->actExercisePackages[ m_entryDesc.getIdxActExercisePackages()];
-        if (packageDesc) {
-            return *packageDesc;  // Dereferenzieren des Zeigers und Rückgabe einer Kopie
-        }
+    if (idx >= 0 && idx < sizePackages) {
+        return this->actExercisePackages[idx];
     }
-    return PackageDesc();
+
+    return nullptr;
 }
 
 void EntryHandler::setQuestionOptionInActPackageIdx(int idx,PackageDesc::DisplayOption option) {

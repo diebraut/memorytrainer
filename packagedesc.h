@@ -44,9 +44,11 @@ public:
 Q_DECLARE_METATYPE(PackagePartState)
 
 class PackageDesc : public QObject {
-    Q_GADGET
+    Q_OBJECT
     Q_PROPERTY(QString packageName READ getPackageName CONSTANT)
+    Q_PROPERTY(int exercizeUnit READ getExercizeUnit CONSTANT)
     Q_PROPERTY(QString uebungsTitel READ getUebungsTitel CONSTANT)
+    Q_PROPERTY(QString frageType READ getFrageType CONSTANT)
     Q_PROPERTY(QString mainQuestion READ getMainQuestion CONSTANT)
     Q_PROPERTY(QString mainQuestionReverse READ getMainQuestionReverse CONSTANT)
     Q_PROPERTY(bool isXMLDescripted READ getIsXMLDescripted CONSTANT);
@@ -62,8 +64,12 @@ public:
 
     explicit PackageDesc(QString packageNAME,bool customPackage,bool fromCustomPackageCreated, QObject *parent = nullptr);
 
+    explicit PackageDesc(QString xmlPackagefile,QString packageName,QObject *parent = nullptr);
+
     // Copy constructor
     PackageDesc(const PackageDesc &other) : QObject(other.parent()) {
+        this->frageType = other.frageType;
+        this->exercizeUnit = other.exercizeUnit;
         this->uebungsTitel = other.uebungsTitel;
         this->packageName = other.packageName;
         this->mainQuestion = other.mainQuestion;
@@ -83,6 +89,8 @@ public:
     // Assignment operator
     PackageDesc& operator=(const PackageDesc &other) {
         if (this != &other) {
+            this->exercizeUnit = other.exercizeUnit;
+            this->frageType = other.frageType;
             this->uebungsTitel = other.uebungsTitel;
             this->packageName = other.packageName;
             this->mainQuestion = other.mainQuestion;
@@ -104,6 +112,8 @@ public:
     // Copy constructor from a pointer
     PackageDesc(const PackageDesc* other) {
         if (other) {
+            this->exercizeUnit = other->exercizeUnit;
+            this->frageType = other->frageType;
             this->uebungsTitel = other->uebungsTitel;
             this->packageName = other->packageName;
             this->mainQuestion = other->mainQuestion;
@@ -136,6 +146,14 @@ public:
 
     QString getUebungsTitel() const {
         return uebungsTitel;
+    }
+
+    QString getFrageType() const {
+        return frageType;
+    }
+
+    int getExercizeUnit() const {
+        return exercizeUnit;
     }
 
     QString getMainQuestion() const {
@@ -218,6 +236,10 @@ public:
         return fromCustomPackageCreated;
     }
 
+    void setExercizeUnit(int unit) {
+        exercizeUnit = unit;
+    }
+
     LicenceInfo getLicenceInfo(int number,bool isReverse);
 
     void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "");
@@ -234,10 +256,13 @@ public:
     QList<EntryDesc *> getEntriesForList(QList<EntryDesc *> listEntries,int idxPackageList, QList<Entry> *filterEntries = NULL);
 
     int getCountEntries(DisplayOption dispOpt);
+    int getCountEntries(XMLParser* parser,DisplayOption dispOpt);
 
     QString packageName;
 
 private:
+    int exercizeUnit = 0;
+    QString frageType;
     QString uebungsTitel;
     QString mainQuestion;
     QString mainQuestionReverse;
@@ -247,7 +272,7 @@ private:
 
     DisplayOption   showList;
     XMLParser *xmlParser = nullptr;
-    XMLParser *getXMLDescription(QString packageName);
+    XMLParser *getXMLParser(QString pathToXmlFile);
     Environment env;
     QString fullPathToPackage="";
     int reverseQuestions;
@@ -266,6 +291,7 @@ private:
     bool fromCustomPackageCreated = false;
 
     bool existPrioritizedPackagePart();
+
 
 };
 

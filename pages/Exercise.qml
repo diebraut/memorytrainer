@@ -602,41 +602,59 @@ Page {
                             anchors.right: prioritySwitchArea.visible ? prioritySwitchArea.left : parent.right
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
-                            Row {
-                                id: itemRowId
-                                anchors.centerIn: parent            // <- wieder schön zentriert
-                                spacing: 6
 
-                                // Kleines Icon wenn priorisiert (Stern)
-                                Text {
-                                    id: prioritizedBadgeBefore
-                                    visible: (index === listViewPacketsId.prioritizedIndex)
-                                    text: " ★"
-                                    font.pixelSize: itemRowIdTxt1.font.pixelSize
-                                    color: "#2d7a2d"
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 2
+
+                                Row {
+                                    id: itemRowId
+                                    spacing: 6
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Text {
+                                        id: prioritizedBadgeBefore
+                                        visible: (index === listViewPacketsId.prioritizedIndex)
+                                        text: " ★"
+                                        font.pixelSize: itemRowIdTxt1.font.pixelSize
+                                        color: "#2d7a2d"
+                                    }
+
+                                    Text {
+                                        id: itemRowIdTxt1
+                                        font.pixelSize: 14
+                                        text: (index === -1) ? "" :
+                                              (isPackagePart ? "(P" + index + ") " + name : name)
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        id: itemRowIdTxt2
+                                        font.pixelSize: 14
+                                        text: "(" + count + ")"
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        id: prioritizedBadgeAfter
+                                        visible: (index === listViewPacketsId.prioritizedIndex)
+                                        text: " ★"
+                                        font.pixelSize: itemRowIdTxt1.font.pixelSize
+                                        color: "#2d7a2d"
+                                    }
                                 }
+
+                                // zweite Zeile für frageType
                                 Text {
-                                    id: itemRowIdTxt1
-                                    font.pixelSize: 14
-                                    text: (index === -1) ? "" : (isPackagePart ? "(P" + index + ") " + name : name)
-                                    elide: Text.ElideRight
-                                }
-                                Text {
-                                    id: itemRowIdTxt2
-                                    font.pixelSize: 14
-                                    text: "(" + count + ")"
-                                    elide: Text.ElideRight
-                                }
-                                // Kleines Icon wenn priorisiert (Stern)
-                                Text {
-                                    id: prioritizedBadgeAfter
-                                    visible: (index === listViewPacketsId.prioritizedIndex)
-                                    text: " ★"
-                                    font.pixelSize: itemRowIdTxt1.font.pixelSize
-                                    color: "#2d7a2d"
+                                    visible: frageType !== ""
+                                    text: "(" + frageType + ")"
+                                    font.pixelSize: 12
+                                    color: "#555555"
+                                    anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
                         }
+
                         function isActiveForPrio() {
                             if (typeof isPackagePartActive !== "undefined") return !!isPackagePartActive;
                             if (typeof isActive !== "undefined")            return !!isActive;
@@ -1148,7 +1166,9 @@ Page {
                 function loadData() {
                     var list = dataModel.getPackages(false, true); // Pakete laden
                     for (var i = 0; i < list.length; i++) {
-                        var packageName = list[i];
+                        var packageName = list[i].packageName;
+                        var packageUnit = list[i].exercizeUnit;
+                        var frageType = list[i].frageType;
                         var isCustomPackage = false;
 
                         // Prüfen, ob das Präfix "CUST//" vorhanden ist
@@ -1159,7 +1179,7 @@ Page {
 
                         // Prüfen, ob Paket schon existiert
                         if (!find(listViewPacketsId.model, packageName)) {
-                            append(createListElement(packageName, dataModel.getPackageEntries(packageName,isCustomPackage), false, isCustomPackage));
+                            append(createListElement(packageName,frageType,packageUnit,dataModel.getPackageEntries(packageName,isCustomPackage), false, isCustomPackage));
                         }
                     }
                 }
@@ -1173,9 +1193,11 @@ Page {
                     return false;
                 }
 
-                function createListElement(packageName, cnt, isPackagePartActive, isCustomPackage) {
+                function createListElement(packageName, frageType,packageUnit, cnt, isPackagePartActive, isCustomPackage) {
                     return {
                         name: packageName,
+                        frageType: frageType,
+                        packageUnit: packageUnit,
                         count: cnt,
                         isPackagePart: false,
                         isPackagePartActive: isPackagePartActive, // Bleibt wie bisher
@@ -1242,9 +1264,10 @@ Page {
 
                 delegate: Item {
                     id: delegateItem01
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
                     width: listViewAvailablePacketsId.delegateWidth
                     height: listViewAvailablePacketsId.delegateHeight
+
                     Rectangle {
                         id: dragRect01
                         width: delegateItem01.width
@@ -1253,19 +1276,34 @@ Page {
                         anchors.verticalCenter: parent.verticalCenter
                         border.color: Qt.darker(color)
                         radius: 15
-                        color:"#eee"
+                        color: "#eee"
 
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 3
-                            Text {
-                                font.pixelSize: 14
-                                text: name
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 2
+
+                            Row {
+                                spacing: 3
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                Text {
+                                    font.pixelSize: 14
+                                    text: name
+                                }
+
+                                Text {
+                                    font.pixelSize: 14
+                                    text: '(' + count + ')'
+                                }
                             }
+
+                            // zweite Zeile für frageType
                             Text {
-                                font.pixelSize: 14
-                                text: '(' + count + ')'
+                                visible: frageType !== ""
+                                text: "(" + frageType + ")"
+                                font.pixelSize: 12
+                                color: "#555"
+                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
 
@@ -1295,18 +1333,15 @@ Page {
                                     anchors.horizontalCenter: undefined
                                     anchors.verticalCenter: undefined
                                 }
-
                             }
                         ]
 
                         Drag.active: mouseArea01.drag.active
                         Drag.hotSpot.x: dragRect01.width / 2
                         Drag.hotSpot.y: dragRect01.height / 2
-
                     }
                 }
             }
-
             DropArea {
                 //id: dropArea
                 anchors.fill: parent

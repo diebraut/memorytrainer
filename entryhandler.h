@@ -61,16 +61,18 @@ public:
 
     Q_INVOKABLE int addExercisePackage(QString packageName,bool isCustomPackage = false,bool isFromCustomPackageCreated = false);
     Q_INVOKABLE void removeExercisePackage(QString packageName);
+
     Q_INVOKABLE QList<PackageDesc *> initExercisePackages();
-    Q_INVOKABLE QStringList getPackages(bool onlyXMLPackages = false,bool withCustomPackages = false);
+
+    Q_INVOKABLE QList<PackageDesc *> getPackages(bool onlyXMLPackages = false, bool withCustomPackages = false);
 
     Q_INVOKABLE int loadPackage(QString packageName,bool isLearnList = false);
 
     Q_INVOKABLE void loadLearnListPackage();
 
-    Q_INVOKABLE PackageDesc getActPackageDescription();
+    Q_INVOKABLE PackageDesc* getActPackageDescription();
 
-    Q_INVOKABLE PackageDesc getActPackageDescriptionIdx(int idx);
+    Q_INVOKABLE PackageDesc* getActPackageDescriptionIdx(int idx);
 
     Q_INVOKABLE void setQuestionOptionInActPackageIdx(int idx,PackageDesc::DisplayOption option);
 
@@ -151,6 +153,8 @@ private:
     bool isEntryOnLearnList(EntryDesc *entry);
 
     int getPackageIndexInPackageList(QString packageName);
+
+    QList<PackageDesc*> m_packages;
 
 signals:
     void imageRemoved(int customImageNr);
