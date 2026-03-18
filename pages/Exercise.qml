@@ -314,7 +314,7 @@ Page {
 
         showScores(false);
 
-        var packageList = dataModel.initExercisePackages();
+        dataModel.initExercisePackages();
 
         console.log("MyCleanup: customStartupDataStore", customStartupDatastore);
         if (settings.datastore) {
@@ -331,7 +331,7 @@ Page {
             for (var i = 0; i < dModel.length-5; ++i) {
                 listViewPacketsId.model.append(dModel[i])
                 var pName = dModel[i].name
-                dataModel.addExercisePackage(dModel[i].name,dModel[i].isCustomPackage);
+                dataModel.addExercisePackage(dModel[i].name,dModel[i].packageUnit,dModel[i].isCustomPackage);
             }
             if (customStartupDatastore) {
                 entryModelAvailablePackagesId.clear()
@@ -347,8 +347,8 @@ Page {
 
             var orderOptions      = dModel[dModel.length-1];
             showMainQuestionId.checked = orderOptions.mainOrderIsSelected;
-            showMainQuestionRevertedId.checked = orderOptions.revertedOrderIsSelected;
             presentInOrderId.checked = orderOptions.sequentiellOrderIsSelected;
+            showMainQuestionRevertedId.checked = orderOptions.revertedOrderIsSelected;
             // NEU: Priorisierung wiederherstellen (nachdem das Model aufgebaut ist)
             restorePrioritizationFromOptions(orderOptions);
             // nach restorePrioritizationFromOptions(orderOptions);
@@ -1113,7 +1113,7 @@ Page {
                         var listElement = listViewAvailablePacketsId.model.get(listViewAvailablePacketsId.dragItemIndex);
                         if (listElement.count > 0) {
                             listViewPacketsId.model.insert(0,listElement)
-                            dataModel.addExercisePackage(listElement.name,listElement.isCustomPackage);
+                            dataModel.addExercisePackage(listElement.name,listElement.packageUnit,listElement.isCustomPackage);
                             startEvaluationId.setQuestionOptions(true);
                             listViewAvailablePacketsId.model.remove(listViewAvailablePacketsId.dragItemIndex)
                             listViewAvailablePacketsId.dragItemIndex = -1;
@@ -1178,15 +1178,15 @@ Page {
                         }
 
                         // Prüfen, ob Paket schon existiert
-                        if (!find(listViewPacketsId.model, packageName)) {
-                            append(createListElement(packageName,frageType,packageUnit,dataModel.getPackageEntries(packageName,isCustomPackage), false, isCustomPackage));
+                        if (!find(listViewPacketsId.model, packageName,packageUnit)) {
+                            append(createListElement(packageName,frageType,packageUnit,dataModel.getPackageEntries(packageName,packageUnit,isCustomPackage), false, isCustomPackage));
                         }
                     }
                 }
 
-                function find(model, criteria) {
+                function find(model, criteria1, criteria2) {
                     for (var i = 0; i < model.count; ++i) {
-                        if (model.get(i).name === criteria) {
+                        if (model.get(i).name === criteria1 && model.get(i).packageUnit === criteria2) {
                             return true;
                         }
                     }
@@ -1210,9 +1210,10 @@ Page {
                         // Überprüfen, ob isCustomPackage true ist
                         var isCustom = entryModelAvailablePackagesId.get(index).isCustomPackage;
                         var packageName = entryModelAvailablePackagesId.get(index).name;
+                        var packageUnit = entryModelAvailablePackagesId.get(index).packageUnit;
 
                         // Zweiter Parameter basierend auf isCustomPackage setzen
-                        var count = dataModel.getPackageEntries(packageName, isCustom);
+                        var count = dataModel.getPackageEntries(packageName,packageUnit, isCustom);
 
                         // Wert aktualisieren
                         entryModelAvailablePackagesId.setProperty(index, "count", count);
@@ -1350,7 +1351,7 @@ Page {
                     if (listViewPacketsId.dragItemIndex >= 0) {
                         var listElement = listViewPacketsId.model.get(listViewPacketsId.dragItemIndex);
                         listViewAvailablePacketsId.model.insert(0,listElement);
-                        dataModel.removeExercisePackage(listElement.name);
+                        dataModel.removeExercisePackage(listElement.name,listElement.packageUnit);
                         entryModelAvailablePackagesId.updateCountWithInitValue(0);
                         startEvaluationId.setQuestionOptions(true);
                         listViewPacketsId.model.remove(listViewPacketsId.dragItemIndex)
@@ -1482,7 +1483,7 @@ Page {
                         packetAvailableId.visible = true;
                         dataModel.initExercisePackages();
                         for (var i= 0;i < entryModelPackagesId.count;i++) {
-                            dataModel.addExercisePackage(entryModelPackagesId.get(i).name,
+                            dataModel.addExercisePackage(entryModelPackagesId.get(i).name,entryModelPackagesId.get(i).packageUnit,
                                                          entryModelPackagesId.get(i).isCustomPackage);
                         }
                         startEvaluationId.setQuestionOptions(false)
@@ -2716,10 +2717,10 @@ Page {
                     var packageDesc = dataModel.getActPackageDescription()
                     var entryDesc   = dataModel.getActEntryDescription()
                     if (recLearnListId.stateAdd) {
-                        LearnListEntryManager.putExerciceInList(packageDesc.packageName,entryDesc.exercizeNumber,entryDesc.reverse);
+                        LearnListEntryManager.putExerciceInList(packageDesc.packageName,packageDesc.exercizeUnit,entryDesc.exercizeNumber,entryDesc.reverse);
                         recLearnListId.visible = false;
                     } else {
-                        LearnListEntryManager.removeExerciceFromList(packageDesc.packageName,entryDesc.exercizeNumber,entryDesc.reverse);
+                        LearnListEntryManager.removeExerciceFromList(packageDesc.packageName,packageDesc.exercizeUnit,entryDesc.exercizeNumber,entryDesc.reverse);
                         recLearnListId.visible = false;
                     }
                     activateLearnListId.actualizeCountLearnList();
@@ -2847,7 +2848,7 @@ Page {
         } else {
             var packageDesc = dataModel.getActPackageDescription()
             var entryDesc   = dataModel.getActEntryDescription()
-            var entryExist = LearnListEntryManager.entryExists(packageDesc.packageName,entryDesc.exercizeNumber,entryDesc.reverse);
+            var entryExist = LearnListEntryManager.entryExists(packageDesc.packageName,packageDesc.exercizeUnit,entryDesc.exercizeNumber,entryDesc.reverse);
             if (!entryExist) {
                 recLearnListId.visible = true;
             }

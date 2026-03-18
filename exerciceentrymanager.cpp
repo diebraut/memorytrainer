@@ -5,21 +5,21 @@
 #include <QDir>
 
 ExerciceEntryManager::ExerciceEntryManager(QString exersizeListFullFilename)
-    : exersizeListFullFilename_(exersizeListFullFilename) { // Setze den vollständigen Dateipfad in filename_
-
-    // Datei laden, falls sie bereits existiert
+    : exersizeListFullFilename_(exersizeListFullFilename)
+{
     if (QFile::exists(exersizeListFullFilename_)) {
-        if (!load()) { // Aufruf der bestehenden load-Funktion
-            qDebug() << "Error: Failed to lo5ad existing file -> " << exersizeListFullFilename_;
+        if (!load()) {
+            qDebug() << "Error: Failed to load existing file -> " << exersizeListFullFilename_;
         }
     } else {
         qDebug() << "Info: No existing file found. A new list will be created.";
     }
 }
 
-bool ExerciceEntryManager::load() {
-
+bool ExerciceEntryManager::load()
+{
     packages_.clear();
+
     QFile file(exersizeListFullFilename_);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Fehler beim Öffnen der Datei zum Laden:" << exersizeListFullFilename_;
@@ -27,34 +27,85 @@ bool ExerciceEntryManager::load() {
     }
 
     QTextStream in(&file);
+
+    Package currentPackage("", 0);
+    bool hasCurrentPackage = false;
+
+    auto flushCurrentPackage = [&]() {
+        if (hasCurrentPackage) {
+            packages_.append(currentPackage);
+            hasCurrentPackage = false;
+        }
+    };
+
     while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
+        const QString line = in.readLine().trimmed();
+
+        if (line.isEmpty()) {
+            flushCurrentPackage();
+            continue;
+        }
+
         if (line.startsWith("Package:")) {
-            QString packageName = line.mid(QString("Package:").length()).trimmed();
-            Package package(packageName);
+            // Vorheriges Paket abschließen
+            flushCurrentPackage();
 
-            // Einträge dieses Packages laden
-            while (!in.atEnd()) {
-                line = in.readLine().trimmed();
-                if (line.isEmpty() || line.startsWith("Package:")) break;
+            const QString packageLine =
+                line.mid(QString("Package:").length()).trimmed();
 
-                QStringList parts = line.split(",");
-                if (parts.size() == 2) {
-                    int position = parts[0].toInt();
-                    bool reverse = (parts[1] == "true");
-                    package.addEntry(Entry(position, reverse));
+            QString packageName;
+            int unit = 0;
+
+            // Neues Format: Package: name,unit
+            // Altes Format:  Package: name
+            const QStringList headerParts = packageLine.split(",");
+
+            if (!headerParts.isEmpty()) {
+                packageName = headerParts[0].trimmed();
+            }
+
+            if (headerParts.size() >= 2) {
+                bool ok = false;
+                const int parsedUnit = headerParts[1].trimmed().toInt(&ok);
+                if (ok) {
+                    unit = parsedUnit;
                 }
             }
-            packages_.append(package);
+
+            currentPackage = Package(packageName, unit);
+            hasCurrentPackage = true;
+            continue;
         }
+
+        // Eintragszeile nur verarbeiten, wenn bereits ein Package aktiv ist
+        if (!hasCurrentPackage)
+            continue;
+
+        const QStringList parts = line.split(",");
+        if (parts.size() != 2)
+            continue;
+
+        bool okPos = false;
+        const int position = parts[0].trimmed().toInt(&okPos);
+        if (!okPos)
+            continue;
+
+        const QString reverseStr = parts[1].trimmed().toLower();
+        const bool reverse = (reverseStr == "true");
+
+        currentPackage.addEntry(Entry(position, reverse));
     }
+
+    // Letztes Paket übernehmen
+    flushCurrentPackage();
+
     file.close();
     return true;
 }
 
 
-bool ExerciceEntryManager::save() {
-    // Datei öffnen (im Schreibmodus, um vorhandene Inhalte zu überschreiben)
+bool ExerciceEntryManager::save()
+{
     QFile file(exersizeListFullFilename_);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << "Error: Unable to open file for writing -> " << exersizeListFullFilename_;
@@ -63,146 +114,161 @@ bool ExerciceEntryManager::save() {
 
     QTextStream out(&file);
 
-    // Wenn `packages_` Einträge enthält, speichere diese
-    if (!packages_.isEmpty()) {
-        for (const Package &package : packages_) {
-            // Package-Überschrift schreiben
-            out << "Package: " << package.getPackageName() << "\n";
+    for (const auto &package : std::as_const(packages_)) {
+        out << "Package: "
+            << package.getPackageName()
+            << "," << package.getUnit()
+            << "\n";
 
-            // Sortierte Einträge des Packages schreiben
-            QList<Entry> sortedEntries = package.getEntries();
-            std::sort(sortedEntries.begin(), sortedEntries.end(), [](const Entry &a, const Entry &b) {
-                return a.getPosition() < b.getPosition();
-            });
+        QList<Entry> sortedEntries = package.getEntries();
+        std::sort(sortedEntries.begin(), sortedEntries.end(),
+                  [](const Entry &a, const Entry &b) {
+                      return a.getPosition() < b.getPosition();
+                  });
 
-            for (const Entry &entry : sortedEntries) {
-                out << formatEntry(entry) << "\n";
-            }
-            out << "\n";  // Leerzeile zwischen Packages
+        for (const Entry &entry : sortedEntries) {
+            out << formatEntry(entry) << "\n";
         }
+
+        out << "\n";
     }
 
-    // Datei schließen und Erfolg melden
     file.close();
     qDebug() << "Success: Packages saved to file -> " << exersizeListFullFilename_;
     return true;
 }
 
-
-QString ExerciceEntryManager::formatEntry(const Entry &entry) const {
+QString ExerciceEntryManager::formatEntry(const Entry &entry) const
+{
     return QString::number(entry.getPosition()) + "," + (entry.isReverse() ? "true" : "false");
 }
 
-bool ExerciceEntryManager::removeExerciceFromList(const QString &packageName, int exercicePosition, bool reverse) {
-    // Find the package by name
+bool ExerciceEntryManager::removeExerciceFromList(const QString &packageName,
+                                                  int unit,
+                                                  int exercicePosition,
+                                                  bool reverse)
+{
     for (int i = 0; i < packages_.size(); ++i) {
-        if (packages_[i].getPackageName() == packageName) {
-            Package &package = packages_[i];
+        if (packages_[i].getPackageName() == packageName &&
+            packages_[i].getUnit() == unit) {
 
-            // Access the actual list of entries and find the entry with the specified position and reverse
+            Package &package = packages_[i];
             QList<Entry> &entries = package.getEntries();
+
             for (int j = 0; j < entries.size(); ++j) {
-                if (entries[j].getPosition() == exercicePosition && entries[j].isReverse() == reverse) {
-                    // Remove the specific entry
+                if (entries[j].getPosition() == exercicePosition &&
+                    entries[j].isReverse() == reverse) {
+
                     entries.removeAt(j);
 
-                    // Check if the package is empty after removing the entry
                     if (entries.isEmpty()) {
-                        packages_.removeAt(i);  // Remove the entire package if no entries remain
-                        qDebug() << "Package" << packageName << "is empty and has been removed.";
+                        packages_.removeAt(i);
+                        qDebug() << "Package" << packageName << "unit" << unit
+                                 << "is empty and has been removed.";
                     }
 
-                    // Save the changes immediately
                     save();
-                    return true;  // Successfully removed
+                    return true;
                 }
             }
 
-            qDebug() << "Entry with position" << exercicePosition << "and reverse" << reverse << "not found in package" << packageName;
-            return false;  // Entry not found with matching position and reverse
+            qDebug() << "Entry with position" << exercicePosition
+                     << "and reverse" << reverse
+                     << "not found in package" << packageName
+                     << "unit" << unit;
+            return false;
         }
     }
 
-    qDebug() << "Package" << packageName << "not found.";
-    return false;  // Package not found
+    qDebug() << "Package" << packageName << "unit" << unit << "not found.";
+    return false;
 }
 
-
-void ExerciceEntryManager::clearAllEntries() {
-    // Alle Einträge aus der Liste entfernen
+void ExerciceEntryManager::clearAllEntries()
+{
     packages_.clear();
-    // Änderungen sofort in die Datei speichern
     save();
     qDebug() << "All entries have been cleared and saved to file -> " << exersizeListFullFilename_;
 }
 
-void ExerciceEntryManager::putExerciceInList(const QString &packageName, int exercicePosition, bool reverse,bool saveImmediately) {
-    // Find or create the package
-    Package* package = findOrCreatePackage(packageName);
+void ExerciceEntryManager::putExerciceInList(const QString &packageName,
+                                             int unit,
+                                             int exercicePosition,
+                                             bool reverse,
+                                             bool saveImmediately)
+{
+    Package* package = findOrCreatePackage(packageName, unit);
 
-    // Check if an entry with the same position and reverse already exists
     for (const Entry &entry : package->getEntries()) {
-        if (entry.getPosition() == exercicePosition && entry.isReverse() == reverse) {
-            qDebug() << "Duplicate entry ignored: position" << exercicePosition << "reverse" << reverse << "in package" << packageName;
-            return;  // Duplicate found, do not add
+        if (entry.getPosition() == exercicePosition &&
+            entry.isReverse() == reverse) {
+            qDebug() << "Duplicate entry ignored: position" << exercicePosition
+                     << "reverse" << reverse
+                     << "in package" << packageName
+                     << "unit" << unit;
+            return;
         }
     }
 
-    // Add new entry if no duplicate exists
     package->addEntry(Entry(exercicePosition, reverse));
 
-    // Save changes immediately
-    if (saveImmediately) save();
+    if (saveImmediately)
+        save();
 }
 
-Package* ExerciceEntryManager::findOrCreatePackage(const QString &packageName) {
+Package* ExerciceEntryManager::findOrCreatePackage(const QString &packageName, int unit)
+{
     for (Package &package : packages_) {
-        if (package.getPackageName() == packageName) {
-            return &package;  // Gefunden, Rückgabe des existierenden Package
+        if (package.getPackageName() == packageName &&
+            package.getUnit() == unit) {
+            return &package;
         }
     }
 
-    // Erstellen eines neuen Package, falls nicht vorhanden
-    packages_.append(Package(packageName));
+    packages_.append(Package(packageName, unit));
     return &packages_.last();
 }
 
-bool ExerciceEntryManager::entryExists(const QString &packageName, int position, bool reverse) const {
-    // Find the package by name
+bool ExerciceEntryManager::entryExists(const QString &packageName,
+                                       int unit,
+                                       int position,
+                                       bool reverse) const
+{
     for (const Package &package : packages_) {
-        if (package.getPackageName() == packageName) {
-            // Search for an entry with the specified position and reverse values
+        if (package.getPackageName() == packageName &&
+            package.getUnit() == unit) {
+
             for (const Entry &entry : package.getEntries()) {
-                if (entry.getPosition() == position && entry.isReverse() == reverse) {
-                    return true;  // Entry found
+                if (entry.getPosition() == position &&
+                    entry.isReverse() == reverse) {
+                    return true;
                 }
             }
-            return false;  // Package found, but entry does not exist
+            return false;
         }
     }
 
-    return false;  // Package not found
+    return false;
 }
 
-Package* ExerciceEntryManager::getPackageByName(const QString &packageName) {
+Package* ExerciceEntryManager::getPackageByName(const QString &packageName, int unit)
+{
     for (Package &package : packages_) {
-        if (package.getPackageName() == packageName) {
-            return &package;  // Return a pointer to the matching package
+        if (package.getPackageName() == packageName &&
+            package.getUnit() == unit) {
+            return &package;
         }
     }
-    return nullptr;  // No matching package found
+    return nullptr;
 }
 
-
-int ExerciceEntryManager::getTotalPositionCount() const {
+int ExerciceEntryManager::getTotalPositionCount() const
+{
     int totalCount = 0;
 
-    // Iterate through each package and count the entries
     for (const Package &package : packages_) {
         totalCount += package.getEntries().size();
     }
 
     return totalCount;
 }
-
-

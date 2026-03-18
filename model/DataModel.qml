@@ -154,8 +154,8 @@ Item {
         return ImageHandler.cntEntriesInRecognizedState(true);
     }
 
-    function getPackageEntries(packageName,isCustomPackage,selectOnlyMainQuestions) {
-        return ImageHandler.getPackageEntries(packageName,isCustomPackage,selectOnlyMainQuestions)
+    function getPackageEntries(packageName,unit,isCustomPackage,selectOnlyMainQuestions) {
+        return ImageHandler.getPackageEntries(packageName,unit,isCustomPackage,selectOnlyMainQuestions)
     }
 
     function setNextQuestion(pictureName) {
@@ -170,12 +170,12 @@ Item {
         return ImageHandler.getXMLQuestionTypes(packageName);
     }
 
-    function removeExercisePackage(packageName) {
-        return ImageHandler.removeExercisePackage(packageName);
+    function removeExercisePackage(packageName,unit) {
+        return ImageHandler.removeExercisePackage(packageName,unit);
     }
 
-    function addExercisePackage(packageName,customPackage) {
-        return ImageHandler.addExercisePackage(packageName,customPackage);
+    function addExercisePackage(packageName,unit,customPackage) {
+        return ImageHandler.addExercisePackage(packageName,unit,customPackage);
     }
 
     function initExercisePackages() {

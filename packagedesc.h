@@ -60,11 +60,9 @@ class PackageDesc : public QObject {
     Q_PROPERTY(int displayQuestionOption READ getShowList CONSTANT)
 
 public:
-    explicit PackageDesc(QObject *parent = nullptr,bool customPackage = false,bool fromCustomPackageCreated = false) : QObject(parent) {this->customPackage = customPackage;this->fromCustomPackageCreated = fromCustomPackageCreated;}
+    explicit PackageDesc(QString packageNAME,int unit, bool customPackage,bool fromCustomPackageCreated, QObject *parent = nullptr);
 
-    explicit PackageDesc(QString packageNAME,bool customPackage,bool fromCustomPackageCreated, QObject *parent = nullptr);
-
-    explicit PackageDesc(QString xmlPackagefile,QString packageName,QObject *parent = nullptr);
+    explicit PackageDesc(QString xmlPackagefile,int unit, QString packageName,QObject *parent = nullptr);
 
     // Copy constructor
     PackageDesc(const PackageDesc &other) : QObject(other.parent()) {
@@ -242,7 +240,7 @@ public:
 
     LicenceInfo getLicenceInfo(int number,bool isReverse);
 
-    void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "");
+    void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "",int unit = 0);
 
     void setSinglePackageLearningPart(bool setToActive,int partIdx);
 
@@ -281,6 +279,7 @@ private:
     bool                    singlePackageLearning = false;
     bool                    randomizeSinglePackages = true;
     QString                 singlePackageLearningName;
+    int                     singlePackageLearningUnit;
     QList<PackagePartState> packageLearningParts;  // statt QList<QPair<bool,int>>
 
     // Komfort-APIs (neu), damit QML/DataModel bequem exklusiv priorisieren kann
@@ -291,6 +290,7 @@ private:
     bool fromCustomPackageCreated = false;
 
     bool existPrioritizedPackagePart();
+    QString getPackageXmlName(int unit);
 
 
 };

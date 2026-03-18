@@ -37,7 +37,7 @@ public:
 
     Q_INVOKABLE void setSaveToPackage (QString packageName);
 
-    Q_INVOKABLE int getPackageEntries(QString package,bool isCustomPackage = false,bool onlyMainEntries = false);
+    Q_INVOKABLE int getPackageEntries(QString package,int unit, bool isCustomPackage = false,bool onlyMainEntries = false);
 
     Q_INVOKABLE void setActEntryRecognizedState(bool);
     Q_INVOKABLE void setLastEntryRecognizedState(bool state);
@@ -59,14 +59,15 @@ public:
         emit imageRemoved(customImageNr);
     }
 
-    Q_INVOKABLE int addExercisePackage(QString packageName,bool isCustomPackage = false,bool isFromCustomPackageCreated = false);
-    Q_INVOKABLE void removeExercisePackage(QString packageName);
+    Q_INVOKABLE int addExercisePackage(QString packageName,int unit, bool isCustomPackage = false,bool isFromCustomPackageCreated = false);
 
-    Q_INVOKABLE QList<PackageDesc *> initExercisePackages();
+    Q_INVOKABLE void removeExercisePackage(QString packageName,int unit);
+
+    Q_INVOKABLE void initExercisePackages();
 
     Q_INVOKABLE QList<PackageDesc *> getPackages(bool onlyXMLPackages = false, bool withCustomPackages = false);
 
-    Q_INVOKABLE int loadPackage(QString packageName,bool isLearnList = false);
+    Q_INVOKABLE int loadPackage(QString packageName,int unit,bool isLearnList = false);
 
     Q_INVOKABLE void loadLearnListPackage();
 
@@ -86,7 +87,7 @@ public:
     Q_INVOKABLE int getActEntryPos();
     Q_INVOKABLE int getMatchingEntry(QString pattern);
 
-    Q_INVOKABLE void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "");
+    Q_INVOKABLE void setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName = "",int unit = 0);
     Q_INVOKABLE void setSinglePackageLearningPart(bool setToActive,int partIdx);
     Q_INVOKABLE void setSinglePackageLearningPartPrioritized(bool setToPrioritized,int partIdx);
 
@@ -102,13 +103,13 @@ private:
     explicit    EntryHandler(QObject *parent = nullptr, QQmlEngine *qmlEngine=nullptr);
     void        initEntryList(bool useLearnList = false);
     EntryDesc  *getEntryDesc(int cnt);
-    int         isPackageInExersizeList(QString package);
+    int         isPackageInExersizeList(QString package,int unit);
     QString     getPackageName(int cnt);
     //int         setLearnList();
-    void        putItemInEntryList(QString entryDir,int idxPackage,bool useLearnList = false);
-    int         getIndexFromPackageList(QString packageName);
+    void        putItemInEntryList(QString packageName,int unit,int idxPackage,bool useLearnList = false);
+    int         getIndexFromPackageList(QString packageName, int unit);
     XMLParser   *getXMLDescription(QString entryName);
-    PackageDesc *getPackageDesc(QString packageName);
+    PackageDesc *getPackageDesc(QString packageName,int unit);
     PackageDesc *getPackageIsInPartedLearningMode();
     QStringList getTxtFilesWithoutSuffix(const QString &directoryName);
 
@@ -152,7 +153,7 @@ private:
 
     bool isEntryOnLearnList(EntryDesc *entry);
 
-    int getPackageIndexInPackageList(QString packageName);
+    //int getPackageIndexInPackageList(QString packageName);
 
     QList<PackageDesc*> m_packages;
 

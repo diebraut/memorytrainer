@@ -8,17 +8,46 @@ LearnListEntryManager::LearnListEntryManager()
     instance = this;  // Setze die statische Instanz
 }
 
-// Methoden, die direkt die Basisklassen-Implementierungen aufrufen
-void LearnListEntryManager::putExerciceInList(const QString &packageName, int exercicePosition, bool reverse, bool saveImmediately) {
-    ExerciceEntryManager::putExerciceInList(packageName, exercicePosition, reverse, saveImmediately);
+
+void LearnListEntryManager::putExerciceInList(const QString &packageName,
+                                              int unit,
+                                              int exercicePosition,
+                                              bool reverse,
+                                              bool saveImmediately)
+{
+    ExerciceEntryManager::putExerciceInList(
+        packageName,
+        unit,
+        exercicePosition,
+        reverse,
+        saveImmediately
+        );
 }
 
-bool LearnListEntryManager::removeExerciceFromList(const QString &packageName, int exercicePosition, bool reverse) {
-    return ExerciceEntryManager::removeExerciceFromList(packageName, exercicePosition, reverse);
+bool LearnListEntryManager::removeExerciceFromList(const QString &packageName,
+                                                   int unit,
+                                                   int exercicePosition,
+                                                   bool reverse)
+{
+    return ExerciceEntryManager::removeExerciceFromList(
+        packageName,
+        unit,
+        exercicePosition,
+        reverse
+        );
 }
 
-bool LearnListEntryManager::entryExists(const QString &packageName, int position, bool reverse) const {
-    return ExerciceEntryManager::entryExists(packageName, position, reverse);
+bool LearnListEntryManager::entryExists(const QString &packageName,
+                                        int unit,
+                                        int position,
+                                        bool reverse) const
+{
+    return ExerciceEntryManager::entryExists(
+        packageName,
+        unit,
+        position,
+        reverse
+        );
 }
 
 QString LearnListEntryManager::getNameOfLearnList() {

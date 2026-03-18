@@ -10,7 +10,6 @@
 #include <QDir>
 #include "environment.h"
 
-// Klasse, die einen einzelnen Eintrag speichert
 class Entry {
 public:
     Entry(int position, bool reverse) : position_(position), reverse_(reverse) {}
@@ -26,51 +25,65 @@ private:
     bool reverse_;
 };
 
-// Klasse, die eine Liste von Einträgen für ein bestimmtes packageName speichert
 class Package {
 public:
-    Package(const QString &packageName) : packageName_(packageName) {}
+    Package(const QString &packageName, int unit)
+        : packageName_(packageName), unit_(unit) {}
 
     QString getPackageName() const { return packageName_; }
-    // Return a non-const reference to allow modification
+    int getUnit() const { return unit_; }
+
     QList<Entry>& getEntries() { return entries_; }
-    const QList<Entry>& getEntries() const { return entries_; }  // Const version for read-only access
+    const QList<Entry>& getEntries() const { return entries_; }
     void addEntry(const Entry &entry) { entries_.append(entry); }
 
 private:
     QString packageName_;
+    int unit_;
     QList<Entry> entries_;
 };
 
-// Hauptklasse zur Verwaltung mehrerer Packages und zum Speichern/Laden in eine Datei
-class ExerciceEntryManager : public QObject {  // Von QObject erben
-    Q_OBJECT  // Q_OBJECT-Makro hinzufügen
+class ExerciceEntryManager : public QObject {
+    Q_OBJECT
 
 public:
     ExerciceEntryManager(QString filenameList);
 
     bool load();
     bool save();
-    Q_INVOKABLE void putExerciceInList(const QString &packageName, int exercicePosition, bool reverse,bool saveImmediately=true);
-    Q_INVOKABLE bool removeExerciceFromList(const QString &packageName, int exercicePosition,bool reverse);
-    Q_INVOKABLE bool entryExists(const QString &packageName, int position, bool reverse) const;
-    Q_INVOKABLE QString getNameOfLearnList() {return  "Lernliste";}
-    Q_INVOKABLE bool isLearnListEmpty() {return  (packages_.size() == 0);}
+
+    Q_INVOKABLE void putExerciceInList(const QString &packageName,
+                                       int unit,
+                                       int exercicePosition,
+                                       bool reverse,
+                                       bool saveImmediately = true);
+
+    Q_INVOKABLE bool removeExerciceFromList(const QString &packageName,
+                                            int unit,
+                                            int exercicePosition,
+                                            bool reverse);
+
+    Q_INVOKABLE bool entryExists(const QString &packageName,
+                                 int unit,
+                                 int position,
+                                 bool reverse) const;
+
+    Q_INVOKABLE QString getNameOfLearnList() { return "Lernliste"; }
+    Q_INVOKABLE bool isLearnListEmpty() { return (packages_.size() == 0); }
     Q_INVOKABLE int getTotalPositionCount() const;
     Q_INVOKABLE void clearAllEntries();
 
     QList<Package> getPackages() const { return packages_; }
-    // New method to retrieve a package by name
-    Package* getPackageByName(const QString &packageName);    
 
+    Package* getPackageByName(const QString &packageName, int unit);
 
 private:
     Environment     env;
     QString         exersizeListFullFilename_;
     QList<Package>  packages_;
 
-    Package*        findOrCreatePackage(const QString &packageName);
-    QString         formatEntry(const Entry &entry) const;
+    Package* findOrCreatePackage(const QString &packageName, int unit);
+    QString  formatEntry(const Entry &entry) const;
 };
 
 #endif // EXERCICEENTRYMANAGER_H

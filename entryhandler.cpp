@@ -66,7 +66,7 @@ int  EntryHandler::sizeActExercisePackages() {
 }
 
 
-int EntryHandler::getPackageEntries(QString packageName,bool isCustomPackage,bool onlyMainEntries) {
+int EntryHandler::getPackageEntries(QString packageName,int unit,bool isCustomPackage,bool onlyMainEntries) {
     int retSize = 0;
     if (isCustomPackage) {
         QString packageFilename = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + DEFAULT_MIXED_PACKAGE_DIR + packageName + ".txt";
@@ -75,7 +75,7 @@ int EntryHandler::getPackageEntries(QString packageName,bool isCustomPackage,boo
         delete(mgr);
     } else {
         QDir directory(env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + packageName);
-        PackageDesc *packageDesc = new PackageDesc(directory.dirName(),false,false);
+        PackageDesc *packageDesc = new PackageDesc(directory.dirName(),unit,false,false);
         qDebug() << "DIRECTORY=" + directory.dirName();
         if (packageDesc->getIsXMLDescripted()) {
             if (onlyMainEntries) {
@@ -133,7 +133,7 @@ QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCu
                        fileName.startsWith("package_") &&
                        fileName.endsWith(".xml")) {
                 bool ok = false;
-                const int nr = fileName.mid(8, 2).toInt(&ok);
+                const int nr = QStringView{fileName}.mid(8, 2).toInt(&ok);
                 if (!ok || nr < 1 || nr > 99)
                     continue;
                 exercizeUnit = nr;
@@ -144,7 +144,7 @@ QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCu
             hasMatchingXml = true;
 
             PackageDesc *packageDesc =
-                new PackageDesc(subDir.filePath(fileName), entryName, this);
+                new PackageDesc(subDir.filePath(fileName),exercizeUnit, entryName, this);
 
             packageDesc->setExercizeUnit(exercizeUnit);
 
@@ -153,7 +153,7 @@ QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCu
         }
 
         if (!hasMatchingXml && !onlyXMLPackages) {
-            PackageDesc *packageDesc = new PackageDesc(entryName, false, false, this);
+            PackageDesc *packageDesc = new PackageDesc(entryName,0, false, false, this);
             m_packages.append(packageDesc);
             result.append(packageDesc);
         }
@@ -164,9 +164,8 @@ QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCu
         const QStringList customPackages = getTxtFilesWithoutSuffix(packageDir);
 
         for (const auto &entryName : std::as_const(customPackages)) {
-            PackageDesc *packageDesc = new PackageDesc(entryName, true, false, this);
+            PackageDesc *packageDesc = new PackageDesc(entryName,0, true, false, this);
             packageDesc->setShowList(PackageDesc::DISPLAY_ALL);
-
             const QString fullFileName =
                 env.getWritableDirectionForOS()
                 + DEFAULT_PACK_DIR
@@ -212,9 +211,9 @@ void EntryHandler::initEntryList(bool useLearnList) {
     this->listEntries.clear();
     PackageDesc *p = getPackageIsInPartedLearningMode();
     if (p != NULL) {
-        int idx =getIndexFromPackageList(p->getSinglePackageLearningName());
+        int idx =getIndexFromPackageList(p->getSinglePackageLearningName(),p->getExercizeUnit());
         if (idx >= 0) {
-            putItemInEntryList(p->getSinglePackageLearningName(),idx);
+            putItemInEntryList(p->getSinglePackageLearningName(),p->getExercizeUnit(),idx);
         }
         else {
             qDebug("Error:can't fond package. Do nothing!! ");
@@ -222,16 +221,16 @@ void EntryHandler::initEntryList(bool useLearnList) {
     }
     else {
         for (int cntPackage=0; cntPackage < this->actExercisePackages.size();cntPackage++) {
-            putItemInEntryList( this->actExercisePackages[cntPackage]->getPackageName(),cntPackage,useLearnList);
+            putItemInEntryList( this->actExercisePackages[cntPackage]->getPackageName(),this->actExercisePackages[cntPackage]->getExercizeUnit(),cntPackage,useLearnList);
         }
     }
     this->allAvailableEntrys = this->listEntries.size();
     return;
 }
 
-int EntryHandler::getIndexFromPackageList(QString packageName) {
+int EntryHandler::getIndexFromPackageList(QString packageName,int unit) {
     for (int i=0; i < this->actExercisePackages.size();i++) {
-        if (QString::compare(packageName, this->actExercisePackages[i]->getPackageName(), Qt::CaseInsensitive) == 0) {
+        if ((QString::compare(packageName, this->actExercisePackages[i]->getPackageName(), Qt::CaseInsensitive) == 0) && actExercisePackages[i]->getExercizeUnit() == unit) {
             return i;
         }
     }
@@ -239,7 +238,7 @@ int EntryHandler::getIndexFromPackageList(QString packageName) {
 }
 
 
-void EntryHandler::putItemInEntryList(QString packageName, int idxPackage, bool useLearnList ) {
+void EntryHandler::putItemInEntryList(QString packageName, int unit, int idxPackage, bool useLearnList ) {
     if (this->actExercisePackages[idxPackage]->isFromCustomPackageCreated()) {
         return;
     }
@@ -262,12 +261,12 @@ void EntryHandler::putItemInEntryList(QString packageName, int idxPackage, bool 
     } else {
         QString entryDir  = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR + packageName;
         QDir directory(entryDir);
-        PackageDesc *packageDesc = getPackageDesc(packageName);
+        PackageDesc *packageDesc = getPackageDesc(packageName,unit);
         if (packageDesc->getIsXMLDescripted()) {
             if (useLearnList) {
                 QList<Entry> entries ;
                 PackageDesc::DisplayOption lastDisplayState = packageDesc->getShowList();
-                entries = learnListManager->getPackageByName(this->actExercisePackages[idxPackage]->getPackageName())->getEntries();
+                entries = learnListManager->getPackageByName(this->actExercisePackages[idxPackage]->getPackageName(), this->actExercisePackages[idxPackage]->getExercizeUnit())->getEntries();
                 //first all with not main
                 QList<Entry> entriesMain = getFilteredEntries(entries,false);
                 packageDesc->setShowList(PackageDesc::DISPLAY_MAIN);
@@ -314,9 +313,9 @@ QList<Entry> EntryHandler::getFilteredEntries(const QList<Entry> &entries, bool 
     return returnEntries;
 }
 
-PackageDesc *EntryHandler::getPackageDesc(QString packageName) {
+PackageDesc *EntryHandler::getPackageDesc(QString packageName,int unit) {
     for (int i=0; i < this->actExercisePackages.size();i++) {
-        if (QString::compare(packageName, this->actExercisePackages[i]->getPackageName(), Qt::CaseInsensitive) == 0) {
+        if ((QString::compare(packageName, this->actExercisePackages[i]->getPackageName(), Qt::CaseInsensitive) == 0) && this->actExercisePackages[i]->getExercizeUnit() == unit) {
             return this->actExercisePackages[i];
         }
     }
@@ -672,11 +671,11 @@ int EntryHandler::setEntryList(bool all, bool recognizedState,bool isLearnlist) 
     return this->listEntries.size();
 }
 
-void EntryHandler::setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName) {
+void EntryHandler::setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName, int unit) {
 
-    PackageDesc *p = getPackageDesc(packageName);
+    PackageDesc *p = getPackageDesc(packageName,unit);
     if (p != NULL) {
-        p->setSinglePackageLearning(activedSinglePackageLearning,parts,packageName);
+        p->setSinglePackageLearning(activedSinglePackageLearning,parts,packageName,unit);
         //force load all packages
         this->actExercisePackagesChanged = true;
     }
@@ -717,19 +716,17 @@ int  EntryHandler::cntEntriesInRecognizedState(bool state) {
     }
     return cnt;
 }
-
-QList<PackageDesc *> EntryHandler::initExercisePackages() {
+void EntryHandler::initExercisePackages() {
 
     this->actExercisePackages.clear();
     this->actExercisePackagesChanged = true;
-    return this->actExercisePackages;
 }
 
 
-int EntryHandler::addExercisePackage(QString packageName,bool isCustomPackage,bool isFromCustomPackageCreated) {
-    int idx = isPackageInExersizeList(packageName);
+int EntryHandler::addExercisePackage(QString packageName,int unit,bool isCustomPackage,bool isFromCustomPackageCreated) {
+    int idx = isPackageInExersizeList(packageName,unit);
     if ((this->actExercisePackages.size() == 0) || idx < 0) {
-        PackageDesc *p = new PackageDesc(packageName,isCustomPackage,isFromCustomPackageCreated);
+        PackageDesc *p = new PackageDesc(packageName,unit, isCustomPackage,isFromCustomPackageCreated);
         this->actExercisePackages.append(p);
         this->actExercisePackagesChanged = true;
         if (isCustomPackage) {
@@ -743,17 +740,17 @@ int EntryHandler::addExercisePackage(QString packageName,bool isCustomPackage,bo
     return idx;
 }
 
-void EntryHandler::removeExercisePackage(QString packageName) {
-    int atPos = isPackageInExersizeList(packageName);
+void EntryHandler::removeExercisePackage(QString packageName,int unit) {
+    int atPos = isPackageInExersizeList(packageName,unit);
     if (atPos >= 0) {
         this->actExercisePackages.removeAt(atPos);
         this->actExercisePackagesChanged = true;
     }
 }
 
-int EntryHandler::isPackageInExersizeList(QString package) {
+int EntryHandler::isPackageInExersizeList(QString package,int unit) {
     for (int i=0; i < this->actExercisePackages.size();i++) {
-        if (package.compare(this->actExercisePackages[i]->getPackageName()) == 0) {
+        if ((package.compare(this->actExercisePackages[i]->getPackageName()) == 0) && this->actExercisePackages[i]->getExercizeUnit() == unit) {
             return i;
         }
     }
@@ -764,12 +761,12 @@ int EntryHandler::getEntriesSize (void) {
     return this->listEntries.size();
 }
 
-int EntryHandler::loadPackage(QString packageName,bool isLearnlist) {
+int EntryHandler::loadPackage(QString packageName,int unit, bool isLearnlist) {
     initExercisePackages();
     if (isLearnlist) {
         addPackagesFromLearnList();
     } else {
-        addExercisePackage(packageName);
+        addExercisePackage(packageName,unit);
     }
     initEntryList(isLearnlist);
     this->allEntryNames.clear();
@@ -780,7 +777,7 @@ void EntryHandler::addPackagesFromLearnList() {
     if (learnListManager) {
         QList<Package> packages = learnListManager->getPackages();
         for (int i = 0; i < packages.size(); i++ ) {
-            addExercisePackage(packages.at(i).getPackageName());
+            addExercisePackage(packages.at(i).getPackageName(),0);
         }
     }
 }
@@ -844,7 +841,7 @@ void EntryHandler::loadLearnListPackage() {
     initExercisePackages();
     QList<Package> list = learnListManager->getPackages();
     for (int i=0; i < list.size();i++) {
-        addExercisePackage(list.at(i).getPackageName());
+        addExercisePackage(list.at(i).getPackageName(),list.at(i).getUnit());
     }
 }
 

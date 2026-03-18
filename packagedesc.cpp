@@ -2,7 +2,7 @@
 
 #include "packagedesc.h"
 
-PackageDesc::PackageDesc(QString pathToXmlFile,QString packageName, QObject *parent)
+PackageDesc::PackageDesc(QString pathToXmlFile,int unit,QString packageName, QObject *parent)
     : QObject(parent),
     packageName(packageName),
     displayExercizesInSequence(false),
@@ -12,10 +12,11 @@ PackageDesc::PackageDesc(QString pathToXmlFile,QString packageName, QObject *par
 {
     this->fullPathToPackage = pathToXmlFile;
     this->xmlParser = getXMLParser(pathToXmlFile);
+    this->exercizeUnit = unit;
 }
 
 
-PackageDesc::PackageDesc(QString packageName,bool customPackage,bool fromCustomPackageCreated, QObject *parent)
+PackageDesc::PackageDesc(QString packageName,int unit,bool customPackage,bool fromCustomPackageCreated, QObject *parent)
     : QObject(parent),
     packageName(packageName),
     displayExercizesInSequence(false),
@@ -25,9 +26,22 @@ PackageDesc::PackageDesc(QString packageName,bool customPackage,bool fromCustomP
 {
     QString dir = env.getWritableDirectionForOS();
     this->fullPathToPackage = "file:"+ dir + "/" + DEFAULT_PACK_DIR + "/" +  packageName + "/";
-
-    QString pathToXmlFile = dir + DEFAULT_PACK_DIR + packageName + "/" + XML_DESCRIPTION_FILENAME;
+    this->exercizeUnit = unit;
+    QString pathToXmlFile = dir + DEFAULT_PACK_DIR + packageName + "/" + getPackageXmlName(unit);
     this->xmlParser = getXMLParser(pathToXmlFile);
+}
+
+QString PackageDesc::getPackageXmlName(int unit)
+{
+    if (unit <= 0) {
+        return XML_DESCRIPTION_FILENAME;   // "package.xml"
+    }
+
+    if (unit > 99) {
+        unit = 99; // optional absichern
+    }
+
+    return QString("package_%1.xml").arg(unit, 2, 10, QChar('0'));
 }
 
 XMLParser* PackageDesc::getXMLParser(QString pathToXmlFile) {
@@ -132,11 +146,12 @@ bool PackageDesc::existPrioritizedPackagePart() {
     return false;
 }
 
-void PackageDesc::setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName) {
+void PackageDesc::setSinglePackageLearning(bool activedSinglePackageLearning,const QList<int> &parts, QString packageName,int unit) {
     this->singlePackageLearning = activedSinglePackageLearning;
     this->packageLearningParts.clear();
     if (activedSinglePackageLearning) {
         this->singlePackageLearningName = packageName;
+        this->singlePackageLearningUnit = unit;
         for (int i=0; i < parts.count();i++) {
             PackagePartState *packagePartState = new PackagePartState(false,false,parts.value(i));
             if (i == 0) packagePartState->active = true;
