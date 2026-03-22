@@ -3056,7 +3056,10 @@ Page {
             questionArea.visible = true
         }
         var packageDesc = dataModel.getActPackageDescription()
+
         var entryDesc   = dataModel.getActEntryDescription()
+        if (packageDesc === null || packageDesc.fullPathToPackage === null)
+             console.log("--- fullPathToPackage ist null ----")
 
         var imageFileName = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage
 
@@ -3108,11 +3111,8 @@ Page {
 
     function isXMLBased() {
         var packageDesc = dataModel.getActPackageDescription()
-        return packageDesc.isXMLDescripted
-    }
-
-    function isXMLBasedFromIdx(idx) {
-        var packageDesc = dataModel.getActPackageDescriptionIdx(idx)
+        if (packageDesc === null || packageDesc.isXMLDescripted === null || packageDesc.isXMLDescripted === undefined)
+            console.log("--- isXMLDescripted ist null ---- packageDesc=" + packageDesc)
         return packageDesc.isXMLDescripted
     }
 

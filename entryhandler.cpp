@@ -174,6 +174,7 @@ QList<PackageDesc *> EntryHandler::getPackages(bool onlyXMLPackages, bool withCu
                 + ".txt";
 
             packageDesc->setFullPathToPackage(fullFileName);
+            packageDesc->packageName = "CUST//" + packageDesc->packageName;
 
             m_packages.append(packageDesc);
             result.append(packageDesc);
@@ -248,8 +249,8 @@ void EntryHandler::putItemInEntryList(QString packageName, int unit, int idxPack
             QList<Package> list = extMgr->getPackages();
             for (int i = 0; i < list.size(); i++) {
                 QList<Entry> entries = list.at(i).getEntries();
-                int idx = addExercisePackage(list.at(i).getPackageName(),false,true);
-                if (idx > 0) {
+                int idx = addExercisePackage(list.at(i).getPackageName(),list.at(i).getUnit(),false,true);
+                if (idx >= 0) {
                     this->actExercisePackages[idx]->setSinglePackageLearning(this->actExercisePackages[idxPackage]->isSinglePackageLearning());
                     this->actExercisePackages[idx]->setPackageLearningParts(this->actExercisePackages[idxPackage]->getPackageLearningParts());
                     this->listEntries = this->actExercisePackages[idx]->getEntriesForList(this->listEntries,idx,&entries);
@@ -382,12 +383,17 @@ EntryDesc EntryHandler::getActEntryDescription() {
 }
 
 
-LicenceInfo EntryHandler::getActLicenceInfo() {
-    PackageDesc packageDesc = getActPackageDescription();
-    LicenceInfo licenceInfo = packageDesc.getLicenceInfo(m_entryDesc.getExercizeNumber(),m_entryDesc.isReverse());
-    return licenceInfo;
-}
+LicenceInfo EntryHandler::getActLicenceInfo()
+{
+    PackageDesc *packageDesc = getActPackageDescription();
+    if (!packageDesc)
+        return LicenceInfo();
 
+    return packageDesc->getLicenceInfo(
+        m_entryDesc.getExercizeNumber(),
+        m_entryDesc.isReverse()
+        );
+}
 
 PackageDesc* EntryHandler::getActPackageDescriptionIdx(int idx)
 {
@@ -588,15 +594,24 @@ bool EntryHandler::saveLastPictureTaken (QString imgName,bool isWideformat) {
     return true;
 }
 
-bool EntryHandler::setNextQuestion(void)
+bool EntryHandler::setNextQuestion()
 {
-    if (listEntries.size() > 0 && actImgIdx < listEntries.size()) {
-        actImgIdx++;
-        m_entryDesc = *listEntries.value(actImgIdx);
-        return (actImgIdx == listEntries.size() - 1);
-    }
-    return true;
+    if (listEntries.isEmpty())
+        return true;
+
+    if (actImgIdx + 1 >= listEntries.size())
+        return true;
+
+    ++actImgIdx;
+
+    EntryDesc *nextEntry = listEntries.value(actImgIdx);
+    if (!nextEntry)
+        return true;
+
+    m_entryDesc = *nextEntry;
+    return (actImgIdx == listEntries.size() - 1);
 }
+
 
 void EntryHandler::adjustEntryListWithLearnList() {
     for (int i=listEntries.size() - 1; i >= 0;i--) {
@@ -726,7 +741,7 @@ void EntryHandler::initExercisePackages() {
 int EntryHandler::addExercisePackage(QString packageName,int unit,bool isCustomPackage,bool isFromCustomPackageCreated) {
     int idx = isPackageInExersizeList(packageName,unit);
     if ((this->actExercisePackages.size() == 0) || idx < 0) {
-        PackageDesc *p = new PackageDesc(packageName,unit, isCustomPackage,isFromCustomPackageCreated);
+        PackageDesc *p = new PackageDesc(packageName,unit, isCustomPackage,isFromCustomPackageCreated,this);
         this->actExercisePackages.append(p);
         this->actExercisePackagesChanged = true;
         if (isCustomPackage) {
@@ -777,7 +792,7 @@ void EntryHandler::addPackagesFromLearnList() {
     if (learnListManager) {
         QList<Package> packages = learnListManager->getPackages();
         for (int i = 0; i < packages.size(); i++ ) {
-            addExercisePackage(packages.at(i).getPackageName(),0);
+            addExercisePackage(packages.at(i).getPackageName(),packages.at(i).getUnit());
         }
     }
 }

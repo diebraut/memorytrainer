@@ -23,7 +23,7 @@ private:
     explicit   PackageManager(QObject *parent = nullptr, QQmlEngine *qmlEngine=nullptr);
     bool existPackDir(QString packDir);
     QVariantList cutAndRandomize(int cntExercise,QVariantList fromPackageList);
-    bool putEntriesToMixPackage(int cntEntries,QString package,QString mixPackage,bool withReverseEntries, QJSValue  jsReturnInfoVal);
+    bool putEntriesToMixPackage(int cntEntries,QString package,int packageUnit,QString mixPackage,bool withReverseEntries, QJSValue  jsReturnInfoVal);
     //QString buildDirectoryStruct (bool &directoryExist);
     void sorting(int **arr,int n, bool firstCol);
     static bool compareAsc1Col(int *a, int *b);
@@ -35,6 +35,8 @@ private:
     bool existPackage(QString mixedPackage);
 
     QList<Entry> getPackageEntryList(QString packageName,bool withReverseEntries, QJSValue jsReturnInfoVal);
+
+    QString getPackageXmlName(int unit);
 
 private:
     Environment env;

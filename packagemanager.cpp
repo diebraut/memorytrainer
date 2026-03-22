@@ -97,7 +97,8 @@ bool PackageManager::createMixPackage  (QString mixPackageName,int cntExercise,Q
         QVariant ct = fromPackageList.at(i);
         QList<QVariant> q = ct.toList();
         QString packName = qvariant_cast<QString>(q.at(0));
-        if (!putEntriesToMixPackage(vecAssignedSizes.at(i).first,packName,mixPackageName,withReverseEntries,jsReturnInfoVal)) {
+        int packageUnit = qvariant_cast<int>(q.at(2));
+        if (!putEntriesToMixPackage(vecAssignedSizes.at(i).first,packName,packageUnit,mixPackageName,withReverseEntries,jsReturnInfoVal)) {
             jsReturnInfoVal.setProperty("RETURN_TYPE","ERROR");
             //jsReturnInfoVal.setProperty("RETURN_VALUE","Das Packet konnte nicht angelegt werden(copy error).");
             jsReturnInfoVal.setProperty("RETURN_VALUE","Das Packet konnte nicht angelegt werden(copy error).");
@@ -251,10 +252,10 @@ bool PackageManager::existPackage(QString mixedPackage) {
     return false;
 }
 
-bool PackageManager::putEntriesToMixPackage(int cntEntries,QString package, QString mixPackage,bool withReverseEntries,QJSValue jsReturnInfoVal) {
+bool PackageManager::putEntriesToMixPackage(int cntEntries,QString package,int packageUnit, QString mixPackage,bool withReverseEntries,QJSValue jsReturnInfoVal) {
 
     //get all entries from package
-    QString fullPackageXMLFile = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR  + package + QDir::separator() + "package.xml" ;
+    QString fullPackageXMLFile = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR  + package + QDir::separator() + getPackageXmlName(packageUnit) ;
     QString fullMixPackageName = env.getWritableDirectionForOS() + DEFAULT_PACK_DIR  + DEFAULT_MIXED_PACKAGE_DIR + mixPackage + ".txt";
 
     QList<Entry> entries = getPackageEntryList(fullPackageXMLFile,withReverseEntries,jsReturnInfoVal);
@@ -264,14 +265,25 @@ bool PackageManager::putEntriesToMixPackage(int cntEntries,QString package, QStr
     std::shuffle(entries.begin(),entries.end(),rng);
     ExerciceEntryManager *mgr = new ExerciceEntryManager(fullMixPackageName);
     for (int i=0; i < cntEntries; i++) {
-        mgr->putExerciceInList(package,entries.at(i).getPosition(),entries.at(i).isReverse(),false);
+        mgr->putExerciceInList(package,packageUnit,entries.at(i).getPosition(),entries.at(i).isReverse(),false);
     }
     mgr->save();
     delete (mgr);
     return true;
 }
 
+QString PackageManager::getPackageXmlName(int unit)
+{
+    if (unit <= 0) {
+        return XML_DESCRIPTION_FILENAME;   // "package.xml"
+    }
 
+    if (unit > 99) {
+        unit = 99; // optional absichern
+    }
+
+    return QString("package_%1.xml").arg(unit, 2, 10, QChar('0'));
+}
 
 
 bool PackageManager::existPackDir(QString packDir) {

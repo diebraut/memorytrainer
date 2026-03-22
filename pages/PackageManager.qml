@@ -136,9 +136,11 @@ Page {
             }
 
             // Funktion zur Erstellung eines Listenelements
-            function createListElement(packageName, cnt, isCustomPackage) {
+            function createListElement(packageName,frageType,packageUnit,cnt,isCustomPackage) {
                 return {
                     name: packageName,
+                    unit: packageUnit,
+                    frageType: frageType,
                     count: cnt,
                     selected: false,
                     isCustomPackage: isCustomPackage
@@ -155,7 +157,9 @@ Page {
                 clear();
                 var list = dataModel.getPackages(true, true); // Pakete laden
                 for (var i = 0; i < list.length; i++) {
-                    var packageName = list[i];
+                    var packageName = list[i].packageName;
+                    var packageUnit = list[i].exercizeUnit;
+                    var frageType = list[i].frageType;
                     var isCustomPackage = false;
 
                     // Prüfen, ob das Präfix "CUST//" vorhanden ist
@@ -163,15 +167,14 @@ Page {
                         isCustomPackage = true;
                         packageName = packageName.slice(6); // Präfix entfernen
                     }
-
                     // Eintrag in das Model einfügen
                     var countEntries;
                     if (selectOnlyMainQuestions) {
-                        countEntries = dataModel.getPackageEntries(packageName,isCustomPackage,true)
+                        countEntries = dataModel.getPackageEntries(packageName,packageUnit,isCustomPackage,true)
                     } else {
-                        countEntries = dataModel.getPackageEntries(packageName,isCustomPackage,false)
+                        countEntries = dataModel.getPackageEntries(packageName,packageUnit,isCustomPackage,false)
                     }
-                    append(createListElement(packageName, countEntries, isCustomPackage));
+                    append(createListElement(packageName,frageType,packageUnit,countEntries, isCustomPackage));
                 }
             }
         }
@@ -187,7 +190,12 @@ Page {
                         id: lCompId
                         width: compId.width
                         height: compId.height
-                        text: name + '(' + count + ')'
+                        text: {
+                            var displayName = name
+                            if (frageType.length > 0)
+                                displayName = name + "<" + frageType + ">"
+                            return displayName + "(" + count + ")";
+                        }
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         MouseArea {
@@ -240,46 +248,60 @@ Page {
 
         Component {
             id: packageSelectDelegate
+
             Item {
                 id: compId
-                width: listPackages.width - 60;
-                height: 40
-                Column {
-                    id : colCB
-                    CheckBox {
-                       enabled: {
-                          console.log("name=" + name)
-                          if (isCustomPackage === true) {
-                             false;
-                          }
-                          else
-                             true;
-                       }
-                       id : cbSelectPackage
-                       height: compId.height
-                       width:40
-                       checked: {
-                           if (isCustomPackage === true || !selected) {
-                             false;
-                           } else
-                               true
+                width: listPackages.width - 60
+                height: frageType !== "" ? 52 : 34
 
-                       }
-                       onClicked: {
-                           entryModelAvailablePackagesId.setProperty(index,"selected",checked);
-                       }
+                Row {
+                    id: rowContent
+                    anchors.fill: parent
+                    anchors.leftMargin: 6
+                    anchors.rightMargin: 6
+                    //spacing: 6
+
+                    CheckBox {
+                        id: cbSelectPackage
+                        enabled: isCustomPackage !== true
+                        checked: isCustomPackage !== true && selected
+
+                        y: frageType !== ""
+                           ? textColumn.y + titleText.y + (titleText.height - height) / 2
+                           : textColumn.y + (textColumn.height - height) / 2
+
+                        onClicked: {
+                            entryModelAvailablePackagesId.setProperty(index, "selected", checked)
+                        }
+                        anchors.top: frageType !== "" ? parent.top : undefined
                     }
-                }
-                Column {
-                    x:40
-                    Label {
-                        width: compId.width
-                        height: compId.height
-                        font.pointSize: 12
-                        font.bold: true
-                        text:  name + '(' + count + ')'
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
+
+                    Column {
+                        id: textColumn
+                        width: parent.width - cbSelectPackage.width - rowContent.spacing
+                        spacing: 2
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Text {
+                            id: titleText
+                            width: parent.width
+                            text: name + " (" + count + ")"
+                            font.pointSize: 12
+                            font.bold: true
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                            color: "black"
+                        }
+
+                        Text {
+                            id: frageTypeText
+                            visible: frageType !== ""
+                            width: parent.width
+                            text: frageType
+                            font.pointSize: 10
+                            wrapMode: Text.WordWrap
+                            color: "#666666"
+                        }
                     }
                 }
             }
@@ -487,8 +509,8 @@ Page {
                     var usePackages = []
                     for (var i = 0; i < entryModelAvailablePackagesId.count; i++) {
                         if (entryModelAvailablePackagesId.get(i).selected) {
-                            console.debug("put" + entryModelAvailablePackagesId.get(i).name);
-                            usePackages.push([entryModelAvailablePackagesId.get(i).name,entryModelAvailablePackagesId.get(i).count]);
+                            console.debug("put" + entryModelAvailablePackagesId.get(i).name,entryModelAvailablePackagesId.get(i).unit);
+                            usePackages.push([entryModelAvailablePackagesId.get(i).name,entryModelAvailablePackagesId.get(i).count,entryModelAvailablePackagesId.get(i).unit]);
                         }
                     }
                     var  result = {};
@@ -659,7 +681,7 @@ Page {
                             }
                             Keys.onPressed: {
                                 if (event.key === Qt.Key_Return) {
-                                  if (Qt.platform.os == "ios") {
+                                  if (Qt.platform.os === "ios") {
                                       if (!inputContainer.renameImageName(columnNr,newName)) {
                                           return;
                                       }
@@ -792,9 +814,9 @@ Page {
                     }
                 }
             }
-            function loadPackage (packageName) {
+            function loadPackage (packageName,packageUnit) {
                 //repeaterId.destroy()
-                repeaterId.model =  dataModel.loadPackage(packageName);
+                repeaterId.model =  dataModel.loadPackage(packageName,packageUnit);
                 currentPackageName = packageName
             }
         }
