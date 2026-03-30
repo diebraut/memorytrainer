@@ -213,8 +213,8 @@ Item {
     }
 
 
-    function setSinglePackageLearning(activatePackageLearning,listCntParts,packageName) {
-        return ImageHandler.setSinglePackageLearning(activatePackageLearning,listCntParts,packageName);
+    function setSinglePackageLearning(activatePackageLearning,listCntParts,packageName,packageUnit) {
+        return ImageHandler.setSinglePackageLearning(activatePackageLearning,listCntParts,packageName,packageUnit);
     }
 
     function sizeActExercisePackages() {

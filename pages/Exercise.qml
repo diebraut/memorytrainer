@@ -71,6 +71,7 @@ Page {
 
     property bool   singlePackageLearning:false
     property var    singlePackageLearningPackagename
+    property var    singlePackageLearningPackageunit
     property var    singlePackageLearningParts
     property var    singlePackageLearningPackagenameIdx
 
@@ -288,10 +289,11 @@ Page {
         dModel.push(singlePackageLearning);
         if (singlePackageLearning) {
             dModel.push(singlePackageLearningPackagename);
+            dModel.push(singlePackageLearningPackageunit);
             dModel.push(singlePackageLearningParts);
             dModel.push(singlePackageLearningPackagenameIdx);
         } else {
-            for (i=0;i<3;i++) dModel.push("");
+            for (i=0;i<4;i++) dModel.push("");
         }
         var serializedGroupBox = serializePackageOptions();
         dModel.push(serializedGroupBox);
@@ -328,7 +330,7 @@ Page {
             } else {
                 dModel = JSON.parse(settings.datastore)
             }
-            for (var i = 0; i < dModel.length-5; ++i) {
+            for (var i = 0; i < dModel.length-6; ++i) {
                 listViewPacketsId.model.append(dModel[i])
                 var pName = dModel[i].name
                 dataModel.addExercisePackage(dModel[i].name,dModel[i].packageUnit,dModel[i].isCustomPackage);
@@ -337,12 +339,13 @@ Page {
                 entryModelAvailablePackagesId.clear()
                 entryModelAvailablePackagesId.loadData();
             }
-            singlePackageLearning = dModel[dModel.length-5];
-            singlePackageLearningPackagename = dModel[dModel.length-4];
+            singlePackageLearning = dModel[dModel.length-6];
+            singlePackageLearningPackagename = dModel[dModel.length-5];
+            singlePackageLearningPackageunit = dModel[dModel.length-4];
             singlePackageLearningParts = dModel[dModel.length-3];
             singlePackageLearningPackagenameIdx = dModel[dModel.length-2];
             if (singlePackageLearning) {
-                listViewPacketsId.setPackageParts(singlePackageLearningPackagename,singlePackageLearningParts,singlePackageLearningPackagenameIdx);
+                listViewPacketsId.setPackageParts(singlePackageLearningPackagename,singlePackageLearningPackageunit,singlePackageLearningParts,singlePackageLearningPackagenameIdx);
             }
 
             var orderOptions      = dModel[dModel.length-1];
@@ -920,6 +923,8 @@ Page {
                                 parList = parList + "'" + parts[z][y] + "'";
                             }
                             parList = parList + "]";
+                            var debn=  entryModelPackagesId.get(packageIdx).name;
+                            var debu=  entryModelPackagesId.get(packageIdx).packageUnit
                             itemScript +=
                                     'MenuItem {
                                          hoverEnabled: true
@@ -941,7 +946,7 @@ Page {
                                                 parent.background.color = "#21be2b"
                                              }
                                              onClicked: {
-                                                listViewPacketsId.createPackageParts(' + '"' + entryModelPackagesId.get(packageIdx).name + '",' + parList + "," + packageIdx + ')
+                                                listViewPacketsId.createPackageParts(' + '"' + entryModelPackagesId.get(packageIdx).name + '",' + entryModelPackagesId.get(packageIdx).packageUnit + ',' + parList + "," + packageIdx + ')
                                                 myContextMenu.close()
                                              }
                                          }
@@ -1007,8 +1012,8 @@ Page {
                     return 0;
                 } // end function computeCountParts
 
-                function setPackageParts(packageName,packList,idxPackage) {
-                    dataModel.setSinglePackageLearning(true,packList,packageName);
+                function setPackageParts(packageName,packageUnit,packList,idxPackage) {
+                    dataModel.setSinglePackageLearning(true,packList,packageName,packageUnit);
                     for (var i=0; i < packList.length; i++) {
                         var isPartActive = listViewPacketsId.model.get(i+1).isPackagePartActive;
                         dataModel.setSinglePackageLearningPart(isPartActive,i);
@@ -1022,18 +1027,19 @@ Page {
                     singlePackageLearning = true;
                 }
 
-                function createPackageParts(packageName,packList,idxPackage)
+                function createPackageParts(packageName,packageUnit,packList,idxPackage)
                 {
                     console.log("choice:packageName:<" + packageName + ">--packageList=" + packList)
                     //disable all other
                     //put to first
                     dataModel.debugPt();
-                    dataModel.setSinglePackageLearning(true,packList,packageName);
+                    dataModel.setSinglePackageLearning(true,packList,packageName,packageUnit);
                     for (var i=packList.length-1; i >= 0;i--) {
                         listViewPacketsId.model.insert(
                             1,
                             {
                               "name": packageName,
+                              "unit": packageUnit,
                               "count": parseInt(packList[i]),
                               "isPackagePart": true,
                               "isPackagePartActive": (i===0)?true:false,
@@ -1048,6 +1054,7 @@ Page {
 
                     singlePackageLearning = true;
                     singlePackageLearningPackagename    = packageName;
+                    singlePackageLearningPackageunit    = packageUnit;
                     singlePackageLearningParts          = packList
                     singlePackageLearningPackagenameIdx = idxPackage
                 }
@@ -1058,7 +1065,7 @@ Page {
                             listViewPacketsId.model.remove(i);
                         }
                     }
-                    dataModel.setSinglePackageLearning(false,[],singlePackageLearningPackagename);
+                    dataModel.setSinglePackageLearning(false,[],singlePackageLearningPackagename,singlePackageLearningPackageunit);
                     packetAvailableId.enabled = true;
                     packetAvailableId.opacity = 1
                     singlePackageLearning = false;
@@ -1476,12 +1483,15 @@ Page {
                         lbTxt001.text= qsTr("Die Einträge der Lernliste (" + cnt + ")");
                         dataModel.loadLearnListPackage();
                         appButtonRight.enabled = true;
+                        myCleanup()
                     } else {
                         setCheckBoxes(true)
                         gbLearnListId.visible = false;
                         packetChoiceId.visible = true;
                         packetAvailableId.visible = true;
-                        dataModel.initExercisePackages();
+                        listViewPacketsId.model.clear()
+                        myStartup();
+                        /*
                         for (var i= 0;i < entryModelPackagesId.count;i++) {
                             dataModel.addExercisePackage(entryModelPackagesId.get(i).name,entryModelPackagesId.get(i).packageUnit,
                                                          entryModelPackagesId.get(i).isCustomPackage);
@@ -1490,6 +1500,7 @@ Page {
                         if (entryModelPackagesId.count === 0) {
                             appButtonRight.enabled = false;
                         }
+                        */
                     }
                 }
                 function setCheckBoxes(state) {
