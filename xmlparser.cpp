@@ -60,9 +60,36 @@ QList<EntryDesc *> XMLParser::getExercizeList(QString exercizeType, int idxPacka
             } else {
                 excludeAereaStr = childElement.firstChildElement("ExcludeAereaAnt").isNull() ? "" : childElement.firstChildElement("ExcludeAereaAnt").text();
             }
+            QString excludeAereaFraStr;
+            QString excludeAereaAntStr;
+            ExcludeAereaList excludeAereaFraList;
+            ExcludeAereaList excludeAereaAntList;
+            //in str ändern
+            QString  arrowDescFraStr;
+            QString  arrowDescAntStr;
+            ArrowDescList arrowDescFraList;
+            ArrowDescList arrowDescAntList;
+            if (!isReverse) {
+                excludeAereaFraStr = childElement.firstChildElement("ExcludeAereaFra").isNull() ? "" : childElement.firstChildElement("ExcludeAereaFra").text();
+                excludeAereaAntStr = childElement.firstChildElement("ExcludeAereaAnt").isNull() ? "" : childElement.firstChildElement("ExcludeAereaAnt").text();
 
-            // Konvertiere den String in einen QVector<ExcludeAerea>
-            ExcludeAereaList excludeAereaList = parseExcludeAereaStr(excludeAereaStr);
+                arrowDescFraStr = childElement.firstChildElement("ArrowDescFra").isNull() ? "" : childElement.firstChildElement("ArrowDescFra").text();
+                arrowDescAntStr = childElement.firstChildElement("ArrowDescAnt").isNull() ? "" : childElement.firstChildElement("ArrowDescAnt").text();
+
+            } else {
+                excludeAereaFraStr = childElement.firstChildElement("ExcludeAereaAnt").isNull() ? "" : childElement.firstChildElement("ExcludeAereaAnt").text();
+                excludeAereaAntStr = childElement.firstChildElement("ExcludeAereaFra").isNull() ? "" : childElement.firstChildElement("ExcludeAereaFra").text();
+
+                arrowDescFraStr = childElement.firstChildElement("ArrowDescAnt").isNull() ? "" : childElement.firstChildElement("ArrowDescAnt").text();
+                arrowDescAntStr = childElement.firstChildElement("ArrowDescFra").isNull() ? "" : childElement.firstChildElement("ArrowDescFra").text();
+            }
+            excludeAereaFraList = parseExcludeAereaStr(excludeAereaFraStr);
+            excludeAereaAntList = parseExcludeAereaStr(excludeAereaAntStr);
+            arrowDescFraList = parseArrowDescStr(arrowDescFraStr);
+            arrowDescAntList = parseArrowDescStr(arrowDescAntStr);
+            /* hier noch parseArrow..() einführen */
+
+
 
             EntryDesc* entry = new EntryDesc(
                 (!isReverse)?frageSubjekt:antwortSubjekt,
@@ -75,7 +102,10 @@ QList<EntryDesc *> XMLParser::getExercizeList(QString exercizeType, int idxPacka
                 idxPackage,
                 exercizeNumber,
                 isReverse,
-                excludeAereaList
+                excludeAereaFraList,
+                excludeAereaAntList,
+                arrowDescFraList,
+                arrowDescAntList
                 );
             listEntries.append(entry);
         }
@@ -139,6 +169,45 @@ ExcludeAereaList XMLParser::parseExcludeAereaStr(const QString& excludeAereaStr)
                                            isBackgroundRectancle));
         list.append(e);
 
+    }
+
+    return list;
+}
+
+ArrowDescList XMLParser::parseArrowDescStr(const QString& arrowDescStr)
+{
+    ArrowDescList list;
+
+    if (arrowDescStr.trimmed().isEmpty())
+        return list;
+
+    const QStringList arrows = arrowDescStr.split('|', Qt::SkipEmptyParts);
+
+    for (const QString& arrowStr : arrows) {
+        const QStringList parts = arrowStr.split(',', Qt::KeepEmptyParts);
+        if (parts.size() < 5)
+            continue;
+
+        const double x = parts[0].toDouble();
+        const double y = parts[1].toDouble();
+        const int angle = parts[2].toInt();
+
+        QString color = QStringLiteral("red");
+        if (parts.size() > 3) {
+            color = parts[3].trimmed();
+            if (color.isEmpty())
+                color = QStringLiteral("red");
+        }
+
+        double scaleFactor = 1.0;
+        if (parts.size() > 4) {
+            scaleFactor = parts[4].toDouble();
+            if (scaleFactor <= 0.0)
+                scaleFactor = 1.0;
+        }
+
+        ArrowDescPtr a(new ArrowDesc(x, y, angle, color, scaleFactor));
+        list.append(a);
     }
 
     return list;

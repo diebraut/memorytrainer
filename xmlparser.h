@@ -34,6 +34,8 @@ public:
 private:
     QDomElement findExcerziseList(QString exercizeType) const;
     QList<QSharedPointer<ExcludeAerea>> parseExcludeAereaStr(const QString& excludeAereaStr);
+    QList<QSharedPointer<ArrowDesc>> parseArrowDescStr(const QString& arrowDescStr);
+
     bool entryExistsWithPosition(QList<Entry> *entries, int position,bool isReverse);
 
     QDomElement root_;

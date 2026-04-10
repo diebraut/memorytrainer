@@ -74,5 +74,11 @@
         <file>BrowserDesktop.qml</file>
         <file>TestWeb.qml</file>
         <file>BrowserAndroid.qml</file>
+        <file>icons/arrow-right-black.png</file>
+        <file>icons/arrow-right-blue.png</file>
+        <file>icons/arrow-right-green.png</file>
+        <file>icons/arrow-right-red.png</file>
+        <file>icons/arrow-right-white.png</file>
+        <file>icons/arrow-right-yellow.png</file>
     </qresource>
 </RCC>

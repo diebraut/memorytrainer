@@ -44,6 +44,7 @@ ios {
 }
 
 HEADERS += \
+    arrowdesc.h \
     licenceinfo.h \
     exerciceentrymanager.h \
     learnlistentrymanager.h \

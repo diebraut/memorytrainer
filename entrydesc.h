@@ -6,10 +6,13 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <QVariant>
+
 #include "excludeaerea.h"
+#include "arrowdesc.h"
 
 class EntryDesc {
     Q_GADGET
+
     Q_PROPERTY(int exercizeNumber READ getExercizeNumber CONSTANT)
     Q_PROPERTY(QString frageSubjekt READ frageSubjekt CONSTANT)
     Q_PROPERTY(QString antwortSubjekt READ antwortSubjekt CONSTANT)
@@ -20,13 +23,19 @@ class EntryDesc {
     Q_PROPERTY(bool recognizedState READ isRecognizedState CONSTANT)
     Q_PROPERTY(int idxActExercisePackages READ getIdxActExercisePackages CONSTANT)
     Q_PROPERTY(bool reverse READ isReverse CONSTANT)
-    Q_PROPERTY(QVariantList excludeAerea READ excludeAereaAsVariant CONSTANT)
+
+    Q_PROPERTY(QVariantList excludeAereaFra READ excludeAereaFraAsVariant CONSTANT)
+    Q_PROPERTY(QVariantList excludeAereaAnt READ excludeAereaAntAsVariant CONSTANT)
+    Q_PROPERTY(QVariantList arrowDescFra READ arrowDescFraAsVariant CONSTANT)
+    Q_PROPERTY(QVariantList arrowDescAnt READ arrowDescAntAsVariant CONSTANT)
 
 public:
     EntryDesc() = default;
 
     EntryDesc(QString imgFileName, int idxPackageList)
-        : mImageFilenameFrage(imgFileName), mIdxActExercisePackages(idxPackageList)  {
+        : mImageFilenameFrage(imgFileName),
+        mIdxActExercisePackages(idxPackageList)
+    {
         mIsReverse = false;
     }
 
@@ -39,10 +48,14 @@ public:
         const QString& imageFilenameAntwort,
         bool recognizedState,
         int idxActExercisePackages,
-        const int exercizeNumber,
+        int exercizeNumber,
         bool isReverse,
-        const QVector<QSharedPointer<ExcludeAerea>>& excludeAereaList
-        ) : mFrageSubjekt(frageSubjekt),
+        const QVector<QSharedPointer<ExcludeAerea>>& excludeAereaFraList,
+        const QVector<QSharedPointer<ExcludeAerea>>& excludeAereaAntList,
+        const QVector<QSharedPointer<ArrowDesc>>& arrowDescFraList,
+        const QVector<QSharedPointer<ArrowDesc>>& arrowDescAntList
+        )
+        : mFrageSubjekt(frageSubjekt),
         mAntwortSubjekt(antwortSubjekt),
         mSubjektPrefixFrage(subjektPrefixFrage),
         mSubjektPrefixAntwort(subjektPrefixAntwort),
@@ -52,10 +65,12 @@ public:
         mIdxActExercisePackages(idxActExercisePackages),
         mExercizeNumber(exercizeNumber),
         mIsReverse(isReverse),
-        mExcludeAereaList(excludeAereaList)
+        mExcludeAereaFraList(excludeAereaFraList),
+        mExcludeAereaAntList(excludeAereaAntList),
+        mArrowDescFraList(arrowDescFraList),
+        mArrowDescAntList(arrowDescAntList)
     {}
 
-    // Copy constructor
     EntryDesc(const EntryDesc& other)
         : mFrageSubjekt(other.mFrageSubjekt),
         mAntwortSubjekt(other.mAntwortSubjekt),
@@ -67,10 +82,14 @@ public:
         mIdxActExercisePackages(other.mIdxActExercisePackages),
         mExercizeNumber(other.mExercizeNumber),
         mIsReverse(other.mIsReverse),
-        mExcludeAereaList(other.mExcludeAereaList) {}
+        mExcludeAereaFraList(other.mExcludeAereaFraList),
+        mExcludeAereaAntList(other.mExcludeAereaAntList),
+        mArrowDescFraList(other.mArrowDescFraList),
+        mArrowDescAntList(other.mArrowDescAntList)
+    {}
 
-    // Assignment operator
-    EntryDesc& operator=(const EntryDesc& other) {
+    EntryDesc& operator=(const EntryDesc& other)
+    {
         if (this != &other) {
             mFrageSubjekt = other.mFrageSubjekt;
             mAntwortSubjekt = other.mAntwortSubjekt;
@@ -82,12 +101,14 @@ public:
             mIdxActExercisePackages = other.mIdxActExercisePackages;
             mExercizeNumber = other.mExercizeNumber;
             mIsReverse = other.mIsReverse;
-            mExcludeAereaList = other.mExcludeAereaList;
+            mExcludeAereaFraList = other.mExcludeAereaFraList;
+            mExcludeAereaAntList = other.mExcludeAereaAntList;
+            mArrowDescFraList = other.mArrowDescFraList;
+            mArrowDescAntList = other.mArrowDescAntList;
         }
         return *this;
     }
 
-    // Getter-Methoden für die verbleibenden Eigenschaften
     QString frageSubjekt() const { return mFrageSubjekt; }
     QString antwortSubjekt() const { return mAntwortSubjekt; }
     QString subjektPrefixFrage() const { return mSubjektPrefixFrage; }
@@ -99,15 +120,42 @@ public:
     int getExercizeNumber() const { return mExercizeNumber; }
     bool isReverse() const { return mIsReverse; }
 
-    QVariantList excludeAereaAsVariant() const {
+    QVariantList excludeAereaFraAsVariant() const
+    {
         QVariantList variantList;
-        for (const auto& ptr : mExcludeAereaList) {
+        for (const auto& ptr : mExcludeAereaFraList) {
             variantList.append(QVariant::fromValue(ptr.data()));
         }
         return variantList;
     }
 
-    // Setter-Methoden für die verbleibenden Eigenschaften
+    QVariantList excludeAereaAntAsVariant() const
+    {
+        QVariantList variantList;
+        for (const auto& ptr : mExcludeAereaAntList) {
+            variantList.append(QVariant::fromValue(ptr.data()));
+        }
+        return variantList;
+    }
+
+    QVariantList arrowDescFraAsVariant() const
+    {
+        QVariantList variantList;
+        for (const auto& ptr : mArrowDescFraList) {
+            variantList.append(QVariant::fromValue(ptr.data()));
+        }
+        return variantList;
+    }
+
+    QVariantList arrowDescAntAsVariant() const
+    {
+        QVariantList variantList;
+        for (const auto& ptr : mArrowDescAntList) {
+            variantList.append(QVariant::fromValue(ptr.data()));
+        }
+        return variantList;
+    }
+
     void setFrageSubjekt(const QString &frage) { mFrageSubjekt = frage; }
     void setAntwortSubjekt(const QString &antwort) { mAntwortSubjekt = antwort; }
     void setSubjektPrefixFrage(const QString &prefix) { mSubjektPrefixFrage = prefix; }
@@ -118,7 +166,26 @@ public:
     void setIdxActExercisePackages(int idx) { mIdxActExercisePackages = idx; }
     void setExercizeNumber(int exercizeNumber) { mExercizeNumber = exercizeNumber; }
     void setReverse(bool reverse) { mIsReverse = reverse; }
-    void setExcludeAerea(const QVector<QSharedPointer<ExcludeAerea>> &excludeAereaList) { mExcludeAereaList = excludeAereaList; }
+
+    void setExcludeAereaFra(const QVector<QSharedPointer<ExcludeAerea>> &excludeAereaList)
+    {
+        mExcludeAereaFraList = excludeAereaList;
+    }
+
+    void setExcludeAereaAnt(const QVector<QSharedPointer<ExcludeAerea>> &excludeAereaList)
+    {
+        mExcludeAereaAntList = excludeAereaList;
+    }
+
+    void setArrowDescFra(const QVector<QSharedPointer<ArrowDesc>> &arrowDescList)
+    {
+        mArrowDescFraList = arrowDescList;
+    }
+
+    void setArrowDescAnt(const QVector<QSharedPointer<ArrowDesc>> &arrowDescList)
+    {
+        mArrowDescAntList = arrowDescList;
+    }
 
 private:
     QString mFrageSubjekt;
@@ -129,9 +196,13 @@ private:
     QString mImageFilenameAntwort;
     bool mRecognizedState = false;
     int  mIdxActExercisePackages = -1;
-    int  mExercizeNumber;
+    int  mExercizeNumber = 0;
     bool mIsReverse = false;
-    QVector<QSharedPointer<ExcludeAerea>> mExcludeAereaList;
+
+    QVector<QSharedPointer<ExcludeAerea>> mExcludeAereaFraList;
+    QVector<QSharedPointer<ExcludeAerea>> mExcludeAereaAntList;
+    QVector<QSharedPointer<ArrowDesc>> mArrowDescFraList;
+    QVector<QSharedPointer<ArrowDesc>> mArrowDescAntList;
 };
 
 Q_DECLARE_METATYPE(EntryDesc)

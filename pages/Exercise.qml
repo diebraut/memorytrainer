@@ -2056,19 +2056,18 @@ Page {
             fillMode: Image.PreserveAspectFit
             source: ""
 
-            onStatusChanged: if (status === Image.Ready) updateExcludeRects()
-
             property var  excludeAereaList: [] // Liste von ExcludeAerea-Objekten
+            property var arrowDescList: []
 
             function updateExcludeRects() {
-                // Nur rechnen, wenn das Bild fertig ist
+                // vorhandene Overlays immer zuerst entfernen
+                for (var y = excludeRectContainer.children.length - 1; y >= 0; y--) {
+                    excludeRectContainer.children[y].destroy();
+                }
+
+                // Nur neu zeichnen, wenn das Bild fertig ist
                 if (imageId.status !== Image.Ready || imageId.paintedWidth <= 0 || imageId.paintedHeight <= 0)
                     return;
-
-                // vorhandene Overlays entfernen
-                for (var i = excludeRectContainer.children.length - 1; i >= 0; i--) {
-                    excludeRectContainer.children[i].destroy();
-                }
 
                 if (!excludeAereaList || excludeAereaList.length === 0)
                     return;
@@ -2104,7 +2103,7 @@ Page {
                         y: rectY,
                         width: rectW,
                         height: rectH,
-                        rotation: area.rotationAngle,   // wird gleich um die Mitte rotiert (siehe Patch 2)
+                        rotation: area.rotationAngle,
                         backColor: rectColor,
                         textColor: rectTextColor,
                         borderWidth: rectBorderWith,
@@ -2113,12 +2112,51 @@ Page {
                     });
                 }
             }
+            function updateArrowOverlays() {
+                for (var y = arrowOverlayContainer.children.length - 1; y >= 0; y--) {
+                    arrowOverlayContainer.children[y].destroy();
+                }
+
+                if (imageId.status !== Image.Ready || imageId.paintedWidth <= 0 || imageId.paintedHeight <= 0)
+                    return;
+
+                if (!arrowDescList || arrowDescList.length === 0)
+                    return;
+
+                var scale = imageId.paintedWidth / imageId.sourceSize.width;
+                var offX  = (imageId.width  - imageId.paintedWidth ) / 2;
+                var offY  = (imageId.height - imageId.paintedHeight) / 2;
+
+                for (var i = 0; i < arrowDescList.length; i++) {
+                    var arrow = arrowDescList[i];
+
+                    arrowComponent.createObject(arrowOverlayContainer, {
+                        x: offX + arrow.x * scale,
+                        y: offY + arrow.y * scale,
+                        rotationAngle: arrow.rotationAngle,
+                        arrowColor: arrow.color,
+                        scaleFactor: arrow.scaleFactor * scale
+                    });
+                }
+            }
             Component.onCompleted: {
                 //setRealImageDimensions()
             }
 
-            onWidthChanged: updateExcludeRects();
-            onHeightChanged: updateExcludeRects();
+            onStatusChanged: if (status === Image.Ready) {
+                updateExcludeRects()
+                updateArrowOverlays()
+            }
+
+            onWidthChanged: {
+                updateExcludeRects();
+                updateArrowOverlays();
+            }
+
+            onHeightChanged: {
+                updateExcludeRects();
+                updateArrowOverlays();
+            }
 
             // Container für dynamisch erstellte Rechtecke
             Item {
@@ -2143,8 +2181,35 @@ Page {
                     border.width: borderWidth
                 }
             }
-        }
+            Item {
+                id: arrowOverlayContainer
+                anchors.fill: parent
+            }
+            Component {
+                id: arrowComponent
+                Item {
+                    property int rotationAngle: 0
+                    property string arrowColor: "red"
+                    property real scaleFactor: 1.0
 
+                    width: 96 * scaleFactor
+                    height: 96 * scaleFactor
+
+                    transform: Rotation {
+                        origin.x: width / 2
+                        origin.y: height / 2
+                        angle: rotationAngle
+                    }
+
+                    Image {
+                        anchors.fill: parent
+                        source: "qrc:/icons/arrow-right-" + arrowColor + ".png"
+                        fillMode: Image.Stretch
+                        smooth: true
+                    }
+                }
+            }
+        }
         function setXMLBasedMode(xmlMode) {
             if (xmlMode) {
                imageId.anchors.top = questionArea.bottom
@@ -2543,14 +2608,25 @@ Page {
                 }
             }
         }
+
         function callSetImage(isQuestion,imgName, entryDesc) {
             imageId.source = imgName;
             if (entryDesc) {
-                if (isQuestion)
-                    imageId.excludeAereaList = entryDesc.excludeAerea;
-                else
-                    imageId.excludeAereaList = "" //no secrets by answer neccessary
+                imageId.excludeAereaList = [];
+                imageId.arrowDescList = [];
                 imageId.updateExcludeRects();
+                imageId.updateArrowOverlays();
+
+                if (isQuestion) {
+                    imageId.excludeAereaList = entryDesc.excludeAereaFra ? entryDesc.excludeAereaFra : [];
+                    imageId.arrowDescList = entryDesc.arrowDescFra ? entryDesc.arrowDescFra : [];
+                } else {
+                    imageId.excludeAereaList = entryDesc.excludeAereaAnt ? entryDesc.excludeAereaAnt : [];
+                    imageId.arrowDescList = entryDesc.arrowDescAnt ? entryDesc.arrowDescAnt : [];
+                }
+
+                imageId.updateExcludeRects();
+                imageId.updateArrowOverlays();
                 licencelink.setLicenseInfo(isQuestion)
             }
         }
