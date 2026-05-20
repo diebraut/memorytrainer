@@ -44,6 +44,7 @@ Page {
     property string source: "pages/Exercise.qml"  // Pfad zur Seite
 
     property string work_datastore: ""
+    property bool restoringPackageSelection: false
 
     enum ActionActivated {
         PressedLeftButton,
@@ -252,15 +253,17 @@ Page {
     }
 
     function restorePrioritizationFromOptions(orderOptions) {
-        var idx = -1;
-        if (orderOptions && typeof orderOptions.prioritizedIndex === "number")
-            idx = orderOptions.prioritizedIndex;
+        var indexes = [];
+        if (orderOptions && Array.isArray(orderOptions.prioritizedIndexes)) {
+            indexes = orderOptions.prioritizedIndexes;
+        } else if (orderOptions && typeof orderOptions.prioritizedIndex === "number"
+                   && orderOptions.prioritizedIndex >= 0) {
+            indexes = [orderOptions.prioritizedIndex];
+        }
 
-        // Guard: Index muss existieren
-        if (idx >= 0 && idx < listViewPacketsId.model.count) {
-            listViewPacketsId.prioritizedIndex = idx;
-        } else {
-            listViewPacketsId.prioritizedIndex = -1;
+        for (var i = 0; i < listViewPacketsId.model.count; ++i) {
+            if (listViewPacketsId.model.get(i).isPackagePart)
+                listViewPacketsId.model.setProperty(i, "isPrioritized", indexes.indexOf(i) !== -1);
         }
     }
 
@@ -270,10 +273,24 @@ Page {
             mainOrderIsSelected:      showMainQuestionId.checked,
             revertedOrderIsSelected:  showMainQuestionRevertedId.checked,
             sequentiellOrderIsSelected: presentInOrderId.checked,
-            // NEU: Priorisierung (exklusiv)
-            prioritizedIndex: (typeof listViewPacketsId !== "undefined"
-                               && typeof listViewPacketsId.prioritizedIndex === "number")
-                              ? listViewPacketsId.prioritizedIndex : -1        };
+            prioritizedIndexes: (typeof listViewPacketsId !== "undefined"
+                                 && typeof listViewPacketsId.prioritizedIndexes === "function")
+                                ? listViewPacketsId.prioritizedIndexes() : []        };
+    }
+
+    function packageModelSnapshot(index) {
+        var elem = entryModelPackagesId.get(index);
+        return {
+            name: elem.name,
+            frageType: elem.frageType,
+            packageUnit: elem.packageUnit,
+            unit: elem.unit,
+            count: elem.count,
+            isPackagePart: elem.isPackagePart === true,
+            isPackagePartActive: elem.isPackagePartActive === true,
+            isPrioritized: elem.isPrioritized === true,
+            isCustomPackage: elem.isCustomPackage === true
+        };
     }
 
     function myCleanup() {
@@ -282,8 +299,7 @@ Page {
         // Führe hier spezifische Aufräumarbeiten aus
         var dModel = []
         for (var i = 0; i < entryModelPackagesId.count; ++i) {
-            var elem = entryModelPackagesId.get(i);
-            dModel.push(entryModelPackagesId.get(i))
+            dModel.push(packageModelSnapshot(i))
         }
         //push PackageLearning Modus
         dModel.push(singlePackageLearning);
@@ -303,12 +319,34 @@ Page {
 
     }
 
+    function persistPackageSelection() {
+        if (restoringPackageSelection)
+            return;
+        var dModel = []
+        for (var i = 0; i < entryModelPackagesId.count; ++i) {
+            dModel.push(packageModelSnapshot(i))
+        }
+        dModel.push(singlePackageLearning);
+        if (singlePackageLearning) {
+            dModel.push(singlePackageLearningPackagename);
+            dModel.push(singlePackageLearningPackageunit);
+            dModel.push(singlePackageLearningParts);
+            dModel.push(singlePackageLearningPackagenameIdx);
+        } else {
+            for (i=0;i<4;i++) dModel.push("");
+        }
+        dModel.push(serializePackageOptions());
+        settings.datastore = JSON.stringify(dModel)
+        work_datastore = settings.datastore
+    }
+
     Component.onDestruction: {
         myCleanup()
     }
 
     function myStartup(customStartupDatastore) {
         //console.debug("onCompleted");
+        restoringPackageSelection = true;
         customProgressBar.stopProgressBar()
         appButtonRight.text           = "Start";
         appButtonLeft.visible         = false;
@@ -354,16 +392,16 @@ Page {
             showMainQuestionRevertedId.checked = orderOptions.revertedOrderIsSelected;
             // NEU: Priorisierung wiederherstellen (nachdem das Model aufgebaut ist)
             restorePrioritizationFromOptions(orderOptions);
-            // nach restorePrioritizationFromOptions(orderOptions);
             if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
-                const idx = listViewPacketsId.prioritizedIndex;
-                if (idx >= 0)
-                    dataModel.setSinglePackageLearningPartPrioritized(true, idx - 1);
+                const indexes = listViewPacketsId.prioritizedIndexes();
+                for (let p = 0; p < indexes.length; ++p)
+                    dataModel.setSinglePackageLearningPartPrioritized(true, indexes[p] - 1);
             }
 
         }
         startEvaluationId.setQuestionOptions(false);
         activateLearnListId.actualizeCountLearnList();
+        restoringPackageSelection = false;
     }
 
     QtCore.Settings {
@@ -516,7 +554,6 @@ Page {
                 height : parent.height * 0.8
                 property int delegateWidth: width * 0.80 ;
                 property int delegateHeight: parent.height / 4  - 7;
-                property int prioritizedIndex: -1   // -1 = keins priorisiert
                 spacing: 5
                 ScrollBar.vertical: ScrollBar {
                     policy: listViewPacketsId.contentHeight > listViewPacketsId.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -544,6 +581,40 @@ Page {
                 property int dragItemIndex: -1
 
                 model: entryModelPackagesId
+
+                function isPartPrioritized(idxPart) {
+                    if (idxPart < 0 || idxPart >= model.count)
+                        return false;
+                    return model.get(idxPart).isPrioritized === true;
+                }
+
+                function setPartPrioritized(idxPart, prioritized) {
+                    if (idxPart < 0 || idxPart >= model.count)
+                        return;
+                    if (!model.get(idxPart).isPackagePart
+                        || (prioritized && !model.get(idxPart).isPackagePartActive))
+                        return;
+
+                    model.setProperty(idxPart, "isPrioritized", prioritized);
+
+                    if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
+                        dataModel.setSinglePackageLearningPartPrioritized(prioritized, idxPart - 1);
+                    }
+                    persistPackageSelection();
+                }
+
+                function togglePartPrioritized(idxPart) {
+                    setPartPrioritized(idxPart, !isPartPrioritized(idxPart));
+                }
+
+                function prioritizedIndexes() {
+                    var indexes = [];
+                    for (var i = 0; i < model.count; ++i) {
+                        if (model.get(i).isPackagePart && model.get(i).isPrioritized === true)
+                            indexes.push(i);
+                    }
+                    return indexes;
+                }
 
                 delegate: Item {
                     id: delegateItem
@@ -617,7 +688,7 @@ Page {
 
                                     Text {
                                         id: prioritizedBadgeBefore
-                                        visible: (index === listViewPacketsId.prioritizedIndex)
+                                        visible: listViewPacketsId.isPartPrioritized(index)
                                         text: " ★"
                                         font.pixelSize: itemRowIdTxt1.font.pixelSize
                                         color: "#2d7a2d"
@@ -640,7 +711,7 @@ Page {
 
                                     Text {
                                         id: prioritizedBadgeAfter
-                                        visible: (index === listViewPacketsId.prioritizedIndex)
+                                        visible: listViewPacketsId.isPartPrioritized(index)
                                         text: " ★"
                                         font.pixelSize: itemRowIdTxt1.font.pixelSize
                                         color: "#2d7a2d"
@@ -677,8 +748,8 @@ Page {
 
                             z: 1000
 
-                            color: (index === listViewPacketsId.prioritizedIndex) ? "#c8f5c1" : "#eeeeee"
-                            border.color: (index === listViewPacketsId.prioritizedIndex) ? "#2d7a2d" : "#c8c8c8"
+                            color: listViewPacketsId.isPartPrioritized(index) ? "#c8f5c1" : "#eeeeee"
+                            border.color: listViewPacketsId.isPartPrioritized(index) ? "#2d7a2d" : "#c8c8c8"
                             border.width: 1
                             radius: Math.min(parent.radius, 15)
 
@@ -690,7 +761,7 @@ Page {
                                 // Linker Stern – nur sichtbar, wenn dieses Item priorisiert ist
                                 Text {
                                     id: prioStarLeft
-                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    visible: listViewPacketsId.isPartPrioritized(index)
                                     text: "★"
                                     font.pixelSize: 12
                                     font.bold: true
@@ -702,16 +773,16 @@ Page {
                                 // Label
                                 Text {
                                     id: prioLabel
-                                    text: (index === listViewPacketsId.prioritizedIndex) ? qsTr("Priorisiert") : qsTr("Priorisieren")
+                                    text: listViewPacketsId.isPartPrioritized(index) ? qsTr("Priorisiert") : qsTr("Priorisieren")
                                     font.pixelSize: 12
-                                    font.bold: (index === listViewPacketsId.prioritizedIndex)
+                                    font.bold: listViewPacketsId.isPartPrioritized(index)
                                     elide: Text.ElideRight
                                 }
 
                                 // Rechter Stern – nur sichtbar, wenn dieses Item priorisiert ist
                                 Text {
                                     id: prioStarRight
-                                    visible: (index === listViewPacketsId.prioritizedIndex)
+                                    visible: listViewPacketsId.isPartPrioritized(index)
                                     text: "★"
                                     font.pixelSize: 12
                                     font.bold: true
@@ -733,14 +804,9 @@ Page {
                                 onClicked: (m) => {
                                     m.accepted = true;
                                     if (m.button === Qt.LeftButton) {
-                                        const make = (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
-                                        listViewPacketsId.prioritizedIndex = make;
-
-                                        // BACKEND: Priorisierung setzen/aufheben (0-basiert; Parts starten ab index 1 im View)
-                                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
-                                            dataModel.setSinglePackageLearningPartPrioritized(make !== -1, index - 1);
-                                        }
-                                                   return;                                    }
+                                        listViewPacketsId.togglePartPrioritized(index);
+                                        return;
+                                    }
                                     // Rechtsklick-Popup
                                     const pt = prioritySwitchArea.mapToItem(page, m.x, m.y);
                                     prioMenu.parent = page;
@@ -753,16 +819,11 @@ Page {
                             Menu {
                                 id: prioMenu
                                 MenuItem {
-                                    text: (index === listViewPacketsId.prioritizedIndex)
+                                    text: listViewPacketsId.isPartPrioritized(index)
                                           ? qsTr("Priorisieren aus") : qsTr("Priorisieren an")
                                     enabled: (isPackagePartActive === true)
                                     onTriggered: {
-                                        const make = (listViewPacketsId.prioritizedIndex === index) ? -1 : index;
-                                        listViewPacketsId.prioritizedIndex = make;
-
-                                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
-                                            dataModel.setSinglePackageLearningPartPrioritized(make !== -1, index - 1);
-                                        }
+                                        listViewPacketsId.togglePartPrioritized(index);
                                     }
                                 }
                             }
@@ -803,13 +864,8 @@ Page {
                         if (!listViewPacketsId.model.get(idxPart).isPackagePartActive) return;
 
                         const cur = listViewPacketsId.model.get(idxPart).isPrioritized === true;
-                        listViewPacketsId.model.setProperty(idxPart, "isPrioritized", !cur);
+                        listViewPacketsId.setPartPrioritized(idxPart, !cur);
 
-                        // Optional: weiterreichen ins Datenmodell, falls vorhanden
-                        if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
-                            // Achtung: deine Parts sind 1-basiert im View; Model/Backend evtl. 0-basiert
-                            dataModel.setSinglePackageLearningPartPrioritized(!cur, idxPart - 1);
-                        }
                     }
 
                     function activatePackagePart(activatePart, idxPart) {
@@ -819,14 +875,9 @@ Page {
                         if (typeof dataModel.setSinglePackageLearningPart === "function") {
                             dataModel.setSinglePackageLearningPart(activatePart, idxPart - 1);
                         }
-                        if (!activatePart && listViewPacketsId.prioritizedIndex === idxPart) {
-                            listViewPacketsId.prioritizedIndex = -1;
-
-                            // BACKEND: Priorisierung aufheben (0-basiert!)
-                            if (typeof dataModel.setSinglePackageLearningPartPrioritized === "function") {
-                                dataModel.setSinglePackageLearningPartPrioritized(false, idxPart - 1);
-                            }
-                        }
+                        if (!activatePart && listViewPacketsId.isPartPrioritized(idxPart))
+                            listViewPacketsId.setPartPrioritized(idxPart, false);
+                        persistPackageSelection();
                         // Optik dieses Delegates
                         delegateItem.opacity = activatePart ? 1 : 0.3;
                     }
@@ -1025,6 +1076,7 @@ Page {
                     packetAvailableId.enabled = false;
                     packetAvailableId.opacity = 0.3;
                     singlePackageLearning = true;
+                    persistPackageSelection();
                 }
 
                 function createPackageParts(packageName,packageUnit,packList,idxPackage)
@@ -1057,6 +1109,7 @@ Page {
                     singlePackageLearningPackageunit    = packageUnit;
                     singlePackageLearningParts          = packList
                     singlePackageLearningPackagenameIdx = idxPackage
+                    persistPackageSelection();
                 }
 
                 function finishSinglePackageLearnig(packetIdx) {
@@ -1069,6 +1122,7 @@ Page {
                     packetAvailableId.enabled = true;
                     packetAvailableId.opacity = 1
                     singlePackageLearning = false;
+                    persistPackageSelection();
                 }
             }
             Button {
@@ -1125,6 +1179,7 @@ Page {
                             listViewAvailablePacketsId.model.remove(listViewAvailablePacketsId.dragItemIndex)
                             listViewAvailablePacketsId.dragItemIndex = -1;
                             listViewPacketsId.positionViewAtBeginning()
+                            persistPackageSelection();
                         }
                     }
                 }
@@ -1364,6 +1419,7 @@ Page {
                         listViewPacketsId.model.remove(listViewPacketsId.dragItemIndex)
                         listViewPacketsId.dragItemIndex = -1;
                         listViewAvailablePacketsId.positionViewAtBeginning()
+                        persistPackageSelection();
                     }
                 }
             }
@@ -1458,6 +1514,7 @@ Page {
                     } else {
                         startEvaluationId.setQuestionDisplayOption(3)
                     }
+                    persistPackageSelection();
                 }
             }
 
@@ -1591,6 +1648,7 @@ Page {
                     } else {
                         startEvaluationId.setQuestionDisplayOption(3)
                     }
+                    persistPackageSelection();
                 }
             }
 
@@ -1607,6 +1665,7 @@ Page {
                 checked: false
                 onCheckStateChanged: {
                     dataModel.setDisplayExercizesInSequenceInActPackageIdx(0,checked);
+                    persistPackageSelection();
                 }
             }
 

@@ -171,13 +171,10 @@ void PackageDesc::setSinglePackageLearningPart(bool setToActive,int partIdx) {
 }
 
 void PackageDesc::setSinglePackageLearningPartPrioritized(bool setToPrioritized,int partIdx) {
-    for (int i = 0; i < this->packageLearningParts.size();i++ ) {
-       PackagePartState packagePartState =  this->packageLearningParts.value(i);
-       packagePartState.prioritized = false;
-       if (partIdx == i && setToPrioritized) {
-           packagePartState.prioritized = true;
-       }
-       this->packageLearningParts.replace(i,packagePartState);
+    if (partIdx >= 0 && partIdx < this->packageLearningParts.size()) {
+       PackagePartState packagePartState = this->packageLearningParts.value(partIdx);
+       packagePartState.prioritized = setToPrioritized;
+       this->packageLearningParts.replace(partIdx, packagePartState);
     }
     return;
 }

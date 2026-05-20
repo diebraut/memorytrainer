@@ -282,7 +282,7 @@ private:
     int                     singlePackageLearningUnit;
     QList<PackagePartState> packageLearningParts;  // statt QList<QPair<bool,int>>
 
-    // Komfort-APIs (neu), damit QML/DataModel bequem exklusiv priorisieren kann
+    // Komfort-APIs fuer aeltere Einzelauswahl-Logik.
     int prioritizedIndex() const;
     void setPrioritizedIndex(int idx);     // -1 => keine Priorisierung
     void clearPrioritization();
