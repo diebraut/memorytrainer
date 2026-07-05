@@ -39,12 +39,43 @@ Page {
       id: dataModel
     }
 
+    NetworkChecker {
+        id: wikipediaSummaryChecker
+        onWikipediaSummaryChecked: function(pageUrl, summaryAvailable, title, extract) {
+            var target = page.pendingSummaryTargets[pageUrl] || ""
+            if (target !== "") {
+                if (target === "answer") {
+                    page.answerSummaryAvailable = summaryAvailable
+                    page.answerSummaryTitle = title
+                    page.answerSummaryText = extract
+                    page.answerSummaryPopupOpen = false
+                } else {
+                    page.questionSummaryAvailable = summaryAvailable
+                    page.questionSummaryTitle = title
+                    page.questionSummaryText = extract
+                    page.questionSummaryPopupOpen = false
+                }
+            }
+        }
+    }
+
     property bool isLoaded: false
     property bool inProcess: false  // Standardstatus
     property string source: "pages/Exercise.qml"  // Pfad zur Seite
 
     property string work_datastore: ""
     property bool restoringPackageSelection: false
+    property string pendingSummaryUrl: ""
+    property string pendingSummaryTarget: ""
+    property var pendingSummaryTargets: ({})
+    property bool questionSummaryAvailable: false
+    property string questionSummaryTitle: ""
+    property string questionSummaryText: ""
+    property bool questionSummaryPopupOpen: false
+    property bool answerSummaryAvailable: false
+    property string answerSummaryTitle: ""
+    property string answerSummaryText: ""
+    property bool answerSummaryPopupOpen: false
 
     enum ActionActivated {
         PressedLeftButton,
@@ -62,6 +93,16 @@ Page {
     }
 
     property int learnModeState:Exercise.NotInLearnMode
+
+    onLearnModeStateChanged: {
+        if (learnModeState === Exercise.NotInLearnMode) {
+            page.pendingSummaryUrl = ""
+            page.pendingSummaryTarget = ""
+            page.pendingSummaryTargets = ({})
+            page.questionSummaryPopupOpen = false
+            page.answerSummaryPopupOpen = false
+        }
+    }
 
     enum ExerciseModeState {
         ExerciseModeChoose,     //bekannt/nicht
@@ -89,6 +130,70 @@ Page {
     // neben deinen Text-Items anlegen
     TextMetrics { id: tm }       // für Breite
     FontMetrics { id: fm }       // für Höhe
+
+    function normalizeWikipediaUrl(raw) {
+        if (!raw)
+            return ""
+
+        var url = String(raw).trim()
+        if (url === "")
+            return ""
+
+        url = url.replace(/&amp;/gi, "&")
+        if (url.indexOf("//") === 0)
+            url = "https:" + url
+        else if (url.indexOf("/wiki/") === 0)
+            url = "https://de.wikipedia.org" + url
+        else if (!/^https?:\/\//i.test(url))
+            url = "https://" + url.replace(/^\/+/, "")
+
+        return url.replace(/\s/g, "%20")
+    }
+
+    function isWikipediaUrl(raw) {
+        var url = normalizeWikipediaUrl(raw)
+        return /^https?:\/\/([^\/]+\.)?wikipedia\.org\/wiki\//i.test(url)
+    }
+
+    function updateSummaryIndicator(isQuestionImage, allowInNormalMode) {
+        page.pendingSummaryUrl = ""
+        page.pendingSummaryTarget = isQuestionImage ? "question" : "answer"
+
+        if (isQuestionImage) {
+            page.questionSummaryAvailable = false
+            page.questionSummaryTitle = ""
+            page.questionSummaryText = ""
+            page.questionSummaryPopupOpen = false
+            page.answerSummaryAvailable = false
+            page.answerSummaryTitle = ""
+            page.answerSummaryText = ""
+            page.answerSummaryPopupOpen = false
+        } else {
+            page.answerSummaryAvailable = false
+            page.answerSummaryTitle = ""
+            page.answerSummaryText = ""
+            page.answerSummaryPopupOpen = false
+        }
+
+        if (learnModeState === Exercise.NotInLearnMode && !allowInNormalMode)
+            return
+
+        var licenceInfo = dataModel.getActLicenceInfo && dataModel.getActLicenceInfo()
+        if (!licenceInfo)
+            return
+
+        var wikiUrl = isQuestionImage ? licenceInfo.infoURLFrage : licenceInfo.infoURLAntwort
+        if (!isWikipediaUrl(wikiUrl))
+            return
+
+        page.pendingSummaryUrl = normalizeWikipediaUrl(wikiUrl)
+        var targets = {}
+        for (var key in page.pendingSummaryTargets)
+            targets[key] = page.pendingSummaryTargets[key]
+        targets[page.pendingSummaryUrl] = page.pendingSummaryTarget
+        page.pendingSummaryTargets = targets
+        wikipediaSummaryChecker.checkWikipediaSummary(page.pendingSummaryUrl)
+    }
 
     function widthOf(item) {
         tm.font = item.font
@@ -2042,6 +2147,7 @@ Page {
                     answerText.y   = topY + answerHeader.height;
                 });
             }
+
             Rectangle {
                 id: answerAreaQuestionTxt
                 anchors.top: parent.top
@@ -2114,6 +2220,175 @@ Page {
             visible: true
             fillMode: Image.PreserveAspectFit
             source: ""
+
+            Rectangle {
+                id: wikipediaSummaryBadge
+                visible: page.questionSummaryAvailable
+                         && !answerArea.visible
+                         && imageId.status === Image.Ready
+                anchors.left: imageId.left
+                anchors.top: imageId.top
+                anchors.leftMargin: 6
+                anchors.topMargin: 6
+                width: Math.max(78, wikipediaSummaryBadgeText.implicitWidth + 14)
+                height: 22
+                radius: 2
+                color: "#fff6b8"
+                border.color: "#6a5d00"
+                border.width: 1
+                z: 5000
+
+                Text {
+                    id: wikipediaSummaryBadgeText
+                    anchors.centerIn: parent
+                    text: "<Summary>"
+                    textFormat: Text.PlainText
+                    color: "#2b2700"
+                    font.bold: true
+                    font.pixelSize: 13
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: page.questionSummaryPopupOpen = !page.questionSummaryPopupOpen
+                }
+            }
+
+            Rectangle {
+                id: wikipediaSummaryPanel
+                visible: wikipediaSummaryBadge.visible && page.questionSummaryPopupOpen
+                anchors.left: wikipediaSummaryBadge.left
+                anchors.top: wikipediaSummaryBadge.bottom
+                anchors.topMargin: 4
+                width: Math.max(120, Math.min(Math.max(0, imageId.width - 18), 360))
+                height: Math.min(180, Math.max(90, wikipediaSummaryTitle.implicitHeight + wikipediaSummaryText.implicitHeight + 34))
+                radius: 4
+                color: "#fffdf0"
+                border.color: "#6a5d00"
+                border.width: 1
+                z: 5001
+                clip: true
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    spacing: 5
+
+                    Text {
+                        id: wikipediaSummaryTitle
+                        width: parent.width
+                        text: page.questionSummaryTitle || "Summary"
+                        color: "#1f1f1f"
+                        font.bold: true
+                        font.pixelSize: 14
+                        elide: Text.ElideRight
+                    }
+
+                    Flickable {
+                        width: parent.width
+                        height: parent.height - wikipediaSummaryTitle.height - parent.spacing
+                        contentWidth: width
+                        contentHeight: wikipediaSummaryText.implicitHeight
+                        clip: true
+
+                        Text {
+                            id: wikipediaSummaryText
+                            width: wikipediaSummaryPanel.width - 16
+                            text: page.questionSummaryText
+                            color: "#1f1f1f"
+                            font.pixelSize: 13
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.PlainText
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: answerImageSummaryBadge
+                visible: learnModeState === Exercise.NotInLearnMode
+                         && answerArea.visible
+                         && page.answerSummaryAvailable
+                         && imageId.status === Image.Ready
+                anchors.left: imageId.left
+                anchors.top: imageId.top
+                anchors.leftMargin: 6
+                anchors.topMargin: 6
+                width: Math.max(78, answerImageSummaryBadgeText.implicitWidth + 14)
+                height: 22
+                radius: 2
+                color: "#fff6b8"
+                border.color: "#6a5d00"
+                border.width: 1
+                z: 5000
+
+                Text {
+                    id: answerImageSummaryBadgeText
+                    anchors.centerIn: parent
+                    text: "<Summary>"
+                    textFormat: Text.PlainText
+                    color: "#2b2700"
+                    font.bold: true
+                    font.pixelSize: 13
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: page.answerSummaryPopupOpen = !page.answerSummaryPopupOpen
+                }
+            }
+
+            Rectangle {
+                id: answerImageSummaryPanel
+                visible: answerImageSummaryBadge.visible && page.answerSummaryPopupOpen
+                anchors.left: answerImageSummaryBadge.left
+                anchors.top: answerImageSummaryBadge.bottom
+                anchors.topMargin: 4
+                width: Math.max(120, Math.min(Math.max(0, imageId.width - 18), 360))
+                height: Math.min(180, Math.max(90, answerImageSummaryTitle.implicitHeight + answerImageSummaryText.implicitHeight + 34))
+                radius: 4
+                color: "#fffdf0"
+                border.color: "#6a5d00"
+                border.width: 1
+                z: 5001
+                clip: true
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    spacing: 5
+
+                    Text {
+                        id: answerImageSummaryTitle
+                        width: parent.width
+                        text: page.answerSummaryTitle || "Summary"
+                        color: "#1f1f1f"
+                        font.bold: true
+                        font.pixelSize: 14
+                        elide: Text.ElideRight
+                    }
+
+                    Flickable {
+                        width: parent.width
+                        height: parent.height - answerImageSummaryTitle.height - parent.spacing
+                        contentWidth: width
+                        contentHeight: answerImageSummaryText.implicitHeight
+                        clip: true
+
+                        Text {
+                            id: answerImageSummaryText
+                            width: answerImageSummaryPanel.width - 16
+                            text: page.answerSummaryText
+                            color: "#1f1f1f"
+                            font.pixelSize: 13
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.PlainText
+                        }
+                    }
+                }
+            }
 
             property var  excludeAereaList: [] // Liste von ExcludeAerea-Objekten
             property var arrowDescList: []
@@ -2668,8 +2943,10 @@ Page {
             }
         }
 
-        function callSetImage(isQuestion,imgName, entryDesc) {
+        function callSetImage(isQuestion,imgName, entryDesc, skipSummaryCheck) {
             imageId.source = imgName;
+            if (!skipSummaryCheck)
+                page.updateSummaryIndicator(isQuestion, !isQuestion)
             if (entryDesc) {
                 imageId.excludeAereaList = [];
                 imageId.arrowDescList = [];
@@ -2764,6 +3041,89 @@ Page {
         font.bold: true
         color: "black"
         text: ""  // Setzen Sie hier den gewünschten Text
+    }
+
+    Rectangle {
+        id: learnAnswerSummaryBadge
+        visible: learnModeState !== Exercise.NotInLearnMode
+                 && imageTextId.text !== ""
+                 && page.answerSummaryAvailable
+        x: Math.max(16, Math.min(parent.width - width - 16,
+                                 imageTextId.x + imageTextId.paintedWidth + 10))
+        y: imageTextId.y + (imageTextId.height - height) / 2
+        width: Math.max(78, learnAnswerSummaryBadgeText.implicitWidth + 14)
+        height: 22
+        radius: 2
+        color: "#fff6b8"
+        border.color: "#6a5d00"
+        border.width: 1
+        z: 5000
+
+        Text {
+            id: learnAnswerSummaryBadgeText
+            anchors.centerIn: parent
+            text: "<Summary>"
+            textFormat: Text.PlainText
+            color: "#2b2700"
+            font.bold: true
+            font.pixelSize: 13
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: page.answerSummaryPopupOpen = !page.answerSummaryPopupOpen
+        }
+    }
+
+    Rectangle {
+        id: learnAnswerSummaryPanel
+        visible: learnAnswerSummaryBadge.visible && page.answerSummaryPopupOpen
+        width: Math.max(120, Math.min(parent.width - 32, 360))
+        height: Math.min(Math.max(90, learnAnswerSummaryTitle.implicitHeight + learnAnswerSummaryText.implicitHeight + 34),
+                         Math.max(90, learnAnswerSummaryBadge.y - imageId.y - 10))
+        x: Math.max(16, Math.min(learnAnswerSummaryBadge.x, parent.width - width - 16))
+        y: Math.max(imageId.y + 6, learnAnswerSummaryBadge.y - height - 4)
+        radius: 4
+        color: "#fffdf0"
+        border.color: "#6a5d00"
+        border.width: 1
+        z: 5001
+        clip: true
+
+        Column {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 5
+
+            Text {
+                id: learnAnswerSummaryTitle
+                width: parent.width
+                text: page.answerSummaryTitle || "Summary"
+                color: "#1f1f1f"
+                font.bold: true
+                font.pixelSize: 14
+                elide: Text.ElideRight
+            }
+
+            Flickable {
+                width: parent.width
+                height: parent.height - learnAnswerSummaryTitle.height - parent.spacing
+                contentWidth: width
+                contentHeight: learnAnswerSummaryText.implicitHeight
+                clip: true
+
+                Text {
+                    id: learnAnswerSummaryText
+                    width: learnAnswerSummaryPanel.width - 16
+                    text: page.answerSummaryText
+                    color: "#1f1f1f"
+                    font.pixelSize: 13
+                    wrapMode: Text.WordWrap
+                    textFormat: Text.PlainText
+                }
+            }
+        }
     }
 
     Rectangle {
@@ -2940,6 +3300,7 @@ Page {
         if (isXMLBased()) {
             var entryDesc   = dataModel.getActEntryDescription()
             imageTextId.text = entryDesc.antwortSubjekt
+            page.updateSummaryIndicator(false, true)
         } else {
             if (dataModel.getActImageName() !== "") {
                 imageTextId.text = stripFileExtension(dataModel.getActImageName());
@@ -3235,9 +3596,10 @@ Page {
             var entryDesc   = dataModel.getActEntryDescription()
             answerArea.writeAnswer("")
             licencelink.visible = false
+            page.updateSummaryIndicator(false, true)
             if (entryDesc.imageFilenameAntwort) {
                 licencelink.visible = true
-                container.callSetImage(false, packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameAntwort, entryDesc)
+                container.callSetImage(false, packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameAntwort, entryDesc, true)
                 //answerAreaQuestionImage.source = packageDesc.fullPathToPackage + "/" + entryDesc.imageFilenameFrage;
                 answerAreaQuestionTxt.textToShow = (entryDesc.frageSubjekt.indexOf("Frage_") !== -1)?"": entryDesc.frageSubjekt;
             } else if (imageId.visible) { //ev. bleibt fragebild sichtbar.
