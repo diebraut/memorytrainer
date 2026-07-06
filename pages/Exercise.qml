@@ -44,12 +44,16 @@ Page {
         onWikipediaSummaryChecked: function(pageUrl, summaryAvailable, title, extract) {
             var target = page.pendingSummaryTargets[pageUrl] || ""
             if (target !== "") {
-                if (target === "answer") {
+                var updateQuestion = target === "question" || target === "both"
+                var updateAnswer = target === "answer" || target === "both"
+
+                if (updateAnswer) {
                     page.answerSummaryAvailable = summaryAvailable
                     page.answerSummaryTitle = title
                     page.answerSummaryText = extract
                     page.answerSummaryPopupOpen = false
-                } else {
+                }
+                if (updateQuestion) {
                     page.questionSummaryAvailable = summaryAvailable
                     page.questionSummaryTitle = title
                     page.questionSummaryText = extract
@@ -68,6 +72,8 @@ Page {
     property string pendingSummaryUrl: ""
     property string pendingSummaryTarget: ""
     property var pendingSummaryTargets: ({})
+    property string questionSummaryUrl: ""
+    property string answerSummaryUrl: ""
     property bool questionSummaryAvailable: false
     property string questionSummaryTitle: ""
     property string questionSummaryText: ""
@@ -99,6 +105,8 @@ Page {
             page.pendingSummaryUrl = ""
             page.pendingSummaryTarget = ""
             page.pendingSummaryTargets = ({})
+            page.questionSummaryUrl = ""
+            page.answerSummaryUrl = ""
             page.questionSummaryPopupOpen = false
             page.answerSummaryPopupOpen = false
         }
@@ -155,6 +163,11 @@ Page {
         return /^https?:\/\/([^\/]+\.)?wikipedia\.org\/wiki\//i.test(url)
     }
 
+    function answerSummaryIsSameAsQuestion() {
+        return page.answerSummaryUrl !== ""
+               && page.answerSummaryUrl === page.questionSummaryUrl
+    }
+
     function updateSummaryIndicator(isQuestionImage, allowInNormalMode) {
         page.pendingSummaryUrl = ""
         page.pendingSummaryTarget = isQuestionImage ? "question" : "answer"
@@ -164,15 +177,18 @@ Page {
             page.questionSummaryTitle = ""
             page.questionSummaryText = ""
             page.questionSummaryPopupOpen = false
+            page.questionSummaryUrl = ""
             page.answerSummaryAvailable = false
             page.answerSummaryTitle = ""
             page.answerSummaryText = ""
             page.answerSummaryPopupOpen = false
+            page.answerSummaryUrl = ""
         } else {
             page.answerSummaryAvailable = false
             page.answerSummaryTitle = ""
             page.answerSummaryText = ""
             page.answerSummaryPopupOpen = false
+            page.answerSummaryUrl = ""
         }
 
         if (learnModeState === Exercise.NotInLearnMode && !allowInNormalMode)
@@ -187,10 +203,21 @@ Page {
             return
 
         page.pendingSummaryUrl = normalizeWikipediaUrl(wikiUrl)
+        if (isQuestionImage)
+            page.questionSummaryUrl = page.pendingSummaryUrl
+        else
+            page.answerSummaryUrl = page.pendingSummaryUrl
+
         var targets = {}
         for (var key in page.pendingSummaryTargets)
             targets[key] = page.pendingSummaryTargets[key]
-        targets[page.pendingSummaryUrl] = page.pendingSummaryTarget
+
+        var existingTarget = targets[page.pendingSummaryUrl] || ""
+        if (existingTarget !== "" && existingTarget !== page.pendingSummaryTarget)
+            targets[page.pendingSummaryUrl] = "both"
+        else
+            targets[page.pendingSummaryUrl] = page.pendingSummaryTarget
+
         page.pendingSummaryTargets = targets
         wikipediaSummaryChecker.checkWikipediaSummary(page.pendingSummaryUrl)
     }
@@ -3048,6 +3075,7 @@ Page {
         visible: learnModeState !== Exercise.NotInLearnMode
                  && imageTextId.text !== ""
                  && page.answerSummaryAvailable
+                 && !page.answerSummaryIsSameAsQuestion()
         x: Math.max(16, Math.min(parent.width - width - 16,
                                  imageTextId.x + imageTextId.paintedWidth + 10))
         y: imageTextId.y + (imageTextId.height - height) / 2
