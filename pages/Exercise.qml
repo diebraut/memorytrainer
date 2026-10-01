@@ -2971,14 +2971,14 @@ Page {
         }
 
         function callSetImage(isQuestion,imgName, entryDesc, skipSummaryCheck) {
+            imageId.excludeAereaList = [];
+            imageId.arrowDescList = [];
+            imageId.updateExcludeRects();
+            imageId.updateArrowOverlays();
             imageId.source = imgName;
             if (!skipSummaryCheck)
                 page.updateSummaryIndicator(isQuestion, !isQuestion)
             if (entryDesc) {
-                imageId.excludeAereaList = [];
-                imageId.arrowDescList = [];
-                imageId.updateExcludeRects();
-                imageId.updateArrowOverlays();
 
                 if (isQuestion) {
                     imageId.excludeAereaList = entryDesc.excludeAereaFra ? entryDesc.excludeAereaFra : [];
