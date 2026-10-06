@@ -1,4 +1,4 @@
-QT += core gui quick quickcontrols2 multimedia xml network
+QT += core gui quick quickcontrols2 multimedia xml network core-private
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17
 
