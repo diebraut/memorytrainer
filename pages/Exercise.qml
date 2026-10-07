@@ -669,7 +669,7 @@ Page {
                     text: qsTr("gewählte Übungspakete")
                     anchors.horizontalCenter: parent.horizontalCenter  // Zentriert den Text horizontal im Rectangle
                     anchors.bottom: parent.top
-                    font.pixelSize: 14
+                    font.pixelSize: isIPhone ? 18 : 14
                     font.bold: true
                     color: "black"  // Stellen Sie sicher, dass die Textfarbe auf einem transparenten Hintergrund sichtbar ist
                 }
@@ -828,7 +828,7 @@ Page {
 
                                     Text {
                                         id: itemRowIdTxt1
-                                        font.pixelSize: 14
+                                        font.pixelSize: isIPhone ? 18 : 14
                                         text: (index === -1) ? "" :
                                               (isPackagePart ? "(P" + index + ") " + name : name)
                                         elide: Text.ElideRight
@@ -836,7 +836,7 @@ Page {
 
                                     Text {
                                         id: itemRowIdTxt2
-                                        font.pixelSize: 14
+                                        font.pixelSize: isIPhone ? 18 : 14
                                         text: "(" + count + ")"
                                         elide: Text.ElideRight
                                     }
@@ -854,7 +854,7 @@ Page {
                                 Text {
                                     visible: frageType !== ""
                                     text: "(" + frageType + ")"
-                                    font.pixelSize: 12
+                                    font.pixelSize: isIPhone ? 16 : 12
                                     color: "#555555"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -895,7 +895,7 @@ Page {
                                     id: prioStarLeft
                                     visible: listViewPacketsId.isPartPrioritized(index)
                                     text: "★"
-                                    font.pixelSize: 12
+                                    font.pixelSize: isIPhone ? 16 : 12
                                     font.bold: true
                                     color: "#2d7a2d"
                                     // optional: gleiche Höhe wie Label
@@ -906,7 +906,7 @@ Page {
                                 Text {
                                     id: prioLabel
                                     text: listViewPacketsId.isPartPrioritized(index) ? qsTr("Priorisiert") : qsTr("Priorisieren")
-                                    font.pixelSize: 12
+                                    font.pixelSize: isIPhone ? 16 : 12
                                     font.bold: listViewPacketsId.isPartPrioritized(index)
                                     elide: Text.ElideRight
                                 }
@@ -916,7 +916,7 @@ Page {
                                     id: prioStarRight
                                     visible: listViewPacketsId.isPartPrioritized(index)
                                     text: "★"
-                                    font.pixelSize: 12
+                                    font.pixelSize: isIPhone ? 16 : 12
                                     font.bold: true
                                     color: "#2d7a2d"
                                     // optional: gleiche Höhe wie Label
@@ -1345,7 +1345,7 @@ Page {
                     text: qsTr("alle aktiven Pakete("  + entryModelAvailablePackagesId.count + ")")
                     anchors.horizontalCenter: parent.horizontalCenter  // Zentriert den Text horizontal im Rectangle
                     anchors.bottom: parent.top
-                    font.pixelSize: 14
+                    font.pixelSize: isIPhone ? 18 : 14
                     font.bold: true
                     color: "black"  // Stellen Sie sicher, dass die Textfarbe auf einem transparenten Hintergrund sichtbar ist
                 }
@@ -1482,12 +1482,12 @@ Page {
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 Text {
-                                    font.pixelSize: 14
+                                    font.pixelSize: isIPhone ? 18 : 14
                                     text: name
                                 }
 
                                 Text {
-                                    font.pixelSize: 14
+                                    font.pixelSize: isIPhone ? 18 : 14
                                     text: '(' + count + ')'
                                 }
                             }
@@ -1496,7 +1496,7 @@ Page {
                             Text {
                                 visible: frageType !== ""
                                 text: "(" + frageType + ")"
-                                font.pixelSize: 12
+                                font.pixelSize: isIPhone ? 16 : 12
                                 color: "#555"
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -1594,7 +1594,7 @@ Page {
                     anchors.horizontalCenter: parent.horizontalCenter  // Zentriert den Text horizontal im Rectangle
                     anchors.bottom: parent.top
                     anchors.bottomMargin: 5
-                    font.pixelSize: 12
+                    font.pixelSize: isIPhone ? 16 : 12
                     font.bold: true
                     color: "black"  // Stellen Sie sicher, dass die Textfarbe auf einem transparenten Hintergrund sichtbar ist
                 }
@@ -1611,13 +1611,17 @@ Page {
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
                 text: qsTr("Nur falsche vorlegen.")
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 onCheckStateChanged: {
                     if (checked) {
-                        learnModusId.text = qsTr("Lernmodus (Falsche Elemente einzeln anzeigen)")
+                        learnModusId.text = isIPhone
+                                ? qsTr("Lernmodus\n(Falsche Elemente einzeln anzeigen)")
+                                : qsTr("Lernmodus (Falsche Elemente einzeln anzeigen)")
                     }
                     else {
-                        learnModusId.text = qsTr("Lernmodus (Alle Elemente einzeln anzeigen)")
+                        learnModusId.text = isIPhone
+                                ? qsTr("Lernmodus\n(Alle Elemente einzeln anzeigen)")
+                                : qsTr("Lernmodus (Alle Elemente einzeln anzeigen)")
                     }
                 }
             }
@@ -1632,7 +1636,7 @@ Page {
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
                 text: qsTr("Direkte Fragen (Frage => Antwort)")
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 onCheckStateChanged: {
                     startEvaluationId.setExcersizeEntries();
                     if (checked) {
@@ -1660,7 +1664,7 @@ Page {
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
                 text: qsTr("Lernliste abspielen") +  "(" + cnt + ")"
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 property int cnt
                 onCheckStateChanged: {
                     showScores(false);
@@ -1727,7 +1731,7 @@ Page {
                 id: clearLearnListButton
                 height: implicitHeight * 0.6
                 text: qsTr("Leere Lernliste")
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 anchors.verticalCenter: activateLearnListId.verticalCenter
                 anchors.left: activateLearnListId.right
                 onClicked: {
@@ -1765,7 +1769,7 @@ Page {
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
                 text: qsTr("Indirekte Fragen (Antwort als Frage => Antwort)")
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 checked: false
                 onCheckStateChanged: {
                     startEvaluationId.setExcersizeEntries();
@@ -1793,7 +1797,7 @@ Page {
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
                 text: qsTr("In Reihenfolge vorlegen")
-                font.pixelSize: 12
+                font.pixelSize: isIPhone ? 16 : 12
                 checked: false
                 onCheckStateChanged: {
                     dataModel.setDisplayExercizesInSequenceInActPackageIdx(0,checked);
@@ -1808,6 +1812,7 @@ Page {
                 anchors.topMargin: parent.height * 0.7
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width * 0.05
+                width: isIPhone ? parent.width * 0.40 : implicitWidth
                 onCheckedChanged: {
                     if (checked) {
                         learnModeState = Exercise.LearnModeFirst;
@@ -1821,8 +1826,18 @@ Page {
                 checked: false
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
-                text: qsTr("Lern-Modus (Alle Elemente einzeln anzeigen)")
-                font.pixelSize: 12;
+                text: isIPhone
+                        ? qsTr("Lern-Modus\n(Alle Elemente einzeln anzeigen)")
+                        : qsTr("Lern-Modus (Alle Elemente einzeln anzeigen)")
+                font.pixelSize: isIPhone ? 16 : 12;
+                contentItem: Text {
+                    text: learnModusId.text
+                    font: learnModusId.font
+                    color: learnModusId.enabled ? learnModusId.palette.text : learnModusId.palette.mid
+                    leftPadding: learnModusId.indicator.width + learnModusId.spacing
+                    verticalAlignment: Text.AlignVCenter
+                    wrapMode: isIPhone ? Text.WordWrap : Text.NoWrap
+                }
             }
         }
 

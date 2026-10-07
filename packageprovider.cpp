@@ -1,6 +1,7 @@
 #include "packageprovider.h"
 
 #include <QDir>
+#include <QDateTime>
 #include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
@@ -36,6 +37,48 @@ bool isSafePathPart(const QString &part)
             return false;
     }
     return true;
+}
+
+QDateTime parsePackageDate(const QString &value)
+{
+    QDateTime date = QDateTime::fromString(value, Qt::ISODateWithMs);
+    if (!date.isValid())
+        date = QDateTime::fromString(value, Qt::ISODate);
+    if (!date.isValid())
+        date = QDateTime::fromString(value, QStringLiteral("yyyy-MM-dd hh:mm:ss"));
+    if (!date.isValid()) {
+        QString normalized = value;
+        const qsizetype dotIndex = normalized.indexOf('.');
+        if (dotIndex >= 0) {
+            qsizetype zoneIndex = normalized.indexOf('Z', dotIndex);
+            const qsizetype plusIndex = normalized.indexOf('+', dotIndex);
+            const qsizetype minusIndex = normalized.indexOf('-', dotIndex);
+            if (zoneIndex < 0 || (plusIndex >= 0 && plusIndex < zoneIndex))
+                zoneIndex = plusIndex;
+            if (zoneIndex < 0 || (minusIndex >= 0 && minusIndex < zoneIndex))
+                zoneIndex = minusIndex;
+
+            const qsizetype fractionEnd = zoneIndex >= 0 ? zoneIndex : normalized.size();
+            const qsizetype fractionLength = fractionEnd - dotIndex - 1;
+            if (fractionLength > 3) {
+                normalized.remove(dotIndex + 4, fractionLength - 3);
+                date = QDateTime::fromString(normalized, Qt::ISODateWithMs);
+            }
+        }
+    }
+    return date;
+}
+
+bool isLocalDownloadCurrent(const QFileInfo &localFile, const QString &remoteModified)
+{
+    if (!localFile.isFile() || localFile.isSymLink())
+        return false;
+
+    const QDateTime remoteDate = parsePackageDate(remoteModified);
+    if (!remoteDate.isValid())
+        return false;
+
+    return localFile.lastModified() >= remoteDate;
 }
 }
 
@@ -138,14 +181,15 @@ void PackageProvider::refreshAvailablePackages()
         for (const QJsonValue &value : files) {
             const QJsonObject file = value.toObject();
             const QString name = file.value(QStringLiteral("name")).toString();
+            const QString modified = file.value(QStringLiteral("modified")).toString();
             const QFileInfo localFile(QDir(importDirectoryPath()).filePath(name));
             if (!isSafePackageName(name)
-                    || (localFile.isFile() && !localFile.isSymLink()))
+                    || isLocalDownloadCurrent(localFile, modified))
                 continue;
             packages.append(QVariantMap{
                 {QStringLiteral("name"), name},
                 {QStringLiteral("size"), file.value(QStringLiteral("size")).toDouble()},
-                {QStringLiteral("modified"), file.value(QStringLiteral("modified")).toString()},
+                {QStringLiteral("modified"), modified},
             });
         }
         emit availablePackagesLoaded(packages);
@@ -169,10 +213,6 @@ void PackageProvider::downloadPackage(const QString &packageName)
         return;
     }
     const QString targetPath = QDir(directoryPath).filePath(packageName);
-    if (QFileInfo::exists(targetPath)) {
-        emit downloadError(packageName, QStringLiteral("Das Paket ist bereits heruntergeladen."));
-        return;
-    }
 
     downloadFile = std::make_unique<QSaveFile>(targetPath);
     if (!downloadFile->open(QIODevice::WriteOnly)) {
@@ -219,8 +259,6 @@ void PackageProvider::downloadPackage(const QString &packageName)
             error = reply->errorString();
         else if (status != 200 || !isAttachment)
             error = QStringLiteral("Der Server hat keine Paketdatei geliefert.");
-        else if (QFileInfo::exists(targetPath))
-            error = QStringLiteral("Das Paket ist bereits heruntergeladen.");
         else if (!downloadFile->commit())
             error = downloadFile->errorString();
 
@@ -389,9 +427,15 @@ void PackageProvider::installDownloadedPackage(const QString &packageName, bool 
         return;
     }
     if (!backupPath.isEmpty() && !QDir(backupPath).removeRecursively()) {
+        if (!QFile::remove(archive.filePath()))
+            emit installationWarning(QStringLiteral("Die heruntergeladene Datei %1 konnte nicht gelöscht werden.")
+                                     .arg(archive.fileName()));
         emit installationFinished(packageName, packageFolder);
         emit installationWarning(QStringLiteral("Die Sicherung unter %1 konnte nicht gelöscht werden.").arg(backupPath));
         return;
     }
+    if (!QFile::remove(archive.filePath()))
+        emit installationWarning(QStringLiteral("Die heruntergeladene Datei %1 konnte nicht gelöscht werden.")
+                                 .arg(archive.fileName()));
     emit installationFinished(packageName, packageFolder);
 }
