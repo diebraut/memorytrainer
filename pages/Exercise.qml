@@ -1628,8 +1628,7 @@ Page {
 
             CheckBox {
                 id : showMainQuestionId
-                anchors.top: parent.top
-                anchors.topMargin: parent.height * 0.1
+                anchors.verticalCenter: repeatWrongEntriesId.verticalCenter
                 anchors.left: showMainQuestionRevertedId.left
                 anchors.rightMargin: parent.width * 0.05
                 checked: true
@@ -1762,8 +1761,7 @@ Page {
 
             CheckBox {
                 id : showMainQuestionRevertedId
-                anchors.top: parent.top
-                anchors.topMargin: parent.height * 0.4
+                anchors.verticalCenter: activateLearnListId.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: parent.width * 0.05
                 indicator.width: parent.height/5
@@ -1791,8 +1789,7 @@ Page {
 
             CheckBox {
                 id : presentInOrderId
-                anchors.top: parent.top
-                anchors.topMargin: parent.height * 0.7
+                anchors.verticalCenter: learnModusId.verticalCenter
                 anchors.left: showMainQuestionRevertedId.left
                 indicator.width: parent.height/5
                 indicator.height: parent.height/5
@@ -1809,7 +1806,7 @@ Page {
             CheckBox {
                 id : learnModusId
                 anchors.top: parent.top
-                anchors.topMargin: parent.height * 0.7
+                anchors.topMargin: parent.height * (isIPhone ? 0.62 : 0.7)
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width * 0.05
                 width: isIPhone ? parent.width * 0.40 : implicitWidth
