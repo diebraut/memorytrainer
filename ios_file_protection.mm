@@ -4,6 +4,7 @@
 
 #ifdef Q_OS_IOS
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 static void setNoProtectionAtPath(const QString &path) {
     @autoreleasepool {
         NSString *p = [NSString stringWithUTF8String:path.toUtf8().constData()];
@@ -12,6 +13,14 @@ static void setNoProtectionAtPath(const QString &path) {
     }
 }
 #endif
+
+bool iosIsIPhone() {
+#ifdef Q_OS_IOS
+    return [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone;
+#else
+    return false;
+#endif
+}
 
 void iosSetNoProtection(const QString &path) {
 #ifdef Q_OS_IOS

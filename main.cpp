@@ -46,10 +46,12 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_IOS
     QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 #endif
-    /* ToDo...Skalierung für Handies
-    qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
-    qputenv("QT_SCALE_FACTOR", "0.5");   // 1 / 4.3
-    */
+#ifdef Q_OS_IOS
+    if (iosIsIPhone()) {
+        qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
+        qputenv("QT_SCALE_FACTOR", "0.5");   // 1 / 4.3
+    }
+#endif
 
     QGuiApplication::setApplicationName("Memory Trainer");
     QGuiApplication::setOrganizationName("QtProject");
@@ -127,6 +129,12 @@ int main(int argc, char *argv[])
     PackageProvider::registerSingleton(&engine);
     PackageManager::registerSingleton(&engine);
 
+#ifdef Q_OS_IOS
+    engine.rootContext()->setContextProperty("isIPhone", iosIsIPhone());
+#else
+    engine.rootContext()->setContextProperty("isIPhone", false);
+#endif
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     //engine.load(QUrl(QStringLiteral("qrc:/TestWeb.qml")));
 
@@ -145,4 +153,3 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
-

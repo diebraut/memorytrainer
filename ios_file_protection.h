@@ -3,3 +3,4 @@
 
 void iosSetNoProtection(const QString &path);
 void iosSetNoProtectionTree(const QString &rootPath);
+bool iosIsIPhone();

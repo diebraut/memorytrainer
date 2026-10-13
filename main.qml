@@ -217,7 +217,7 @@ ApplicationWindow {
             Label {
                 id: titleLabel
                 text: listView.currentItem ? listView.currentItem.text : "Memory Trainer (" + Qt.platform.os + ")"
-                font.pixelSize: 20
+                font.pixelSize: isIPhone ? 26 : 20
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
@@ -243,7 +243,7 @@ ApplicationWindow {
                 visible: mainFocusScope.webShown
                 height: parent.height
                 text: "Webseite schließen"
-                font.pixelSize: 14
+                font.pixelSize: isIPhone ? 18 : 14
                 font.bold: true
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 Layout.rightMargin: 10
@@ -323,6 +323,13 @@ ApplicationWindow {
                 anchors.right: logo.right
                 anchors.rightMargin: 70
                 z: 1
+
+                Binding {
+                    target: infoLabel.font
+                    property: "pixelSize"
+                    value: 16
+                    when: isIPhone
+                }
             }
 
             Button {
@@ -333,7 +340,7 @@ ApplicationWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 50
-                font.pixelSize: 24
+                font.pixelSize: isIPhone ? 31 : 24
                 background: Rectangle {
                     color: startButton.down ? "#006400" : "#00FF00"
                     radius: 75
