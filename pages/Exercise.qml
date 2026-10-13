@@ -2448,7 +2448,7 @@ Page {
 
                     var rectColor      = area.color;
                     var rectTextColor  = area.color;
-                    var rectBorderWith = 2;
+                    var rectBorderWith = 0;
                     var rectBorderColor = "black";
                     var showQuestionText = false;
 
@@ -2529,7 +2529,7 @@ Page {
             Component {
                 id: rectangleComponent
                 Rectangle {
-                    property int borderWidth: 2
+                    property int borderWidth: 0
                     property string borderColor: "black"
                     // Text-Props
                     property bool   showQuestionText: true
